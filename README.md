@@ -6,6 +6,9 @@ Raspberry PI models 3B+, 4, and 5 integrated Wi-Fi interfaces supporting both 2.
 The hostapd daemon is used to configure the device as a wireless access point (WLAN), allowing client devices (e.g., PCs, smartphones, ...) to connect.
 Internet connectivity (WAN) can be provided either through the onboard Ethernet interface or via USB tethering.
 
+At the network level, `rpiap` creates a local LAN, where Wi-Fi clients can connect.
+Traffic from these clients is forwarded to the Internet using network address translation (NAT).
+
 ## Components
 - The Wi-Fi AP is powered by `hostapd`
 - It includes a DHCP server `udhcpd` and client `udhcpc`
