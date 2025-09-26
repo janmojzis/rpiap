@@ -3,14 +3,14 @@ It is a Debian configuration package that transforms a Raspberry Pi into a wirel
 
 ## How it works
 Raspberry PI models 3B+, 4, and 5 integrated Wi-Fi interfaces supporting both 2.4 GHz and 5 GHz bands.
-The hostapd daemon is used to configure the device as a wireless access point (WLAN), allowing client devices (e.g., PCs, smartphones) to connect.
+The hostapd daemon is used to configure the device as a wireless access point (WLAN), allowing client devices (e.g., PCs, smartphones, ...) to connect.
 Internet connectivity (WAN) can be provided either through the onboard Ethernet interface or via USB tethering.
 
 ## Components
 - The Wi-Fi AP is powered by `hostapd`
 - It includes a DHCP server `udhcpd` and client `udhcpc`
-- DNS services are handled by `dqcache` with support for the DNSCurve protocol
-- `PQConnect` is used to encrypt network traffic.
+- DNS services are handled by [dqcache](https://github.com/janmojzis/dq) with support for the DNSCurve protocol
+- [PQConnect](https://www.pqconnect.net) is used to encrypt network traffic.
 
 # Installation
 
