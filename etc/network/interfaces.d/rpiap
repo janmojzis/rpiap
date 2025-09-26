@@ -1,0 +1,22 @@
+auto lo
+iface lo inet loopback
+
+auto wlan0
+iface wlan0 inet static
+        address 192.168.137.1
+        netmask 255.255.255.0
+iface wlan0 inet6 static
+        address fd::1
+        netmask 64
+
+allow-hotplug eth0
+iface eth0 inet manual
+
+allow-hotplug eth1
+iface eth1 inet manual
+
+allow-hotplug eth2
+iface eth2 inet manual
+
+allow-hotplug usb0
+iface usb0 inet manual

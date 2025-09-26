@@ -1,0 +1,48 @@
+Template: rpiap/wlanssid
+Type: string
+Default: rpiap
+Description: Enter SSID:
+ Enter the name (SSID) of your wireless network (WLAN).
+
+Template: rpiap/wlanpass
+Type: password
+Description: Enter password:
+ Set a WPA password for your WLAN.
+ The password must be at least 8 characters long.
+ If you are reconfiguring the package, leaving this field blank will keep the
+ current password unchanged.
+
+Template: rpiap/wlanchannel
+Type: string
+Default: 6
+Description: Enter WLAN channel:
+ Choose a WLAN channel if you want to use a specific one.
+ For 2.4 GHz, recommended channels are 1, 6, or 11.
+ For 5 GHz, you can use 36, 40, 44, or 48.
+ If you are not sure, just keep the default (6).
+
+Template: rpiap/wlancountry
+Type: string
+Default: CZ
+Description: Enter WLAN country code:
+ Country code (ISO/IEC 3166-1) used to set the regulatory domain.
+ This may limit available channels and transmit power.
+ Default: CZ
+
+Template: rpiap/dhcpdns
+Type: boolean
+Default: false
+Description: Use DNS server from DHCP?
+ If you need to use local DNS resolvers, for example to resolve internal DNS
+ zones, select 'Yes'. To use the internal DNS server and benefit from support
+ for encrypted DNS (DNSCurve), leave the default setting as 'No'.
+
+Template: rpiap/restart
+Type: text
+Description: Restart services.
+ To apply the changes, the services must be restarted. Please restart them
+ manually using: "svc -t /etc/service/rpiap_*". Note that if you are connected
+ via SSH, the restart may terminate the connection.
+ Alternatively, performing a system reboot will restart all services and apply
+ the changes as well.
+

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+exec 2>&1
+
+if systemctl status radvd.service >/dev/null; then
+  echo "WARNING: radvd.service running, stopping it" >&2
+  systemctl stop radvd.service
+  systemctl mask radvd.service
+fi
+
+# pid file
+rm -rf ./var
+mkdir -p ./var
+chown nobody ./var
+
+# chroot directory
+rm -rf ./root
+mkdir -p ./root/etc ./root/var
+cp /etc/rpiap/radvd.conf ./root/etc/
+
+/usr/share/rpiap/scripts/randomuidgid.py sh -c '
+  echo "radvd:x:${UID}:${GID}:radvd:/nonexistent:/usr/sbin/nologin" > ./root/etc/passwd
+  chown "${UID}:${GID}" ./root/var
+'
+
+exec radvd -d 5 -n /etc/radvd.conf -p /var/radvd.pid -t ./root -u radvd

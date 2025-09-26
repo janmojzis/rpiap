@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+if [ x"$1" = "xremove" ]; then
+
+  ifdown wlan0 || :
+
+fi
+
+if [ x"$1" = "xpurge" ]; then
+
+  #remove directories
+  rm -rf /var/lib/rpiap /var/log/rpiap
+
+fi
+
+#DEBHELPER#

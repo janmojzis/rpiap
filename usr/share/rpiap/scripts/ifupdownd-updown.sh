@@ -1,0 +1,10 @@
+#!/bin/sh
+
+case "$2" in
+up)
+  /sbin/ifup $1
+  ;;
+down)
+  /sbin/ifdown $1
+  ;;
+esac

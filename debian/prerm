@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+if [ x"$1" = "xremove" ]; then
+  for d in `ls -1d /etc/service/rpiap_*`; do
+    echo -n "stopping: ${d}"
+    cd "${d}"
+    rm "${d}"
+    svc -dx . log || :
+    echo ". done"
+  done
+fi
+
+#DEBHELPER#

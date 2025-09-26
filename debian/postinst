@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+if [ x"$1" = "xconfigure" ]; then
+  for d in `ls -1 /var/lib/rpiap/service`; do
+    if [ ! -e "/etc/service/rpiap_${d}" ]; then
+      echo -n "linking: /var/lib/rpiap/service/${d} -> /etc/service/rpiap_${d}"
+      ln -s "/var/lib/rpiap/service/${d}" "/etc/service/rpiap_${d}"
+      echo '. done.'
+    fi
+  done
+fi
+
+# leave only /etc/network/interfaces.d/rpiap
+# XXX TODO: backup files and restore it in postrm
+ls /etc/network/interfaces.d/ | while read name; do
+  if [ x"${name}" = xrpiap ]; then
+    continue
+  fi
+  echo "warning: /etc/network/interfaces.d/${name} removed" >&2
+  rm "/etc/network/interfaces.d/${name}"
+done
+
+#DEBHELPER#

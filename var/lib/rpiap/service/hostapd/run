@@ -1,0 +1,48 @@
+#!/bin/sh
+exec 2>&1
+
+umask 027
+
+# try to setup wlan0
+rfkill unblock wifi || :
+ifup wlan0 || :
+
+if systemctl status hostapd.service >/dev/null; then
+  echo "WARNING: hostapd.service running, stopping it" >&2
+  systemctl stop hostapd.service
+  systemctl mask hostapd.service
+fi
+
+# config
+rm -rf ./conf
+mkdir -p ./conf
+envdir /var/lib/rpiap/env sh -c '
+  if [ "${wlanchannel}" -gt 14 ]; then
+    _wlanmode=a
+  else
+    _wlanmode=g
+  fi
+  sed -e "s/__PASS__/${wlanpass}/"\
+      -e "s/__SSID__/${wlanssid}/"\
+      -e "s/__MODE__/${_wlanmode}/"\
+      -e "s/__COUNTRY__/${wlancountry}/"\
+      -e "s/__CHANNEL__/${wlanchannel}/" < /etc/rpiap/hostapd.conf | grep -v "^#" > ./conf/hostapd.conf
+'
+
+# run hostapd under random UID/GID
+exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
+
+  # binary
+  rm -rf ./bin
+  mkdir -p ./bin
+  cp /usr/sbin/hostapd ./bin/hostapd
+  chmod +x ./bin/hostapd
+  chown "0:${GID}" ./bin ./bin/hostapd
+  setcap cap_net_raw,cap_net_admin+ep ./bin/hostapd
+
+  # config
+  chown "0:${GID}" ./conf ./conf/hostapd.conf
+
+  # run hostapd under random UID/GID
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/hostapd ./conf/hostapd.conf
+'

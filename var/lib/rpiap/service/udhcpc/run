@@ -1,0 +1,46 @@
+#!/bin/sh
+exec 2>&1
+
+umask 027
+
+# run udhcpc under random UID/GID
+exec envdir /var/lib/rpiap/service/udhcpc/env /usr/share/rpiap/scripts/randomuidgid.py sh -c '
+
+  # binaries
+  rm -rf ./bin
+  mkdir -p ./bin
+  chown "0:${GID}" ./bin
+  (
+    echo "/bin/busybox udhcpc cap_net_raw+ep"
+    echo "/usr/sbin/iptables iptables cap_net_admin+ep"
+    echo "/bin/busybox busybox cap_net_admin+ep"
+  ) | (
+    cd ./bin
+    while read src bin cap; do
+      cp "${src}" "${bin}"
+      chmod +x "${bin}"
+      chown "0:${GID}" "${bin}"
+      setcap "${cap}" "${bin}"
+    done
+  )
+
+  # var
+  rm -rf ./var
+  mkdir -p ./var
+  chown "${UID}:${GID}" ./var
+
+  while true; do
+    [ -d /var/lib/rpiap/service/dqcache/supervise ] && break
+    sleep 1
+  done
+  chmod 770 /var/lib/rpiap/service/dqcache/supervise
+  chmod 660 /var/lib/rpiap/service/dqcache/supervise/control
+  chown "0:${GID}" /var/lib/rpiap/service/dqcache/supervise
+  chown "0:${GID}" /var/lib/rpiap/service/dqcache/supervise/control
+
+  PATH="`pwd`/bin:${PATH}"
+  export PATH
+
+  # run udhcpd under random UID/GID
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/udhcpc -fi "${IFACE}" -s /usr/share/rpiap/scripts/udhcpc.sh
+'

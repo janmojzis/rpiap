@@ -1,0 +1,36 @@
+#!/bin/sh
+exec 2>&1
+
+if systemctl status dqcache.service >/dev/null; then
+  echo "WARNING: dqcache.service running, stopping it" >&2
+  systemctl stop dqcache.service
+  systemctl mask dqcache.service
+fi
+
+# root - servers
+rm -rf ./root/servers
+mkdir -p ./root/servers
+
+# root - cache dump
+if [ ! -d ./root/dump ]; then
+  mkdir -p ./root/dump
+  touch ./root/dump/dnsdata
+  rm -f ./root/dump/dnsdata.tmp
+fi
+
+dhcpdns="`envdir /var/lib/rpiap/env printenv dhcpdns`"
+if [ x"${dhcpdns}" = xtrue ] && [ -s /var/lib/rpiap/service/udhcpc/var/@ ]; then
+  cat /var/lib/rpiap/service/udhcpc/var/@ > ./root/servers/@
+  FORWARDONLY='yes'; export FORWARDONLY
+else
+  cat /etc/dqcache/servers/.@ > ./root/servers/@
+  unset FORWARDONLY
+fi
+
+ROOT='./root'; export ROOT
+OKCLIENT='1'; export OKCLIENT
+
+exec /usr/share/rpiap/scripts/randomuidgid.py envdir /etc/rpiap/dqcache/env sh -c '
+  chown "${UID}:${GID}" ./root/dump ./root/dump/dnsdata
+  exec /usr/sbin/dqcache
+'

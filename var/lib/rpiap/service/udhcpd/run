@@ -1,0 +1,33 @@
+#!/bin/sh
+exec 2>&1
+
+umask 027
+
+# run udhcpd under random UID/GID
+exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
+
+  # binary
+  rm -rf ./bin
+  mkdir -p ./bin
+  cp /bin/busybox ./bin/udhcpd
+  chmod +x ./bin/udhcpd
+  chown "0:${GID}" ./bin ./bin/udhcpd
+  setcap cap_net_raw,cap_net_bind_service+ep ./bin/udhcpd
+
+  # config
+  rm -rf ./conf
+  mkdir -p ./conf
+  (
+    echo lease_file ./var/udhcpd.leases
+    grep -v "^lease_file\|^#" /etc/rpiap/udhcpd.conf
+  ) > ./conf/udhcpd.conf
+  chown "0:${GID}" ./conf ./conf/udhcpd.conf
+
+  # lease file
+  rm -rf ./var
+  mkdir -p ./var
+  touch ./var/udhcpd.leases
+  chown "${UID}:${GID}" ./var ./var/udhcpd.leases
+
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/udhcpd -f ./conf/udhcpd.conf
+'

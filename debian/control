@@ -1,0 +1,35 @@
+Source: rpiap
+Section: misc
+Priority: optional
+Build-Depends:
+ debhelper-compat (= 13),
+Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
+Standards-Version: 4.7.2
+
+Package: rpiap
+Architecture: all
+Depends:
+ adduser,
+ busybox,
+ daemontools-run,
+ dqcache,
+ hostapd,
+ iptables,
+ nftables,
+ python3,
+ python3-pqconnect,
+ radvd,
+ rfkill,
+ usbmuxd,
+ ${misc:Depends},
+Conflicts:
+ dhcpcd5,
+ isc-dhcp-client,
+ isc-dhcp-server,
+ pqconnect,
+Description: Raspberry PI - AP
+ A configuration package that transforms a Raspberry Pi into a wireless access
+ point. The Wi-Fi AP is powered by hostapd. It includes a DHCP server (udhcpd)
+ and client (udhcpc). DNS services are handled by dqcache with support for
+ the DNSCurve protocol. PQConnect is used to encrypt network traffic.
+ All daemons are managed through daemontools.
