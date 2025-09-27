@@ -1,15 +1,15 @@
 Package: rpiap
-Version: 20250926
+Version: 20250927
 Architecture: all
 Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
-Installed-Size: 85
-Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-pqconnect, radvd, rfkill, usbmuxd, debconf (>= 0.5) | debconf-2.0
+Installed-Size: 89
+Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-pqconnect, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
 Conflicts: dhcpcd5, isc-dhcp-client, isc-dhcp-server, pqconnect
-Filename: ./trixie/rpiap_20250926_all.deb
-Size: 9912
-MD5sum: 01dcdc29a82f6e75293dc82698453752
-SHA1: 3e8f5f309fe3948fe6799ea019a2aefc3e71706b
-SHA256: 5008fd620418911e40382762859bc3f8695203fdd0a11a6a323e1fd5ead85e89
+Filename: ./trixie/rpiap_20250927_all.deb
+Size: 10168
+MD5sum: ea892a1e36ac83b4ecaa354d6f7f8d5c
+SHA1: da4059e1802260cdbc5a8b2656c29dc5d1be051d
+SHA256: 9716c0d88e1a5ee81194d129df4bf659e08f1edfd4564fc2673f426c80b6b3f9
 Section: misc
 Priority: optional
 Description: Raspberry PI - AP
