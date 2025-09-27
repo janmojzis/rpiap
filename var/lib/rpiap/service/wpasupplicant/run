@@ -1,6 +1,12 @@
 #!/bin/sh
 exec 2>&1
 
+if systemctl status wpa_supplicant.service >/dev/null; then
+  echo "WARNING: wpa_supplicant.service running, stopping it" >&2
+  systemctl stop wpa_supplicant.service
+  systemctl mask wpa_supplicant.service
+fi
+
 umask 027
 
 # try to unblock wifi
