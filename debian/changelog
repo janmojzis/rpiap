@@ -1,3 +1,9 @@
+rpiap (20250927) unstable; urgency=medium
+
+  * Add support for client wireless connection (wlan1 WAN)
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Sat, 27 Sep 2025 21:28:51 +0200
+
 rpiap (20250926) unstable; urgency=medium
 
   * Initial release.
