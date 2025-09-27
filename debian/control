@@ -21,6 +21,7 @@ Depends:
  radvd,
  rfkill,
  usbmuxd,
+ wpasupplicant,
  ${misc:Depends},
 Conflicts:
  dhcpcd5,

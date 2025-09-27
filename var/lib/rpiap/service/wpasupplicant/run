@@ -1,0 +1,29 @@
+#!/bin/sh
+exec 2>&1
+
+umask 027
+
+# try to unblock wifi
+rfkill unblock wifi || :
+
+# run wpa_supplicant under random UID/GID
+exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
+
+  rm -rf ./conf ./bin
+  mkdir -p ./conf ./bin
+
+  # config
+  (
+    cat /etc/rpiap/wpa_supplicant.conf || :
+  ) > ./conf/wpa_supplicant.conf
+  chown "0:${GID}" ./conf ./conf/wpa_supplicant.conf
+
+  # binary
+  cp /usr/sbin/wpa_supplicant ./bin/wpa_supplicant
+  chmod +x ./bin/wpa_supplicant
+  chown "0:${GID}" ./bin ./bin/wpa_supplicant
+  setcap cap_net_raw,cap_net_admin+ep ./bin/wpa_supplicant
+
+  # run wpa_supplican under random UID/GID
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/wpa_supplicant -i wlan1 -c ./conf/wpa_supplicant.conf
+'
