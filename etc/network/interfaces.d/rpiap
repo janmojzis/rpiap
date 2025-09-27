@@ -9,6 +9,9 @@ iface wlan0 inet6 static
         address fd::1
         netmask 64
 
+allow-hotplug wlan1
+iface wlan1 inet manual
+
 allow-hotplug eth0
 iface eth0 inet manual
 

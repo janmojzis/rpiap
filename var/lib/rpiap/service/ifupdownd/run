@@ -11,7 +11,7 @@ while true; do
 done
 
 # check interface configuration
-for interface in eth0 eth1 eth2 usb0; do
+for interface in wlan1 eth0 eth1 eth2 usb0; do
   all="`ifquery -v ${interface} 2>&1 | grep  '^ifquery: querying interface'`"
   rpiap="`ifquery -vi /etc/network/interfaces.d/rpiap ${interface} 2>&1 | grep  '^ifquery: querying interface'`"
   if [ x"${all}" != x"${rpiap}" ]; then
@@ -22,7 +22,7 @@ for interface in eth0 eth1 eth2 usb0; do
 done
 
 # run iptables NAT rules
-for interface in eth0 eth1 eth2 usb0 pqccli0; do
+for interface in wlan1 eth0 eth1 eth2 usb0 pqccli0; do
   iptables -t nat -A POSTROUTING -o "${interface}" -j MASQUERADE
   iptables -A FORWARD -i "${interface}" -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
   iptables -A FORWARD -i wlan0 -o "${interface}" -j ACCEPT
@@ -32,4 +32,4 @@ for interface in eth0 eth1 eth2 usb0 pqccli0; do
   ip6tables -A FORWARD -i wlan0 -o "${interface}" -j ACCEPT
 done
 
-exec /usr/share/rpiap/scripts/ifupdownd.py -i eth0 -i eth1 -i eth2 -i usb0 -l /usr/share/rpiap/scripts/ifupdownd-dhcp.sh -d /usr/share/rpiap/scripts/ifupdownd-updown.sh
+exec /usr/share/rpiap/scripts/ifupdownd.py -i wlan1 -i eth0 -i eth1 -i eth2 -i usb0 -l /usr/share/rpiap/scripts/ifupdownd-dhcp.sh -d /usr/share/rpiap/scripts/ifupdownd-updown.sh
