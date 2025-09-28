@@ -1,10 +1,10 @@
-rpiap (20250928) UNRELEASED; urgency=medium
+rpiap (20250928) unstable; urgency=medium
 
   * var/lib/rpiap/service/wpasupplicant/run: stop wpa_supplicant service
   * var/lib/rpiap/service/wpasupplicant/down: add file, prevent the service
     from starting after system startup
 
- -- Jan Mojžíš <janmojzis@debian.org>  Sun, 28 Sep 2025 09:08:28 +0200
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 28 Sep 2025 12:26:58 +0200
 
 rpiap (20250927) unstable; urgency=medium
 
