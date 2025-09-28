@@ -1,6 +1,8 @@
 rpiap (20250928) UNRELEASED; urgency=medium
 
   * var/lib/rpiap/service/wpasupplicant/run: stop wpa_supplicant service
+  * var/lib/rpiap/service/wpasupplicant/down: add file, prevent the service
+    from starting after system startup
 
  -- Jan Mojžíš <janmojzis@debian.org>  Sun, 28 Sep 2025 09:08:28 +0200
 
