@@ -12,7 +12,8 @@ Traffic from these clients is forwarded to the Internet using network address tr
 ## Components
 - The Wi-Fi AP is powered by `hostapd`
 - It includes a DHCP server `udhcpd` and client `udhcpc`
-- DNS services are handled by [dqcache](https://github.com/janmojzis/dq) with support for the [DNSCurve](https://dnscurve.org) protocol
+- Network Address Translation (NAT) is managed through nftables/iptables."
+- DNS service is handled by [dqcache](https://github.com/janmojzis/dq) with support for the [DNSCurve](https://dnscurve.org) protocol
 - [PQConnect](https://www.pqconnect.net) is used to encrypt network traffic.
 
 # Installation
