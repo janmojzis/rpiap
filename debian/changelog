@@ -1,3 +1,9 @@
+rpiap (20250928) UNRELEASED; urgency=medium
+
+  * var/lib/rpiap/service/wpasupplicant/run: stop wpa_supplicant service
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 28 Sep 2025 09:08:28 +0200
+
 rpiap (20250927) unstable; urgency=medium
 
   * Add support for client wireless connection (wlan1 WAN)
