@@ -33,3 +33,16 @@ echo 'deb [trusted=yes] https://raw.githubusercontent.com/janmojzis/rpiap/refs/h
 apt-get update
 apt-get install rpiap
 ~~~
+
+## Reconfigure rpiap package
+
+After installation, a local WLAN is created with the network range `192.168.137.0/24`.
+The Raspberry Pi uses the address `192.168.137.1`.
+
+Reconfiguration can then be performed via an SSH connection:
+~~~
+ssh root@192.168.137.1
+~~~
+~~~
+dpkg-reconfigure rpiap
+~~~
