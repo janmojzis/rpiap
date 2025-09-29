@@ -20,7 +20,7 @@ exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
 
   # config
   cp -pr /etc/rpiap/wpasupplicant/* ./conf
-  chown -r "0:${GID}" ./conf
+  chown -R "0:${GID}" ./conf
 
   # binary
   cp /usr/sbin/wpa_supplicant ./bin/wpa_supplicant
