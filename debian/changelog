@@ -1,3 +1,10 @@
+rpiap (20250929) UNRELEASED; urgency=medium
+
+  * usr/share/rpiap/scripts/ifupdownd-updown.sh: fix variable in interface
+    detection
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Mon, 29 Sep 2025 07:37:43 +0200
+
 rpiap (20250928) unstable; urgency=medium
 
   * var/lib/rpiap/service/wpasupplicant/run: stop wpa_supplicant service

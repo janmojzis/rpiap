@@ -10,7 +10,7 @@ case "${phase}" in
   up)
     echo "${script}: ${interface}: phase=${phase}, executing /sbin/ifup ${interface}" >&2
     /sbin/ifup "${interface}"
-    if [ xinterface = xwlan1 ]; then
+    if [ x"${interface}" = xwlan1 ]; then
       echo "${script}: ${interface}: phase=${phase}, running wpasupplicant on ${interface}" >&2
       svc -tu /etc/service/rpiap_wpasupplicant
     fi
@@ -19,7 +19,7 @@ case "${phase}" in
   down)
     echo "${script}: ${interface}: phase=${phase}, executing /sbin/ifdown ${interface}" >&2
     /sbin/ifdown "${interface}"
-    if [ xinterface = xwlan1 ]; then
+    if [ x"${interface}" = xwlan1 ]; then
       echo "${script}: ${interface}: phase=${phase}, stopping wpasupplicant on ${interface}" >&2
       svc -d /etc/service/rpiap_wpasupplicant
     fi
