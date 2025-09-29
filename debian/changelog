@@ -1,11 +1,11 @@
-rpiap (20250929) UNRELEASED; urgency=medium
+rpiap (20250929) unstable; urgency=medium
 
   * wpasupplicant rework
-    - add support for also for wired eth0
+    - add support also for wired eth0
     - configuration moved to /etc/rpiap/wpasupplicant
     - services moved to var/lib/rpiap/service/wpasupplicant_{wlan1,eth0}
 
- -- Jan Mojžíš <janmojzis@debian.org>  Mon, 29 Sep 2025 07:37:43 +0200
+ -- Jan Mojžíš <janmojzis@debian.org>  Mon, 29 Sep 2025 22:03:53 +0200
 
 rpiap (20250928) unstable; urgency=medium
 
