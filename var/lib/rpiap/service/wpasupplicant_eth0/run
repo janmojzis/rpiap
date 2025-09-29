@@ -9,6 +9,9 @@ fi
 
 umask 027
 
+# directory /etc/rpiap/wpasupplicant can contain passwords, keys, ...
+chmod 750 /etc/rpiap/wpasupplicant /etc/rpiap/wpasupplicant/*
+
 # try to unblock wifi
 rfkill unblock wifi || :
 
