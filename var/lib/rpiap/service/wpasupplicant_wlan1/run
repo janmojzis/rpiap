@@ -19,10 +19,8 @@ exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
   mkdir -p ./conf ./bin
 
   # config
-  (
-    cat /etc/rpiap/wpa_supplicant.conf || :
-  ) > ./conf/wpa_supplicant.conf
-  chown "0:${GID}" ./conf ./conf/wpa_supplicant.conf
+  cp -pr /etc/rpiap/wpasupplicant/* ./conf
+  chown -r "0:${GID}" ./conf
 
   # binary
   cp /usr/sbin/wpa_supplicant ./bin/wpa_supplicant
@@ -31,5 +29,5 @@ exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
   setcap cap_net_raw,cap_net_admin+ep ./bin/wpa_supplicant
 
   # run wpa_supplican under random UID/GID
-  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/wpa_supplicant -i wlan1 -c ./conf/wpa_supplicant.conf
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/wpa_supplicant -i wlan1 -c ./conf/wlan1.conf
 '
