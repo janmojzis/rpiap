@@ -19,3 +19,21 @@ Description: Raspberry PI - AP
  the DNSCurve protocol. PQConnect is used to encrypt network traffic.
  All daemons are managed through daemontools.
 
+Package: rtl88x2bu-dkms
+Source: rtl88x2bu
+Version: 0.0~git20250529.fe48647-1~mj1
+Architecture: all
+Maintainer: Jan Mojžíš <janmojzis@debian.org>
+Installed-Size: 28588
+Depends: dkms (>= 2.1.0.0)
+Filename: ./trixie/rtl88x2bu-dkms_0.0~git20250529.fe48647-1~mj1_all.deb
+Size: 2711400
+MD5sum: 7ac81e180d3148632baf10dd53e8b123
+SHA1: ec95d57cea2be97647b55aff5a136329a610d61b
+SHA256: 18d1f9ac75703617f0e0c41c147ae960d0a7e05ebd1ee351561592799b5d4a8c
+Section: non-free/kernel
+Priority: optional
+Homepage: https://github.com/morrownr/88x2bu-20210702
+Description: dkms source for the Realtek 88x2bu network driver
+ TODO
+
