@@ -21,16 +21,16 @@ Description: Raspberry PI - AP
 
 Package: rtl88x2bu-dkms
 Source: rtl88x2bu
-Version: 0.0~git20250529.fe48647-1~mj1
+Version: 5.13.1-1
 Architecture: all
 Maintainer: Jan Mojžíš <janmojzis@debian.org>
-Installed-Size: 28588
+Installed-Size: 28214
 Depends: dkms (>= 2.1.0.0)
-Filename: ./trixie/rtl88x2bu-dkms_0.0~git20250529.fe48647-1~mj1_all.deb
-Size: 2711400
-MD5sum: 7ac81e180d3148632baf10dd53e8b123
-SHA1: ec95d57cea2be97647b55aff5a136329a610d61b
-SHA256: 18d1f9ac75703617f0e0c41c147ae960d0a7e05ebd1ee351561592799b5d4a8c
+Filename: ./trixie/rtl88x2bu-dkms_5.13.1-1_all.deb
+Size: 2517032
+MD5sum: c14bcd9d5d67c26cc1aa303086d58c74
+SHA1: 51744351aadf4d2b3da6d94c1c8d18cce4a1443e
+SHA256: 414fb77acec94d199ffc942845b78a38827ca7955db36477654f4e9967398605
 Section: non-free/kernel
 Priority: optional
 Homepage: https://github.com/morrownr/88x2bu-20210702
