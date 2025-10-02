@@ -18,13 +18,14 @@ Traffic from these clients is forwarded to the Internet using network address tr
 
 # Installation
 
-## Install Trixie Raspberry Pi OS Lite + install SSH and add ssh-ed25519 public-key
+## Install Trixie Raspberry Pi OS Lite, install SSH, add ssh-ed25519 public-key
 - https://www.raspberrypi.com/software/operating-systems/
 - and install Your favorite SSH server (I prefer TinySSH) and insert Your ssh-ed25519 public-key to /root/.ssh/authorized_keys 
 ~~~
 apt-get install tinysshd
 echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your@email' >>  /root/.ssh/authorized_keys
 ~~~
+Note: replace `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your@email` with Your ssh-ed25519 public-key
 
 ## Install rpiap package
 ~~~
