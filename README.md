@@ -18,15 +18,9 @@ Traffic from these clients is forwarded to the Internet using network address tr
 
 # Installation
 
-## Install Raspberry Pi OS Lite
+## Install Trixie Raspberry Pi OS Lite
 - https://www.raspberrypi.com/software/operating-systems/
-
-## Upgrade Raspberry Pi OS to trixie
-~~~
-sed -i 's/bookworm/trixie/g' /etc/apt/sources.list /etc/apt/sources.list.d/*
-apt-get update
-apt full-upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" --purge --auto-remove
-~~~
+- and install Your favorite SSH server, I prefer TinySSH `apt-get install tinysshd`
 
 ## Install rpiap package
 ~~~
