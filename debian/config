@@ -34,7 +34,7 @@ dbdo() {
 }
 
 dbdo wlanssid
-dbdo wlanpass _
+dbdo wlanpassword _
 dbdo wlanchannel
 dbdo wlancountry
 dbdo dhcpdns

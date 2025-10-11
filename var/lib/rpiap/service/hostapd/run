@@ -22,7 +22,7 @@ envdir /var/lib/rpiap/env sh -c '
   else
     _wlanmode=g
   fi
-  sed -e "s/__PASS__/${wlanpass}/"\
+  sed -e "s/__PASS__/${wlanpassword}/"\
       -e "s/__SSID__/${wlanssid}/"\
       -e "s/__MODE__/${_wlanmode}/"\
       -e "s/__COUNTRY__/${wlancountry}/"\

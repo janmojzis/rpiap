@@ -4,7 +4,7 @@ Default: rpiap
 Description: Enter SSID:
  Enter the name (SSID) of your wireless network (WLAN).
 
-Template: rpiap/wlanpass
+Template: rpiap/wlanpassword
 Type: password
 Description: Enter password:
  Set a WPA password for your WLAN.

@@ -1,3 +1,9 @@
+rpiap (20250930) UNRELEASED; urgency=medium
+
+  * move password configuration from wlanpass to wlanpassword file
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Sat, 11 Oct 2025 08:22:11 +0200
+
 rpiap (20250929) unstable; urgency=medium
 
   * wpasupplicant rework
