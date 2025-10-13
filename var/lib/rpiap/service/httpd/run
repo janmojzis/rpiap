@@ -1,0 +1,24 @@
+#!/bin/sh
+exec 2>&1
+
+if ! getent group rpiap > /dev/null; then
+  addgroup --quiet --system rpiap
+fi
+
+if ! getent passwd rpiap > /dev/null; then
+  adduser --quiet --system --no-create-home --disabled-password --home /var/lib/rpiap/env --ingroup rpiap --gecos "rpiap user" rpiap
+fi
+
+chown -R rpiap:rpiap /var/lib/rpiap/env
+
+# binary
+rm -rf ./bin
+mkdir -p ./bin
+cp /bin/busybox ./bin/httpd
+cp /usr/bin/python3.13 ./bin/python3
+setcap cap_sys_chroot+ep ./bin/python3
+
+PATH="`pwd`/bin:$PATH"
+export PATH
+umask 077
+exec ./bin/httpd -f -p 192.168.137.1:80 -u rpiap:rpiap -h /usr/share/rpiap/www

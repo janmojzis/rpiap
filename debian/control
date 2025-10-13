@@ -17,6 +17,7 @@ Depends:
  iptables,
  nftables,
  python3,
+ python3-legacy-cgi,
  python3-pqconnect,
  radvd,
  rfkill,

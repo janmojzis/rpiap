@@ -7,6 +7,7 @@ set -e
 # in preinst phase the directory doesn't exist
 var='/var/lib/rpiap/env'
 mkdir -p "${var}"
+chown rpiap:rpiap "${var}"
 
 dbdo() {
   fn="$1"
@@ -25,11 +26,17 @@ dbdo() {
   (
     umask 077
     echo "${RET}" > "${var}/${fn}"
+    chown rpiap:rpiap "${var}/${fn}"
   )
 
   # clear value from the debconf DB
   if [ x"${secret}" != x ]; then
     db_set "${dbname}" "${secret}"
+  fi
+
+  # don't store restart file
+  if [ x"${fn}" = xrestart ]; then
+    rm -f "${var}/${fn}"
   fi
 }
 

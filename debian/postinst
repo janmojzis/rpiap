@@ -5,6 +5,18 @@ set -e
 . /usr/share/debconf/confmodule
 
 if [ x"$1" = "xconfigure" ]; then
+
+  if ! getent group rpiap > /dev/null; then
+    addgroup --quiet --system rpiap
+  fi
+
+  if ! getent passwd rpiap > /dev/null; then
+    adduser --quiet --system --no-create-home --disabled-password --home /var/lib/rpiap/env --ingroup rpiap --gecos "rpiap user" rpiap
+  fi
+
+  chown rpiap:rpiap /var/lib/rpiap/env
+  chown rpiap:rpiap /var/lib/rpiap/env/* 2>/dev/null || :
+
   for d in `ls -1 /var/lib/rpiap/service`; do
     if [ ! -e "/etc/service/rpiap_${d}" ]; then
       echo -n "linking: /var/lib/rpiap/service/${d} -> /etc/service/rpiap_${d}"

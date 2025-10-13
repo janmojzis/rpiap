@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>rpiap – Configuration Interface</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Status Banner -->
+  <div id="status-banner" class="status-banner" style="display: none;">
+    <div class="container">
+      <span id="status-message"></span>
+      <button id="status-close" class="status-close">&times;</button>
+    </div>
+  </div>
+
+  <header class="container">
+    <h1>Raspberry PI - access point</h1>
+    <p class="subtitle">Configuration Interface</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>WLAN Settings</h2>
+      <form id="wlan-form">
+        <div class="row">
+          <label for="wlanssid">SSID</label>
+          <input id="wlanssid" name="wlanssid" type="text" placeholder="Enter SSID" required>
+        </div>
+        <div class="row">
+          <label for="wlanpassword">Password</label>
+          <input id="wlanpassword" name="wlanpassword" type="password" minlength="8" placeholder="Leave empty to keep the current password unchanged">
+        </div>
+        <div class="row">
+          <label for="wlanchannel">Channel</label>
+          <select id="wlanchannel" name="wlanchannel">
+            <!-- options will be loaded dynamically -->
+          </select>
+        </div>
+        <div class="row">
+          <label for="wlancountry">Country</label>
+          <select id="wlancountry" name="wlancountry">
+            <!-- options will be loaded dynamically -->
+          </select>
+        </div>
+        <div class="actions">
+          <button type="submit">Save</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>
