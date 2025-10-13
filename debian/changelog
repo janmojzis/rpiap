@@ -1,6 +1,7 @@
 rpiap (20250930) UNRELEASED; urgency=medium
 
   * move password configuration from wlanpass to wlanpassword file
+  * etc/rpiap/hostapd.conf update comments
 
  -- Jan Mojžíš <janmojzis@debian.org>  Sat, 11 Oct 2025 08:22:11 +0200
 
