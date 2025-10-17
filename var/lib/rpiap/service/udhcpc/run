@@ -29,10 +29,17 @@ exec envdir /var/lib/rpiap/service/udhcpc/env /usr/share/rpiap/scripts/randomuid
   mkdir -p ./var
   chown "${UID}:${GID}" ./var
 
+  # set owner `rpiap` to allow control from web interface
+  chown rpiap /var/lib/rpiap/service/udhcpc/supervise
+  chown rpiap /var/lib/rpiap/service/udhcpc/supervise/control
+  chown rpiap /var/lib/rpiap/service/udhcpc/env
+
+  # wait for dqcache
   while true; do
     [ -d /var/lib/rpiap/service/dqcache/supervise ] && break
     sleep 1
   done
+  # to allow restart dqcache
   chmod 770 /var/lib/rpiap/service/dqcache/supervise
   chmod 660 /var/lib/rpiap/service/dqcache/supervise/control
   chown "0:${GID}" /var/lib/rpiap/service/dqcache/supervise
