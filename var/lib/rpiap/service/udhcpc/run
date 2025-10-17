@@ -33,6 +33,7 @@ exec envdir /var/lib/rpiap/service/udhcpc/env /usr/share/rpiap/scripts/randomuid
   chown rpiap /var/lib/rpiap/service/udhcpc/supervise
   chown rpiap /var/lib/rpiap/service/udhcpc/supervise/control
   chown rpiap /var/lib/rpiap/service/udhcpc/env
+  chown rpiap /var/lib/rpiap/service/udhcpc/env/IFACE
 
   # wait for dqcache
   while true; do
