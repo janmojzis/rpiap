@@ -1,56 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>rpiap – Configuration Interface</title>
-  <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry PI - Access Point</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <!-- Status Banner -->
-  <div id="status-banner" class="status-banner" style="display: none;">
-    <div class="container">
-      <span id="status-message"></span>
-      <button id="status-close" class="status-close">&times;</button>
+    <!-- Admin Bar -->
+    <div class="admin-bar">
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </div>
+        <div class="user-icon" onclick="showUserMenu()">
+            <div class="user-avatar">R</div>
+        </div>
     </div>
-  </div>
 
-  <header class="container">
-    <h1>Raspberry PI - access point</h1>
-    <p class="subtitle">Configuration Interface</p>
-  </header>
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar Menu -->
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="#" onclick="showContent('home')"><span class="menu-icon">🏠</span>Home</a></li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('settings')"><span class="menu-icon">⚙️</span>Settings <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="settings-submenu">
+                        <li><a href="#" onclick="showContent('settings-wlan')"><span class="submenu-icon">📶</span>WLAN</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
 
-  <main class="container">
-    <section class="card">
-      <h2>WLAN Settings</h2>
-      <form id="wlan-form">
-        <div class="row">
-          <label for="wlanssid">SSID</label>
-          <input id="wlanssid" name="wlanssid" type="text" placeholder="Enter SSID" required>
-        </div>
-        <div class="row">
-          <label for="wlanpassword">Password</label>
-          <input id="wlanpassword" name="wlanpassword" type="password" minlength="8" placeholder="Leave empty to keep the current password unchanged">
-        </div>
-        <div class="row">
-          <label for="wlanchannel">Channel</label>
-          <select id="wlanchannel" name="wlanchannel">
-            <!-- options will be loaded dynamically -->
-          </select>
-        </div>
-        <div class="row">
-          <label for="wlancountry">Country</label>
-          <select id="wlancountry" name="wlancountry">
-            <!-- options will be loaded dynamically -->
-          </select>
-        </div>
-        <div class="actions">
-          <button type="submit">Save</button>
-        </div>
-      </form>
-    </section>
-  </main>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <span id="statusMessage"></span>
+            </div>
 
-  <script src="settings.js"></script>
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Home Content -->
+                <div id="home-content" class="content-section">
+                    <h1>Home</h1>
+                    <p>System overview and statistics</p>
+                    
+                    <div class="dashboard-controls">
+                        <button class="btn btn-primary refresh-btn" onclick="refreshDashboard()">
+                            <span class="refresh-icon">🔄</span>
+                            Refresh Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="content-grid">
+                        <div class="card wlan-card">
+                            <div class="interface-header">
+                                <h3>WLAN Status</h3>
+                                <span class="status-indicator online"></span>
+                            </div>
+                            <p>SSID: Loading...</p>
+                            <p>IPv4: Loading...</p>
+                            <p>IPv6: Loading...</p>
+                            <p>Status: Loading...</p>
+                        </div>
+                        <div class="card">
+                            <h3>WAN Interfaces</h3>
+                            <div class="wan-interfaces-grid" id="wan-interfaces-container">
+                                <!-- Interface cards will be dynamically generated from script data -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WLAN Settings Content -->
+                <div id="settings-wlan-content" class="content-section" style="display: none;">
+                    <h1>WLAN Settings</h1>
+                    <p>Configure wireless network parameters</p>
+                    
+                    <form id="wlan-form" class="form-container">
+                        <div class="form-group">
+                            <label for="wlanssid">Network Name (SSID):</label>
+                            <input type="text" id="wlanssid" name="wlanssid" placeholder="Enter network name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wlanpassword">Password:</label>
+                            <div class="password-input-container">
+                                <input type="password" id="wlanpassword" name="wlanpassword" minlength="8" placeholder="Enter password (min 8 characters)">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('wlanpassword')">
+                                    <span class="password-icon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wlanchannel">Channel:</label>
+                            <select id="wlanchannel" name="wlanchannel">
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="wlancountry">Country:</label>
+                            <select id="wlancountry" name="wlancountry">
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save Settings</button>
+                            <button type="button" class="btn btn-secondary" onclick="loadCurrentSettings()">Load Current</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="index.js"></script>
+    <script src="settings.js"></script>
 </body>
 </html>
