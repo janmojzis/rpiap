@@ -19,6 +19,7 @@ Depends:
  python3,
  python3-legacy-cgi,
  python3-pqconnect,
+ python3-psutil,
  radvd,
  rfkill,
  usbmuxd,
