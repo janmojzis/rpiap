@@ -231,7 +231,7 @@
         }
         
         // Clear WLAN interface container and show loading message
-        const wlanContainer = document.getElementById('wlan-interfaces-container');
+        const wlanContainer = document.getElementById('lan-interfaces-container');
         if (wlanContainer) {
             wlanContainer.innerHTML = '<div class="loading-message">Loading LAN/WLAN interfaces...</div>';
         }
@@ -288,7 +288,7 @@
     }
 
     function generateWLANCards() {
-        const container = document.getElementById('wlan-interfaces-container');
+        const container = document.getElementById('lan-interfaces-container');
         if (!container) return;
         
         // Clear existing cards
@@ -300,7 +300,7 @@
             
             // Create card element
             const card = document.createElement('div');
-            card.className = 'wlan-interface-card';
+            card.className = 'lan-interface-card';
             card.setAttribute('data-interface', interfaceData.interface);
             
             // Add classes based on status

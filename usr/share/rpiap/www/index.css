@@ -198,10 +198,8 @@ body {
     transform: translateY(-100%);
     opacity: 0;
     transition: all 0.3s ease;
-    position: fixed;
-    top: 50px;
-    left: 200px;
-    right: 0;
+    position: relative;
+    width: 100%;
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -212,6 +210,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 0;
 }
 
 .status-bar.visible {
@@ -266,6 +265,12 @@ body {
     padding: 25px;
     flex: 1;
     background-color: #1a1a1a;
+    transition: margin-top 0.3s ease;
+}
+
+/* Content Area with visible status bar */
+.main-content:has(.status-bar.visible) .content-area {
+    margin-top: 0;
 }
 
 .content-area h1 {
@@ -364,14 +369,14 @@ body {
 }
 
 /* WLAN Interface Cards - similar to WAN cards */
-.wlan-interfaces-grid {
+.lan-interfaces-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 15px;
     margin-top: 20px;
 }
 
-.wan-interface-card, .wlan-interface-card {
+.wan-interface-card, .lan-interface-card {
     background-color: #1a1a1a;
     border: 1px solid #404040;
     border-radius: 8px;
@@ -380,19 +385,19 @@ body {
     position: relative;
 }
 
-.wan-interface-card:hover, .wlan-interface-card:hover {
+.wan-interface-card:hover, .lan-interface-card:hover {
     border-color: #606060;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.wan-interface-card.active, .wlan-interface-card.active {
+.wan-interface-card.active, .lan-interface-card.active {
     border-color: #4CAF50;
     background-color: #1a2a1a;
     box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
-.wan-interface-card.offline, .wlan-interface-card.offline {
+.wan-interface-card.offline, .lan-interface-card.offline {
     /* Keep default styling - only red dot indicates offline status */
 }
 
@@ -776,7 +781,7 @@ body {
     }
     
     .status-bar {
-        left: 0;
+        width: 100%;
     }
     
     .sidebar {
