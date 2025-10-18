@@ -5,7 +5,7 @@
     let isMenuOpen = false;
     let openSubmenu = null;
     let wanInterfaces = [];
-    let wlanData = {};
+    let lanInterfaces = [];
     let dataLoaded = false;
 
     // DOM elements
@@ -144,21 +144,41 @@
     // ------------------------------
     async function loadAllData() {
         try {
-            const response = await fetch('/cgi-bin/index.py');
+            const response = await fetch('/cgi-bin/interfaces.py');
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
             if (data.success) {
-                wanInterfaces = data.wan_interfaces || [];
-                wlanData = data.wlan || {};
+                // Process WAN interfaces from 'wan' data
+                wanInterfaces = (data.wan || []).map(iface => ({
+                    interface: iface.interface,
+                    ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
+                    ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                    link: iface.state,
+                    device: iface.state,
+                    active: iface.active,
+                    mac: iface.mac
+                }));
+                
+                // Process LAN interfaces from 'lan' data (including WLAN)
+                lanInterfaces = (data.lan || []).map(iface => ({
+                    interface: iface.interface,
+                    ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
+                    ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                    link: iface.state,
+                    device: iface.state,
+                    active: iface.active,
+                    mac: iface.mac
+                }));
+                
                 dataLoaded = true;
                 
-                console.log('All data loaded:', { wanInterfaces, wlanData });
+                console.log('All data loaded:', { wanInterfaces, lanInterfaces });
                 
-                updateInterfaceCards();
-                updateWLANCard();
+                updateWANCards();
+                updateWLANCards();
             } else {
                 throw new Error(data.error || 'Invalid response format');
             }
@@ -205,31 +225,22 @@
 
     function showLoadingStates() {
         // Clear WAN interface container and show loading message
-        const container = document.getElementById('wan-interfaces-container');
-        if (container) {
-            container.innerHTML = '<div class="loading-message">Loading interfaces...</div>';
+        const wanContainer = document.getElementById('wan-interfaces-container');
+        if (wanContainer) {
+            wanContainer.innerHTML = '<div class="loading-message">Loading WAN interfaces...</div>';
         }
         
-        // Reset WLAN card
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            const h3 = card.querySelector('h3');
-            if (h3 && h3.textContent.includes('WLAN Status')) {
-                const paragraphs = card.querySelectorAll('p');
-                if (paragraphs.length >= 4) {
-                    paragraphs[0].textContent = 'SSID: Loading...';
-                    paragraphs[1].textContent = 'IPv4: Loading...';
-                    paragraphs[2].textContent = 'IPv6: Loading...';
-                    paragraphs[3].textContent = 'Status: Loading...';
-                }
-            }
-        });
+        // Clear WLAN interface container and show loading message
+        const wlanContainer = document.getElementById('wlan-interfaces-container');
+        if (wlanContainer) {
+            wlanContainer.innerHTML = '<div class="loading-message">Loading LAN/WLAN interfaces...</div>';
+        }
     }
 
     // ------------------------------
     // Interface Management
     // ------------------------------
-    function generateInterfaceCards() {
+    function generateWANCards() {
         const container = document.getElementById('wan-interfaces-container');
         if (!container) return;
         
@@ -237,7 +248,7 @@
         container.innerHTML = '';
         
         wanInterfaces.forEach(interfaceData => {
-            const isOnline = interfaceData.link === 'up' && interfaceData.device === 'up';
+            const isOnline = interfaceData.link === 'up';
             const isActive = interfaceData.active;
             
             // Create card element
@@ -261,19 +272,63 @@
                 <div class="interface-details">
                     <p>IPv4: ${interfaceData.ip4 || 'N/A'}</p>
                     <p>IPv6: ${interfaceData.ip6 || 'N/A'}</p>
+                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
                     <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
                 </div>
-                <button class="btn btn-primary use-btn" data-interface="${interfaceData.interface}">Use</button>
+                <button class="btn btn-primary use-btn" data-interface="${interfaceData.interface}">
+                    Use
+                </button>
             `;
             
             container.appendChild(card);
         });
         
         // Attach event listeners after generating cards
-        attachButtonListeners();
+        attachWANButtonListeners();
     }
 
-    function attachButtonListeners() {
+    function generateWLANCards() {
+        const container = document.getElementById('wlan-interfaces-container');
+        if (!container) return;
+        
+        // Clear existing cards
+        container.innerHTML = '';
+        
+        lanInterfaces.forEach(interfaceData => {
+            const isOnline = interfaceData.link === 'up';
+            const isActive = interfaceData.active;
+            
+            // Create card element
+            const card = document.createElement('div');
+            card.className = 'wlan-interface-card';
+            card.setAttribute('data-interface', interfaceData.interface);
+            
+            // Add classes based on status
+            if (isActive) {
+                card.classList.add('active');
+            } else if (!isOnline) {
+                card.classList.add('offline');
+            }
+            
+            // Create card HTML WITHOUT button
+            card.innerHTML = `
+                <div class="interface-header">
+                    <h4>${interfaceData.interface}</h4>
+                    <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
+                </div>
+                <div class="interface-details">
+                    <p>IPv4: ${interfaceData.ip4 || 'N/A'}</p>
+                    <p>IPv6: ${interfaceData.ip6 || 'N/A'}</p>
+                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
+                    <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
+    }
+
+    function attachWANButtonListeners() {
         const container = document.getElementById('wan-interfaces-container');
         if (!container) return;
         
@@ -281,57 +336,41 @@
             if (e.target.classList.contains('use-btn')) {
                 const interfaceName = e.target.getAttribute('data-interface');
                 if (interfaceName) {
-                    console.log('Button clicked for interface:', interfaceName);
-                    switchWANInterface(interfaceName);
+                    switchInterface(interfaceName);
                 }
             }
         });
     }
 
-    function updateInterfaceCards() {
-        generateInterfaceCards();
+    // WLAN button listeners removed - WLAN interfaces don't have buttons
+
+    function updateWANCards() {
+        generateWANCards();
     }
 
-    function updateWLANCard() {
-        const cards = document.querySelectorAll('.card');
-        let wlanCard = null;
-        
-        cards.forEach(card => {
-            const h3 = card.querySelector('h3');
-            if (h3 && h3.textContent.includes('WLAN Status')) {
-                wlanCard = card;
-            }
-        });
-        
-        if (!wlanCard) return;
-        
-        const paragraphs = wlanCard.querySelectorAll('p');
-        if (paragraphs.length >= 4) {
-            paragraphs[0].textContent = `SSID: ${wlanData.ssid || 'N/A'}`;
-            paragraphs[1].textContent = `IPv4: ${wlanData.ip || 'N/A'}`;
-            paragraphs[2].textContent = `IPv6: ${wlanData.ipv6 || 'N/A'}`;
-            paragraphs[3].textContent = `Status: Online`;
-        }
+    function updateWLANCards() {
+        generateWLANCards();
     }
 
-    async function switchWANInterface(interfaceName) {
-        console.log('Switching to interface:', interfaceName);
+    async function switchInterface(interfaceName) {
+        console.log('Switching to WAN interface:', interfaceName);
         
         if (!dataLoaded) {
             showStatusMessage('Data not loaded yet', 'error', 3000);
             return;
         }
         
+        // Only check WAN interfaces for switching
         const interfaceData = wanInterfaces.find(iface => iface.interface === interfaceName);
         
         if (!interfaceData) {
-            console.log('Interface data not found for:', interfaceName);
-            showStatusMessage(`Interface ${interfaceName} not found`, 'error', 3000);
+            console.log('WAN Interface data not found for:', interfaceName);
+            showStatusMessage(`WAN Interface ${interfaceName} not found`, 'error', 3000);
             return;
         }
         
         // Check if interface is up
-        if (interfaceData.link !== 'up' || interfaceData.device !== 'up') {
+        if (interfaceData.link !== 'up') {
             showStatusMessage(`Cannot switch to ${interfaceName} - interface is down`, 'error', 3000);
             return;
         }
@@ -341,7 +380,7 @@
             const formData = new FormData();
             formData.append('interface', interfaceName);
             
-            const response = await fetch('/cgi-bin/index.py', {
+            const response = await fetch('/cgi-bin/interfaces.py', {
                 method: 'POST',
                 body: formData
             });
@@ -350,12 +389,33 @@
             
             if (result.success) {
                 // Update local data with server response
-                if (result.wan_interfaces) {
-                    wanInterfaces = result.wan_interfaces;
+                if (result.wan) {
+                    wanInterfaces = result.wan.map(iface => ({
+                        interface: iface.interface,
+                        ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
+                        ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                        link: iface.state,
+                        device: iface.state,
+                        active: iface.active,
+                        mac: iface.mac
+                    }));
+                }
+                
+                if (result.lan) {
+                    lanInterfaces = result.lan.map(iface => ({
+                        interface: iface.interface,
+                        ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
+                        ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                        link: iface.state,
+                        device: iface.state,
+                        active: iface.active,
+                        mac: iface.mac
+                    }));
                 }
                 
                 // Update UI
-                updateInterfaceCards();
+                updateWANCards();
+                updateWLANCards();
                 
                 // Show success message
                 showStatusMessage(result.message || `Switched to ${interfaceName}`, 'success', 3000);
@@ -475,7 +535,7 @@
     window.showStatusMessage = showStatusMessage;
     window.hideStatusMessage = hideStatusMessage;
     window.togglePasswordVisibility = togglePasswordVisibility;
-    window.switchWANInterface = switchWANInterface;
+    window.switchInterface = switchInterface;
     window.refreshDashboard = refreshDashboard;
     
     console.log('Index.js loaded successfully');

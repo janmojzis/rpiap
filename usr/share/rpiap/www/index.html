@@ -56,20 +56,16 @@
                     </div>
                     
                     <div class="content-grid">
-                        <div class="card wlan-card">
-                            <div class="interface-header">
-                                <h3>WLAN Status</h3>
-                                <span class="status-indicator online"></span>
+                        <div class="card">
+                            <h3>WLAN/LAN Interfaces</h3>
+                            <div class="wlan-interfaces-grid" id="wlan-interfaces-container">
+                                <!-- WLAN/LAN Interface cards will be dynamically generated from 'lan' data -->
                             </div>
-                            <p>SSID: Loading...</p>
-                            <p>IPv4: Loading...</p>
-                            <p>IPv6: Loading...</p>
-                            <p>Status: Loading...</p>
                         </div>
                         <div class="card">
                             <h3>WAN Interfaces</h3>
                             <div class="wan-interfaces-grid" id="wan-interfaces-container">
-                                <!-- Interface cards will be dynamically generated from script data -->
+                                <!-- WAN Interface cards will be dynamically generated from 'wan' data -->
                             </div>
                         </div>
                     </div>

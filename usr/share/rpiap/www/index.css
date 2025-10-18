@@ -320,17 +320,7 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* WLAN Card - styled like online WAN interface */
-.card.wlan-card {
-    background-color: #1a2a1a;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
-}
-
-.card.wlan-card:hover {
-    border-color: #4CAF50;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
-}
+/* Old WLAN Card styles removed - now using grid of cards like WAN */
 
 .card h3 {
     color: #e0e0e0;
@@ -373,7 +363,15 @@ body {
     margin-top: 20px;
 }
 
-.wan-interface-card {
+/* WLAN Interface Cards - similar to WAN cards */
+.wlan-interfaces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.wan-interface-card, .wlan-interface-card {
     background-color: #1a1a1a;
     border: 1px solid #404040;
     border-radius: 8px;
@@ -382,19 +380,19 @@ body {
     position: relative;
 }
 
-.wan-interface-card:hover {
+.wan-interface-card:hover, .wlan-interface-card:hover {
     border-color: #606060;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.wan-interface-card.active {
+.wan-interface-card.active, .wlan-interface-card.active {
     border-color: #4CAF50;
     background-color: #1a2a1a;
     box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
-.wan-interface-card.offline {
+.wan-interface-card.offline, .wlan-interface-card.offline {
     /* Keep default styling - only red dot indicates offline status */
 }
 
