@@ -11,6 +11,7 @@
     // DOM elements
     const statusBar = document.getElementById('statusBar');
     const statusMessage = document.getElementById('statusMessage');
+    const mainContent = document.querySelector('.main-content');
 
     // ------------------------------
     // Initialization
@@ -59,6 +60,9 @@
         // Show status bar
         setTimeout(() => {
             statusBar.classList.add('visible');
+            if (mainContent) {
+                mainContent.classList.add('status-bar-visible');
+            }
         }, 50);
         
         // Hide status bar after specified duration
@@ -78,6 +82,9 @@
         
         // Hide status bar
         statusBar.classList.remove('visible');
+        if (mainContent) {
+            mainContent.classList.remove('status-bar-visible');
+        }
         
         // Clean up after animation completes
         setTimeout(() => {

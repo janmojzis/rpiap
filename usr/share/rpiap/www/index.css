@@ -198,9 +198,12 @@ body {
     transform: translateY(-100%);
     opacity: 0;
     transition: all 0.3s ease;
-    position: relative;
-    width: 100%;
-    z-index: 9999;
+    position: fixed;
+    top: 50px;
+    left: 200px;
+    right: 0;
+    width: calc(100% - 200px);
+    z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,6 +219,12 @@ body {
 .status-bar.visible {
     transform: translateY(0);
     opacity: 1;
+}
+
+/* Status bar when main content is expanded (sidebar hidden) */
+.main-content.expanded .status-bar {
+    left: 0;
+    width: 100%;
 }
 
 .status-bar.success {
@@ -269,8 +278,8 @@ body {
 }
 
 /* Content Area with visible status bar */
-.main-content:has(.status-bar.visible) .content-area {
-    margin-top: 0;
+.main-content.status-bar-visible .content-area {
+    margin-top: 40px;
 }
 
 .content-area h1 {
@@ -782,6 +791,12 @@ body {
     
     .status-bar {
         width: 100%;
+        left: 0;
+        right: 0;
+    }
+    
+    .main-content.status-bar-visible .content-area {
+        margin-top: 40px;
     }
     
     .sidebar {
