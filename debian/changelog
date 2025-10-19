@@ -1,8 +1,8 @@
-rpiap (20250930) UNRELEASED; urgency=medium
+rpiap (20251019) unstable; urgency=medium
 
-  * add configuration web-interface
+  * add configuration web-interface (disabled for now)
 
- -- Jan Mojžíš <janmojzis@debian.org>  Sat, 11 Oct 2025 08:22:11 +0200
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 19 Oct 2025 09:06:09 +0200
 
 rpiap (20250929) unstable; urgency=medium
 
