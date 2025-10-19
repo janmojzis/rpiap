@@ -1,9 +1,123 @@
 #!/usr/bin/python3
 
-import time, os
+import os
+import socket
+import struct
+import select
 import logging
 import argparse
 import subprocess
+
+RTM_NEWLINK = 16
+RTM_DELLINK = 17
+
+# Netlink constants
+NETLINK_ROUTE = 0
+RTMGRP_LINK = 1
+
+# Flags from ifinfomsg
+IFF_UP = 0x1
+IFF_BROADCAST = 0x2
+IFF_DEBUG = 0x4
+IFF_LOOPBACK = 0x8
+IFF_POINTOPOINT = 0x10
+IFF_NOTRAILERS = 0x20
+IFF_RUNNING = 0x40
+IFF_NOARP = 0x80
+IFF_PROMISC = 0x100
+
+IFF_MULTICAST = 1<<12
+IFF_LOWER_UP = 1<<16
+IFF_DORMANT = 1<<17
+IFF_ECHO = 1<<18
+
+# Attribute types (from linux/if_link.h)
+IFLA_IFNAME = 3
+
+def rtattr_parse(data):
+    """Parse TLV-encoded Netlink attributes."""
+    attrs = {}
+    while len(data) >= 4:
+        rta_len, rta_type = struct.unpack("HH", data[:4])
+        attr_data = data[4:rta_len]
+        attrs[rta_type] = attr_data.rstrip(b'\x00')
+        # Align to 4 bytes
+        rta_len = (rta_len + 3) & ~3
+        data = data[rta_len:]
+    return attrs
+
+def netlink_parse(data: bytes) -> None:
+
+    if 1==1:
+
+        # Parse Netlink message header
+        while len(data) >= 16:
+            nlmsg_len, nlmsg_type, nlmsg_flags, nlmsg_seq, nlmsg_pid = struct.unpack("IHHII", data[:16])
+            msg = data[16:nlmsg_len]
+
+            # RTM_NEWLINK or RTM_DELLINK
+            if nlmsg_type in (RTM_NEWLINK, RTM_DELLINK):
+                # struct ifinfomsg { unsigned char family; unsigned char pad;
+                #                    unsigned short type; int index;
+                #                    unsigned int flags; unsigned int change; };
+                if len(msg) < 16:
+                    if len(msg) > 0:
+                        logging.warning(f"len(msg) < 16")
+                    break
+                family, _, if_type, if_index, flags, change = struct.unpack("=BBHiII", msg[:16])
+                attrs = rtattr_parse(msg[16:])
+
+                name = attrs.get(IFLA_IFNAME, b'?').decode()
+                state = ""
+                if bool(flags & IFF_UP):
+                    state += "IFF_UP,"
+                    flags -= IFF_UP
+                if bool(flags & IFF_BROADCAST):
+                    state += "IFF_BROADCAST,"
+                    flags -= IFF_BROADCAST
+                if bool(flags & IFF_LOOPBACK):
+                    state += "IFF_LOOPBACK,"
+                    flags -= IFF_LOOPBACK
+                if bool(flags & IFF_DEBUG):
+                    state += "IFF_DEBUG,"
+                    flags -= IFF_DEBUG
+                if bool(flags & IFF_POINTOPOINT):
+                    state += "IFF_POINTOPOINT,"
+                    flags -= IFF_POINTOPOINT
+                if bool(flags & IFF_NOTRAILERS):
+                    state += "IFF_NOTRAILERS,"
+                    flags -= IFF_NOTRAILERS
+                if bool(flags & IFF_RUNNING):
+                    state += "IFF_RUNNING,"
+                    flags -= IFF_RUNNING
+                if bool(flags & IFF_NOARP):
+                    state += "IFF_NOARP,"
+                    flags -= IFF_NOARP
+                if bool(flags & IFF_PROMISC):
+                    state += "IFF_PROMISC,"
+                    flags -= IFF_PROMISC
+                if bool(flags & IFF_MULTICAST):
+                    state += "IFF_MULTICAST,"
+                    flags -= IFF_MULTICAST
+                if bool(flags & IFF_LOWER_UP):
+                    state += "IFF_LOWER_UP,"
+                    flags -= IFF_LOWER_UP
+                if bool(flags & IFF_DORMANT):
+                    state += "IFF_DORMANT,"
+                    flags -= IFF_DORMANT
+                if len(state) > 0:
+                    state = state[0:-1]
+                if flags == 0:
+                    logging.info(f"{name}: {state}")
+                else:
+                    logging.info(f"{name}: {state}, otherflags = {flags}")
+            else:
+                logging.warning(f"unknown nlmsg_type: {nlmsg_type}")
+
+            # Move to next message
+            nlmsg_len = (nlmsg_len + 3) & ~3
+            data = data[nlmsg_len:]
+
 
 
 def iflist(allowed = []):
@@ -53,8 +167,12 @@ LOG_LEVELS = ["INFO", "DEBUG"]
 if (args.verbose > len(LOG_LEVELS) - 1):
     args.verbose = len(LOG_LEVELS) - 1
 
-logging.basicConfig(level=LOG_LEVELS[args.verbose], datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s", level=LOG_LEVELS[args.verbose])
 logging.info('start')
+
+# bind netlink interface
+s = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, NETLINK_ROUTE)
+s.bind((0, RTMGRP_LINK))
 
 # old dictionary
 old = {}
@@ -113,6 +231,11 @@ while True:
     except Exception as e:
         logging.fatal('%s' % (e))
 
-    time.sleep(2)
+    # wait for netlink event
+    r, _, _ = select.select([s], [], [])
+    if len(r) > 0:
+        logging.debug('netlink event')
+        data = s.recv(65535)
+        netlink_parse(data)
 
 exit(0)
