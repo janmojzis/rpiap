@@ -6,6 +6,7 @@
     let openSubmenu = null;
     let wanInterfaces = [];
     let lanInterfaces = [];
+    let services = [];
     let dataLoaded = false;
 
     // DOM elements
@@ -118,6 +119,11 @@
         // Load WLAN data when WLAN submenu is visited
         if (menuItem === 'settings-wlan' && window.initializeWLANData) {
             await window.initializeWLANData();
+        }
+        
+        // Load services data when services submenu is visited
+        if (menuItem === 'system-services') {
+            await loadServicesData();
         }
     }
 
@@ -533,6 +539,230 @@
     });
 
     // ------------------------------
+    // Services Management
+    // ------------------------------
+    async function loadServicesData() {
+        try {
+            const response = await fetch('/cgi-bin/services.py');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            if (data.success) {
+                services = data.services || [];
+                console.log('Services data loaded:', services);
+                updateServicesDisplay();
+            } else {
+                throw new Error(data.error || 'Invalid services response format');
+            }
+        } catch (error) {
+            console.error('Failed to load services data:', error);
+            showStatusMessage('Failed to load services data: ' + error.message, 'error', 5000);
+        }
+    }
+
+    async function refreshServices() {
+        const refreshBtn = document.querySelector('.refresh-btn');
+        const refreshIcon = document.querySelector('.refresh-icon');
+        
+        if (!refreshBtn || !refreshIcon) return;
+        
+        // Disable button and show loading animation
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add('loading');
+        refreshIcon.textContent = '🔄';
+        
+        try {
+            // Show loading state
+            showServicesLoadingState();
+            
+            // Load fresh services data
+            await loadServicesData();
+            
+            // Show success message
+            showStatusMessage('Services refreshed successfully', 'success', 3000);
+            
+        } catch (error) {
+            console.error('Failed to refresh services:', error);
+            showStatusMessage('Failed to refresh services: ' + error.message, 'error', 5000);
+        } finally {
+            // Re-enable button and stop loading animation
+            refreshBtn.disabled = false;
+            refreshBtn.classList.remove('loading');
+            refreshIcon.textContent = '🔄';
+        }
+    }
+
+    function showServicesLoadingState() {
+        const servicesList = document.getElementById('services-list');
+        if (servicesList) {
+            servicesList.innerHTML = '<div class="loading-message">Loading services...</div>';
+        }
+    }
+
+    function updateServicesDisplay() {
+        const servicesList = document.getElementById('services-list');
+        if (!servicesList) return;
+        
+        // Clear existing services
+        servicesList.innerHTML = '';
+        
+        services.forEach(service => {
+            const isUp = service.status === 'up';
+            
+            // Create service row element
+            const serviceRow = document.createElement('div');
+            serviceRow.className = 'service-row';
+            serviceRow.setAttribute('data-service', service.name);
+            
+            // Add classes based on status
+            if (isUp) {
+                serviceRow.classList.add('service-up');
+            } else {
+                serviceRow.classList.add('service-down');
+            }
+            
+            // Create service row HTML
+            serviceRow.innerHTML = `
+                <div class="service-name">${service.name}</div>
+                <div class="service-actions">
+                    <button class="btn btn-success start-btn" data-service="${service.name}">
+                        Start
+                    </button>
+                    <button class="btn btn-danger stop-btn" data-service="${service.name}">
+                        Stop
+                    </button>
+                    <button class="btn btn-primary restart-btn" data-service="${service.name}">
+                        Restart
+                    </button>
+                </div>
+            `;
+            
+            servicesList.appendChild(serviceRow);
+        });
+        
+        // Attach event listeners after generating service rows
+        attachServiceButtonListeners();
+    }
+
+    function attachServiceButtonListeners() {
+        const servicesList = document.getElementById('services-list');
+        if (!servicesList) return;
+        
+        servicesList.addEventListener('click', function(e) {
+            const serviceName = e.target.getAttribute('data-service');
+            if (!serviceName) return;
+            
+            if (e.target.classList.contains('restart-btn')) {
+                restartService(serviceName);
+            } else if (e.target.classList.contains('start-btn')) {
+                startService(serviceName);
+            } else if (e.target.classList.contains('stop-btn')) {
+                stopService(serviceName);
+            }
+        });
+    }
+
+    async function restartService(serviceName) {
+        console.log('Restarting service:', serviceName);
+        
+        try {
+            // Send POST request to restart service
+            const formData = new FormData();
+            formData.append('service', serviceName);
+            
+            const response = await fetch('/cgi-bin/services.py', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                showStatusMessage(result.message || `Service ${serviceName} restarted successfully`, 'success', 3000);
+                
+                // Refresh services data to get updated status
+                await loadServicesData();
+                
+                console.log('Successfully restarted service:', serviceName);
+            } else {
+                showStatusMessage(result.message || `Failed to restart service ${serviceName}`, 'error', 5000);
+            }
+        } catch (error) {
+            console.error('Error restarting service:', error);
+            showStatusMessage('Error restarting service: ' + error.message, 'error', 5000);
+        }
+    }
+
+    async function startService(serviceName) {
+        console.log('Starting service:', serviceName);
+        
+        try {
+            // Send POST request to start service
+            const formData = new FormData();
+            formData.append('service', serviceName);
+            formData.append('action', 'start');
+            
+            const response = await fetch('/cgi-bin/services.py', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                showStatusMessage(result.message || `Service ${serviceName} started successfully`, 'success', 3000);
+                
+                // Refresh services data to get updated status
+                await loadServicesData();
+                
+                console.log('Successfully started service:', serviceName);
+            } else {
+                showStatusMessage(result.message || `Failed to start service ${serviceName}`, 'error', 5000);
+            }
+        } catch (error) {
+            console.error('Error starting service:', error);
+            showStatusMessage('Error starting service: ' + error.message, 'error', 5000);
+        }
+    }
+
+    async function stopService(serviceName) {
+        console.log('Stopping service:', serviceName);
+        
+        try {
+            // Send POST request to stop service
+            const formData = new FormData();
+            formData.append('service', serviceName);
+            formData.append('action', 'stop');
+            
+            const response = await fetch('/cgi-bin/services.py', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                showStatusMessage(result.message || `Service ${serviceName} stopped successfully`, 'success', 3000);
+                
+                // Refresh services data to get updated status
+                await loadServicesData();
+                
+                console.log('Successfully stopped service:', serviceName);
+            } else {
+                showStatusMessage(result.message || `Failed to stop service ${serviceName}`, 'error', 5000);
+            }
+        } catch (error) {
+            console.error('Error stopping service:', error);
+            showStatusMessage('Error stopping service: ' + error.message, 'error', 5000);
+        }
+    }
+
+    // ------------------------------
     // Global Functions
     // ------------------------------
     window.toggleMenu = toggleMenu;
@@ -544,6 +774,8 @@
     window.togglePasswordVisibility = togglePasswordVisibility;
     window.switchInterface = switchInterface;
     window.refreshDashboard = refreshDashboard;
+    window.refreshServices = refreshServices;
+    window.loadServicesData = loadServicesData;
     
     console.log('Index.js loaded successfully');
 })();

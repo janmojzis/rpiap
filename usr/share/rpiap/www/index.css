@@ -854,3 +854,154 @@ body {
 .status-bar.visible {
     display: flex !important;
 }
+
+/* Services Management Styles */
+.services-controls {
+    margin: 20px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.services-container {
+    margin-top: 25px;
+}
+
+.services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.service-row {
+    background-color: #1a1a1a;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.service-row:hover {
+    border-color: #606060;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.service-row.service-up {
+    border-left: 4px solid #4CAF50;
+}
+
+.service-row.service-down {
+    border-left: 4px solid #f44336;
+}
+
+.service-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0;
+    text-align: left;
+}
+
+
+.service-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.restart-btn, .start-btn, .stop-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 70px;
+}
+
+.restart-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.start-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+.stop-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.restart-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.start-btn:hover {
+    background-color: #1976D2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.stop-btn:hover {
+    background-color: #d32f2f;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.restart-btn:active, .start-btn:active, .stop-btn:active {
+    transform: translateY(0);
+}
+
+.restart-btn:disabled, .start-btn:disabled, .stop-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Services loading state */
+.services-list .loading-message {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-style: italic;
+    font-size: 16px;
+}
+
+/* Mobile responsive for services */
+@media (max-width: 768px) {
+    .service-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px 16px;
+    }
+    
+    .service-actions {
+        justify-self: stretch;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .restart-btn, .start-btn, .stop-btn {
+        flex: 1;
+        min-width: 60px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    
+    .services-controls {
+        margin: 15px 0;
+    }
+}

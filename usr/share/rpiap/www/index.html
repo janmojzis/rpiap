@@ -31,6 +31,12 @@
                         <li><a href="#" onclick="showContent('settings-wlan')"><span class="submenu-icon">📶</span>WLAN</a></li>
                     </ul>
                 </li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('system')"><span class="menu-icon">🖥️</span>System <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="system-submenu">
+                        <li><a href="#" onclick="showContent('system-services')"><span class="submenu-icon">⚙️</span>Services</a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
@@ -111,6 +117,25 @@
                             <button type="button" class="btn btn-secondary" onclick="loadCurrentSettings()">Load Current</button>
                         </div>
                     </form>
+                </div>
+
+                <!-- System Services Content -->
+                <div id="system-services-content" class="content-section" style="display: none;">
+                    <h1>System Services</h1>
+                    <p>Manage and monitor system services</p>
+                    
+                    <div class="services-controls">
+                        <button class="btn btn-primary refresh-btn" onclick="refreshServices()">
+                            <span class="refresh-icon">🔄</span>
+                            Refresh Services
+                        </button>
+                    </div>
+                    
+                    <div class="services-container">
+                        <div class="services-list" id="services-list">
+                            <!-- Services will be dynamically generated here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
