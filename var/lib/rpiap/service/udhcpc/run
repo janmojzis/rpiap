@@ -11,7 +11,7 @@ exec envdir /var/lib/rpiap/service/udhcpc/env /usr/share/rpiap/scripts/randomuid
   mkdir -p ./bin
   chown "0:${GID}" ./bin
   (
-    echo "/bin/busybox udhcpc cap_net_raw+ep"
+    echo "/bin/busybox udhcpc cap_net_raw,cap_net_bind_service+ep"
     echo "/usr/sbin/iptables iptables cap_net_admin+ep"
     echo "/bin/busybox busybox cap_net_admin+ep"
   ) | (
@@ -50,5 +50,5 @@ exec envdir /var/lib/rpiap/service/udhcpc/env /usr/share/rpiap/scripts/randomuid
   export PATH
 
   # run udhcpd under random UID/GID
-  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/udhcpc -fi "${IFACE}" -s /usr/share/rpiap/scripts/udhcpc.sh
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/udhcpc -Rfi "${IFACE}" -s /usr/share/rpiap/scripts/udhcpc.sh
 '

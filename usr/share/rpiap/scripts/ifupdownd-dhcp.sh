@@ -8,6 +8,10 @@ bkiface=$3
 
 mkdir -p /var/lib/rpiap/service/udhcpc/env
 
+if [ -s /var/lib/rpiap/service/udhcpc/env/IFACE ]; then
+  curiface=`cat /var/lib/rpiap/service/udhcpc/env/IFACE`
+fi
+
 case "${phase}" in
 
   up)
@@ -18,9 +22,13 @@ case "${phase}" in
 
   down)
     if [ x"${bkiface}" != x ]; then
-      echo "${script}: ${interface}: phase=${phase}, falling back to ${bkiface} and running udhcpc on ${bkiface}" >&2
-      echo "${bkiface}" > /var/lib/rpiap/service/udhcpc/env/IFACE
-      svc -t /etc/service/rpiap_udhcpc
+      if [ x"${interface}" = "x${curiface}" ]; then
+        echo "${script}: ${interface}: phase=${phase}, falling back to ${bkiface} and running udhcpc on ${bkiface}" >&2
+        echo "${bkiface}" > /var/lib/rpiap/service/udhcpc/env/IFACE
+        svc -t /etc/service/rpiap_udhcpc
+      else
+        echo "${script}: ${interface}: phase=${phase}, interface not active, doing nothing" >&2
+      fi
     else
       echo "${script}: ${interface}: phase=${phase}, other interfaces are not active, stoping udhcpc" >&2
       rm /var/lib/rpiap/service/udhcpc/env/IFACE
