@@ -16,7 +16,7 @@ rm -rf ./bin
 mkdir -p ./bin
 cp /bin/busybox ./bin/httpd
 cp /usr/bin/python3.13 ./bin/python3
-setcap cap_sys_chroot+ep ./bin/python3
+setcap cap_net_admin,cap_sys_chroot+ep ./bin/python3
 
 PATH="`pwd`/bin:$PATH"
 export PATH

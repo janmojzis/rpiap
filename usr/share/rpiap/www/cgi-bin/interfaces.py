@@ -9,12 +9,36 @@ import fcntl
 import logging
 import cgi
 
-SIOCGIFFLAGS = 0x8913
+
+os.chdir("/var/lib/rpiap/empty")
+os.chroot(".")
+
+SIOCGIFFLAGS = 0x8913  # get flags
+SIOCSIFFLAGS = 0x8914  # set flags
 IFF_UP = 0x1
 IFF_RUNNING = 0x40
 
-os.chdir("/var/lib/rpiap/service/udhcpc")
-os.chroot(".")
+def if_downup(ifname: str) -> None:
+
+    # create socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # get flags
+    ifreq = struct.pack('256s', ifname[:15].encode('utf-8'))
+    res = fcntl.ioctl(s, SIOCGIFFLAGS, ifreq)
+    flags = struct.unpack('H', res[16:18])[0]
+
+    # unset IFF_UP
+    flags &= ~IFF_UP
+    ifreq = struct.pack('16sH', ifname[:15].encode('utf-8'), flags)
+    fcntl.ioctl(s, SIOCSIFFLAGS, ifreq)
+
+    # set IFF_UP
+    flags |= IFF_UP
+    ifreq = struct.pack('16sH', ifname[:15].encode('utf-8'), flags)
+    fcntl.ioctl(s, SIOCSIFFLAGS, ifreq)
+
+    s.close()
 
 def ipv4_to_cidr(addr: str, mask: str) -> str:
     prefixlen = ipaddress.IPv4Network(f"0.0.0.0/{mask}").prefixlen
@@ -142,10 +166,8 @@ def handle_post():
             }
         
         # Update active interface
-        with open(f'env/IFACE', 'w') as f:
-            f.write(interface_name)
-        with open(f'supervise/control', 'w') as f:
-            f.write("t")
+        logging.debug("Set active interface {interface_name}")
+        if_downup(interface_name)
         
         # Return updated data
         return {

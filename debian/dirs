@@ -1,3 +1,4 @@
+/var/lib/rpiap/empty
 /var/lib/rpiap/env
 /var/log/rpiap
 /etc/rpiap/wpasupplicant
