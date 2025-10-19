@@ -1,15 +1,15 @@
 Package: rpiap
-Version: 20250929
+Version: 20251019
 Architecture: all
 Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
-Installed-Size: 94
-Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-pqconnect, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
+Installed-Size: 169
+Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-legacy-cgi, python3-pqconnect, python3-psutil, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
 Conflicts: dhcpcd5, isc-dhcp-client, isc-dhcp-server, pqconnect
-Filename: ./trixie/rpiap_20250929_all.deb
-Size: 10608
-MD5sum: ec690bc04c62935dafa3583bd04280b9
-SHA1: da6736be7ad2294e8cbca1360247944f95ba1b71
-SHA256: 753b4fb5735521a6ed0c6ddeb0501024b990b0e80b9223e680c1b878289bf179
+Filename: ./trixie/rpiap_20251019_all.deb
+Size: 23548
+MD5sum: dead42ae02d5d7c5a8c1ac5b9249458d
+SHA1: 123732867e46776a986c7b1581b98d2f3880a36d
+SHA256: 861bbdaeaf4d4ab92cd9c6a39b708e78c4e59201b040fb6fc5a5cbb2ba9561f9
 Section: misc
 Priority: optional
 Description: Raspberry PI - AP
@@ -18,22 +18,4 @@ Description: Raspberry PI - AP
  and client (udhcpc). DNS services are handled by dqcache with support for
  the DNSCurve protocol. PQConnect is used to encrypt network traffic.
  All daemons are managed through daemontools.
-
-Package: rtl88x2bu-dkms
-Source: rtl88x2bu
-Version: 5.13.1-1
-Architecture: all
-Maintainer: Jan Mojžíš <janmojzis@debian.org>
-Installed-Size: 28214
-Depends: dkms (>= 2.1.0.0)
-Filename: ./trixie/rtl88x2bu-dkms_5.13.1-1_all.deb
-Size: 2517032
-MD5sum: c14bcd9d5d67c26cc1aa303086d58c74
-SHA1: 51744351aadf4d2b3da6d94c1c8d18cce4a1443e
-SHA256: 414fb77acec94d199ffc942845b78a38827ca7955db36477654f4e9967398605
-Section: non-free/kernel
-Priority: optional
-Homepage: https://github.com/morrownr/88x2bu-20210702
-Description: dkms source for the Realtek 88x2bu network driver
- TODO
 
