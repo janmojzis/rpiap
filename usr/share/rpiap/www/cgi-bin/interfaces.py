@@ -56,9 +56,14 @@ def ifaces_get() -> dict:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     try:
-        # use trick how to get local IP
-        s.connect(("1.1.1.1", 53))
-        local_ip = s.getsockname()[0]
+        # use trick how to get local IP - try external connection first
+        local_ip = None
+        try:
+            s.connect(("1.1.1.1", 53))
+            local_ip = s.getsockname()[0]
+        except (OSError, socket.error):
+            # If it fails (no internet connection)
+            local_ip = None
 
         for ifname, addrs in interfaces.items():
             ret[ifname] = {}
@@ -73,7 +78,7 @@ def ifaces_get() -> dict:
                     ret[ifname]["mac"] = addr.address
                 # IPv4
                 if addr.family.name == "AF_INET" and addr.address:
-                    if addr.address == local_ip:
+                    if local_ip and addr.address == local_ip:
                         ret[ifname]["active"] = True
                     ret[ifname]["ipv4"].append(ipv4_to_cidr(addr.address, addr.netmask))
                 # IPv6
