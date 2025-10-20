@@ -12,6 +12,9 @@ import time
 import hashlib
 import binascii
 
+os.chdir("/var/lib/rpiap/empty")
+os.chroot(".")
+
 def handle_ping():
     """Handle ping test - returns empty data"""
     return {
