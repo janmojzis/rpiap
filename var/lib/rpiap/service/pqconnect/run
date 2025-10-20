@@ -16,4 +16,4 @@ nft add table inet rpiap-pqconnect-filter
 nft add chain inet rpiap-pqconnect-filter output '{ type filter hook output priority -10; policy accept; }'
 nft add rule inet rpiap-pqconnect-filter output udp sport 53 queue to 0
 
-exec ./bin/pqconnect
+exec ./bin/pqconnect -a 10.75.0.1
