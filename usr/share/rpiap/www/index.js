@@ -119,6 +119,11 @@
         if (menuItem === 'settings-wlan' && window.initializeWLANData) {
             await window.initializeWLANData();
         }
+        
+        // Initialize speed test content when speed test submenu is visited
+        if (menuItem === 'system-speedtest' && window.initializeSpeedTestContent) {
+            await window.initializeSpeedTestContent();
+        }
     }
 
     function showUserMenu() {

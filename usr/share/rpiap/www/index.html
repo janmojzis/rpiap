@@ -31,6 +31,12 @@
                         <li><a href="#" onclick="showContent('settings-wlan')"><span class="submenu-icon">📶</span>WLAN</a></li>
                     </ul>
                 </li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('system')"><span class="menu-icon">🖥️</span>System <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="system-submenu">
+                        <li><a href="#" onclick="showContent('system-speedtest')"><span class="submenu-icon">🚀</span>Speed Test</a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
@@ -112,11 +118,38 @@
                         </div>
                     </form>
                 </div>
+
+                <!-- Speed Test Content -->
+                <div id="system-speedtest-content" class="content-section" style="display: none;">
+                    <h1>Speed Test</h1>
+                    <p>Test your network connection speed and latency</p>
+                    
+                    <div class="speedtest-container">
+                        <div class="speedtest-controls">
+                            <button id="run-speedtest-btn" class="btn btn-primary" onclick="runFullSpeedTest()">
+                                Run Speed Test
+                            </button>
+                        </div>
+                        
+                        <div id="speedtest-results" class="speedtest-results" style="display: none;">
+                            <div class="test-section">
+                                <h3>Test Results</h3>
+                                <div id="ping-result" class="test-result-container">
+                                    <!-- Ping results will be displayed here -->
+                                </div>
+                                <div id="download-result" class="test-result-container">
+                                    <!-- Download results will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
     <script src="index.js"></script>
     <script src="settings.js"></script>
+    <script src="speedtest.js"></script>
 </body>
 </html>
