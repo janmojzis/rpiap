@@ -122,23 +122,51 @@
                 <!-- Speed Test Content -->
                 <div id="system-speedtest-content" class="content-section" style="display: none;">
                     <h1>Speed Test</h1>
-                    <p>Test your network connection speed and latency</p>
+                    <p>Test your internet connection speed</p>
                     
-                    <div class="speedtest-container">
-                        <div class="speedtest-controls">
-                            <button id="run-speedtest-btn" class="btn btn-primary" onclick="runFullSpeedTest()">
-                                Run Speed Test
+                    <div class="speed-test-container">
+                        <div class="speed-test-controls">
+                            <button id="start-speed-test" class="btn btn-primary" onclick="startSpeedTest()">
+                                <span class="test-icon">🚀</span>
+                                Start Speed Test
+                            </button>
+                            <button id="stop-speed-test" class="btn btn-secondary" onclick="stopSpeedTest()" style="display: none;">
+                                <span class="test-icon">⏹️</span>
+                                Stop Test
                             </button>
                         </div>
                         
-                        <div id="speedtest-results" class="speedtest-results" style="display: none;">
-                            <div class="test-section">
-                                <h3>Test Results</h3>
-                                <div id="ping-result" class="test-result-container">
-                                    <!-- Ping results will be displayed here -->
+                        <div class="speed-test-results" id="speed-test-results" style="display: none;">
+                            <div class="speed-metrics">
+                                <div class="metric-card">
+                                    <h3>Download Speed</h3>
+                                    <div class="metric-value" id="download-speed">--</div>
+                                    <div class="metric-unit">Mbps</div>
                                 </div>
-                                <div id="download-result" class="test-result-container">
-                                    <!-- Download results will be displayed here -->
+                                <div class="metric-card">
+                                    <h3>Ping</h3>
+                                    <div class="metric-value" id="ping-value">--</div>
+                                    <div class="metric-unit">ms</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-label">Test Progress</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="progress-text" id="progress-text">Ready to start</div>
+                            </div>
+                            
+                            <div class="test-details" id="test-details">
+                                <h4>Test Details</h4>
+                                <div class="detail-item">
+                                    <span class="detail-label">Test Duration:</span>
+                                    <span class="detail-value" id="test-duration">--</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Data Transferred:</span>
+                                    <span class="detail-value" id="data-transferred">--</span>
                                 </div>
                             </div>
                         </div>
