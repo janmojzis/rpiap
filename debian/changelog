@@ -1,3 +1,15 @@
+rpiap (20251021) unstable; urgency=medium
+
+  * pqconnect: use 10.75.0.1 intead of default 10.43.0.1
+  * pqconnect: use prerouting rule for DNS packets
+  * web interface - add speedtest
+  * interfaces.py: rework, fix local_ip detection and chroot to empty directory
+  * ifupdownd.py: use netlink instead of pooling
+  * udhcpc: release IP at exit
+  * d/postinst: fix chmod
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Tue, 21 Oct 2025 18:03:36 +0200
+
 rpiap (20251019) unstable; urgency=medium
 
   * add configuration web-interface (disabled for now)
