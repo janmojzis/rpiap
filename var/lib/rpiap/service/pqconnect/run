@@ -11,9 +11,9 @@ if ! getent passwd pqconnect > /dev/null; then
   adduser --quiet --system --no-create-home --disabled-password --home /etc/pqconnect --ingroup pqconnect --gecos "pqconnect user" pqconnect
 fi
 
-# pqconnect - add hook for outgoing DNS traffic (from dqcache to the client)
+# pqconnect - add prerouting hook (from dqcache to the client)
 nft add table inet rpiap-pqconnect-filter
-nft add chain inet rpiap-pqconnect-filter output '{ type filter hook output priority -10; policy accept; }'
-nft add rule inet rpiap-pqconnect-filter output udp sport 53 queue to 0
+nft add chain inet rpiap-pqconnect-filter prerouting '{ type filter hook prerouting priority -10; policy accept; }'
+nft add rule inet rpiap-pqconnect-filter prerouting udp sport 53 queue to 0
 
 exec ./bin/pqconnect -a 10.75.0.1
