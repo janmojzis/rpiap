@@ -1,11 +1,8 @@
 #!/bin/sh
 set -e
 
-# Source debconf library.
-. /usr/share/debconf/confmodule
-
+# create users
 if [ x"$1" = "xconfigure" ]; then
-
   if ! getent group rpiap > /dev/null; then
     addgroup --quiet --system rpiap
   fi
@@ -16,7 +13,14 @@ if [ x"$1" = "xconfigure" ]; then
 
   chown rpiap:rpiap /var/lib/rpiap/env
   chown rpiap:rpiap /var/lib/rpiap/env/* 2>/dev/null || :
+fi
 
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+
+# start services
+if [ x"$1" = "xconfigure" ]; then
   for d in `ls -1 /var/lib/rpiap/service`; do
     if [ ! -e "/etc/service/rpiap_${d}" ]; then
       echo -n "linking: /var/lib/rpiap/service/${d} -> /etc/service/rpiap_${d}"
@@ -25,6 +29,7 @@ if [ x"$1" = "xconfigure" ]; then
     fi
   done
 fi
+
 
 # leave only /etc/network/interfaces.d/rpiap
 # XXX TODO: backup files and restore it in postrm
