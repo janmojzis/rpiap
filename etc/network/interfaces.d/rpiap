@@ -16,7 +16,7 @@ iface lan inet6 static
     netmask 64
 
 allow-hotplug wlan0
-iface wlan1 inet manual
+iface wlan0 inet manual
 
 allow-hotplug wlan1
 iface wlan1 inet manual
