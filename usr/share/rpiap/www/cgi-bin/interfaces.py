@@ -10,7 +10,7 @@ import logging
 import cgi
 
 
-os.chdir("/var/lib/rpiap/empty")
+os.chdir("/sys")
 os.chroot(".")
 
 SIOCGIFFLAGS = 0x8913  # get flags
@@ -39,6 +39,13 @@ def if_downup(ifname: str) -> None:
     fcntl.ioctl(s, SIOCSIFFLAGS, ifreq)
 
     s.close()
+
+
+def bridge_list(ifname: str) -> list[str]:
+    """
+    """
+
+    return os.listdir(f"/class/net/{ifname}/brif/")
 
 def ipv4_to_cidr(addr: str, mask: str) -> str:
     prefixlen = ipaddress.IPv4Network(f"0.0.0.0/{mask}").prefixlen
@@ -104,6 +111,7 @@ def ifaces_get() -> dict:
             except Exception:
                 ret[ifname]["state"] = "unknown"
 
+
     finally:
         s.close()
 
@@ -112,17 +120,28 @@ def ifaces_get() -> dict:
 def handle_get():
     """Handle GET request - return all data"""
 
-    lan = []
-    wan = []
-
+    # ALL interfaces
     ifaces = ifaces_get()
+
+    # LAN interfaces
+    lan_ifnames = bridge_list("lan")
+    lan = ifaces["lan"]
+    lan["active"] = True
+    lan["interfaces"] = []
+    del lan["state"]
+    del lan["interface"]
+    for ifname in ifaces:
+        if ifname in lan_ifnames:
+            del ifaces[ifname]["ipv4"]
+            del ifaces[ifname]["ipv6"]
+            del ifaces[ifname]["active"]
+            lan["interfaces"].append(ifaces[ifname])
+
+    # WAN
+    wan = []
     for ifname in ifaces:
         if ifname in ["eth0", "eth1", "wlan1", "usb0"]:
             wan.append(ifaces[ifname])
-        if ifname in ["wlan0"]:
-            # XXX - mark wlan0 always active
-            ifaces[ifname]["active"] = True
-            lan.append(ifaces[ifname])
 
     response = {
         "success": True,

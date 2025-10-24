@@ -1,3 +1,9 @@
+rpiap (20251024) UNRELEASED; urgency=medium
+
+  * create bridge lan for LAN interfaces
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 24 Oct 2025 19:13:35 +0200
+
 rpiap (20251021) unstable; urgency=medium
 
   * pqconnect: use 10.75.0.1 intead of default 10.43.0.1

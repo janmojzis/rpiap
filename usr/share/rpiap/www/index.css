@@ -385,6 +385,18 @@ body {
     margin-top: 20px;
 }
 
+/* LAN Card Status */
+.card.lan-active {
+    border-color: #4CAF50;
+    background-color: #1a2a1a;
+    box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
+}
+
+.card.lan-inactive {
+    border-color: #666;
+    background-color: #1a1a1a;
+}
+
 .wan-interface-card, .lan-interface-card {
     background-color: #1a1a1a;
     border: 1px solid #404040;

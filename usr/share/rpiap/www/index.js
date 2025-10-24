@@ -174,16 +174,27 @@
                     mac: iface.mac
                 }));
                 
-                // Process LAN interfaces from 'lan' data (including WLAN)
-                lanInterfaces = (data.lan || []).map(iface => ({
+                // Process LAN data - IP addresses are now at LAN level, not individual interfaces
+                const lanData = data.lan || {};
+                const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
+                const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
+                const lanActive = lanData.active || false;
+                
+                // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
+                lanInterfaces = (lanData.interfaces || []).map(iface => ({
                     interface: iface.interface,
-                    ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
-                    ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                    ip4: '', // No IP addresses on individual LAN interfaces anymore
+                    ip6: '', // No IP addresses on individual LAN interfaces anymore
                     link: iface.state,
                     device: iface.state,
                     active: iface.active,
                     mac: iface.mac
                 }));
+                
+                // Store LAN IP addresses and active status separately for display
+                window.lanIP4 = lanIP4;
+                window.lanIP6 = lanIP6;
+                window.lanActive = lanActive;
                 
                 dataLoaded = true;
                 
@@ -191,6 +202,7 @@
                 
                 updateWANCards();
                 updateWLANCards();
+                updateLANIPInfo();
             } else {
                 throw new Error(data.error || 'Invalid response format');
             }
@@ -306,6 +318,7 @@
         // Clear existing cards
         container.innerHTML = '';
         
+        // Add individual interface cards (without IP addresses)
         lanInterfaces.forEach(interfaceData => {
             const isOnline = interfaceData.link === 'up';
             const isActive = interfaceData.active;
@@ -322,15 +335,13 @@
                 card.classList.add('offline');
             }
             
-            // Create card HTML WITHOUT button
+            // Create card HTML WITHOUT IP addresses and WITHOUT button
             card.innerHTML = `
                 <div class="interface-header">
                     <h4>${interfaceData.interface}</h4>
                     <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
                 </div>
                 <div class="interface-details">
-                    <p>IPv4: ${interfaceData.ip4 || 'N/A'}</p>
-                    <p>IPv6: ${interfaceData.ip6 || 'N/A'}</p>
                     <p>MAC: ${interfaceData.mac || 'N/A'}</p>
                     <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
                 </div>
@@ -362,6 +373,32 @@
 
     function updateWLANCards() {
         generateWLANCards();
+    }
+
+    function updateLANIPInfo() {
+        const lanIPv4Element = document.getElementById('lan-ipv4');
+        const lanIPv6Element = document.getElementById('lan-ipv6');
+        const lanCard = document.getElementById('lan-card');
+        
+        if (lanIPv4Element) {
+            lanIPv4Element.textContent = window.lanIP4 || 'N/A';
+        }
+        if (lanIPv6Element) {
+            lanIPv6Element.textContent = window.lanIP6 || 'N/A';
+        }
+        
+        // Apply CSS class based on LAN active status
+        if (lanCard) {
+            // Remove existing status classes
+            lanCard.classList.remove('lan-active', 'lan-inactive');
+            
+            // Add appropriate class based on active status
+            if (window.lanActive) {
+                lanCard.classList.add('lan-active');
+            } else {
+                lanCard.classList.add('lan-inactive');
+            }
+        }
     }
 
     async function switchInterface(interfaceName) {
@@ -414,20 +451,33 @@
                 }
                 
                 if (result.lan) {
-                    lanInterfaces = result.lan.map(iface => ({
+                    // Process LAN data - IP addresses are now at LAN level
+                    const lanData = result.lan;
+                    const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
+                    const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
+                    const lanActive = lanData.active || false;
+                    
+                    // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
+                    lanInterfaces = (lanData.interfaces || []).map(iface => ({
                         interface: iface.interface,
-                        ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
-                        ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                        ip4: '', // No IP addresses on individual LAN interfaces anymore
+                        ip6: '', // No IP addresses on individual LAN interfaces anymore
                         link: iface.state,
                         device: iface.state,
                         active: iface.active,
                         mac: iface.mac
                     }));
+                    
+                    // Update LAN IP addresses and active status
+                    window.lanIP4 = lanIP4;
+                    window.lanIP6 = lanIP6;
+                    window.lanActive = lanActive;
                 }
                 
                 // Update UI
                 updateWANCards();
                 updateWLANCards();
+                updateLANIPInfo();
                 
                 // Show success message
                 showStatusMessage(result.message || `Switched to ${interfaceName}`, 'success', 3000);

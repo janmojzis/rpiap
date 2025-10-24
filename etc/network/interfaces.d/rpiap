@@ -1,13 +1,22 @@
 auto lo
 iface lo inet loopback
 
-auto wlan0
-iface wlan0 inet static
-        address 192.168.137.1
-        netmask 255.255.255.0
-iface wlan0 inet6 static
-        address fd::1
-        netmask 64
+# bridge for 'lan' interfaces
+auto lan
+#iface lan inet manual
+iface lan inet static
+    address 192.168.137.1
+    netmask 255.255.255.0
+    bridge_ports none
+    bridge_stp off
+    bridge_fd 0
+    bridge_maxwait 0
+iface lan inet6 static
+    address fd::1
+    netmask 64
+
+allow-hotplug wlan0
+iface wlan1 inet manual
 
 allow-hotplug wlan1
 iface wlan1 inet manual
