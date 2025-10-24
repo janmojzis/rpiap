@@ -207,6 +207,10 @@ while True:
                 active.append(iface)
 
         for iface in allowed:
+            # bridge
+            if os.path.exists(f"/sys/class/net/{iface}/brif"):
+                logging.info(f'{iface}: is bridge, nothing to do')
+                continue
             # link
             if old[iface]['link'] != current[iface]['link']:
                 for script in linkscripts:
