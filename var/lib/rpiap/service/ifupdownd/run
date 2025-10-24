@@ -21,15 +21,17 @@ for interface in wlan1 eth0 eth1 eth2 usb0; do
   fi
 done
 
+lan='lan'
+
 # run iptables NAT rules
 for interface in wlan1 eth0 eth1 eth2 usb0 pqccli0; do
   iptables -t nat -A POSTROUTING -o "${interface}" -j MASQUERADE
-  iptables -A FORWARD -i "${interface}" -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-  iptables -A FORWARD -i wlan0 -o "${interface}" -j ACCEPT
+  iptables -A FORWARD -i "${interface}" -o "${lan}" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  iptables -A FORWARD -i "${lan}" -o "${interface}" -j ACCEPT
 
   ip6tables -t nat -A POSTROUTING -o "${interface}" -j MASQUERADE
-  ip6tables -A FORWARD -i "${interface}" -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-  ip6tables -A FORWARD -i wlan0 -o "${interface}" -j ACCEPT
+  ip6tables -A FORWARD -i "${interface}" -o "${lan}" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  ip6tables -A FORWARD -i "${lan}" -o "${interface}" -j ACCEPT
 done
 
 exec /usr/share/rpiap/scripts/ifupdownd.py -i wlan1 -i eth0 -i eth1 -i eth2 -i usb0 -l /usr/share/rpiap/scripts/ifupdownd-dhcp.sh -d /usr/share/rpiap/scripts/ifupdownd-updown.sh
