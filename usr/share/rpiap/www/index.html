@@ -70,10 +70,18 @@
                                 <!-- LAN Interface cards will be dynamically generated from 'lan' data -->
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card" id="wan-card">
                             <h3>WAN Interfaces</h3>
+                            <p>IPv4: <span id="wan-ipv4">Loading...</span></p>
+                            <p>IPv6: <span id="wan-ipv6">Loading...</span></p>
                             <div class="wan-interfaces-grid" id="wan-interfaces-container">
                                 <!-- WAN Interface cards will be dynamically generated from 'wan' data -->
+                            </div>
+                        </div>
+                        <div class="card" id="other-card">
+                            <h3>Other Interfaces</h3>
+                            <div class="other-interfaces-grid" id="other-interfaces-container">
+                                <!-- Other Interface cards will be dynamically generated from 'other' data -->
                             </div>
                         </div>
                     </div>

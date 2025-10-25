@@ -1,6 +1,7 @@
 rpiap (20251024) UNRELEASED; urgency=medium
 
   * create bridge lan for LAN interfaces
+  * web WAN interface - add drag-and-drop functions
 
  -- Jan Mojžíš <janmojzis@debian.org>  Fri, 24 Oct 2025 19:13:35 +0200
 

@@ -6,6 +6,7 @@
     let openSubmenu = null;
     let wanInterfaces = [];
     let lanInterfaces = [];
+    let otherInterfaces = [];
     let dataLoaded = false;
 
     // DOM elements
@@ -163,16 +164,27 @@
             
             const data = await response.json();
             if (data.success) {
-                // Process WAN interfaces from 'wan' data
-                wanInterfaces = (data.wan || []).map(iface => ({
+                // Process WAN data - IP addresses are now at WAN level, not individual interfaces
+                const wanData = data.wan || {};
+                const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
+                const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
+                const wanActive = wanData.active || false;
+                
+                // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
+                wanInterfaces = (wanData.interfaces || []).map(iface => ({
                     interface: iface.interface,
-                    ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
-                    ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                    ip4: '', // No IP addresses on individual WAN interfaces anymore
+                    ip6: '', // No IP addresses on individual WAN interfaces anymore
                     link: iface.state,
                     device: iface.state,
                     active: iface.active,
                     mac: iface.mac
                 }));
+                
+                // Store WAN IP addresses and active status separately for display
+                window.wanIP4 = wanIP4;
+                window.wanIP6 = wanIP6;
+                window.wanActive = wanActive;
                 
                 // Process LAN data - IP addresses are now at LAN level, not individual interfaces
                 const lanData = data.lan || {};
@@ -196,12 +208,26 @@
                 window.lanIP6 = lanIP6;
                 window.lanActive = lanActive;
                 
+                // Process OTHER interfaces
+                const otherData = data.other || {};
+                
+                // Process OTHER interfaces from 'other.interfaces' data
+                otherInterfaces = (otherData.interfaces || []).map(iface => ({
+                    interface: iface.interface,
+                    link: iface.state,
+                    device: iface.state,
+                    active: iface.active,
+                    mac: iface.mac
+                }));
+                
                 dataLoaded = true;
                 
-                console.log('All data loaded:', { wanInterfaces, lanInterfaces });
+                console.log('All data loaded:', { wanInterfaces, lanInterfaces, otherInterfaces });
                 
                 updateWANCards();
                 updateWLANCards();
+                updateOtherCards();
+                updateWANIPInfo();
                 updateLANIPInfo();
             } else {
                 throw new Error(data.error || 'Invalid response format');
@@ -287,28 +313,20 @@
                 card.classList.add('offline');
             }
             
-            // Create card HTML
+            // Create card HTML WITHOUT IP addresses and WITHOUT button
             card.innerHTML = `
                 <div class="interface-header">
                     <h4>${interfaceData.interface}</h4>
                     <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
                 </div>
                 <div class="interface-details">
-                    <p>IPv4: ${interfaceData.ip4 || 'N/A'}</p>
-                    <p>IPv6: ${interfaceData.ip6 || 'N/A'}</p>
                     <p>MAC: ${interfaceData.mac || 'N/A'}</p>
                     <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
                 </div>
-                <button class="btn btn-primary use-btn" data-interface="${interfaceData.interface}">
-                    Use
-                </button>
             `;
             
             container.appendChild(card);
         });
-        
-        // Attach event listeners after generating cards
-        attachWANButtonListeners();
     }
 
     function generateWLANCards() {
@@ -351,16 +369,51 @@
         });
     }
 
-    function attachWANButtonListeners() {
-        const container = document.getElementById('wan-interfaces-container');
-        if (!container) return;
+    // Button listeners removed - now using drag and drop
+
+    function attachDragAndDropListeners() {
+        const otherContainer = document.getElementById('other-interfaces-container');
+        const wanContainer = document.getElementById('wan-interfaces-container');
         
-        container.addEventListener('click', function(e) {
-            if (e.target.classList.contains('use-btn')) {
-                const interfaceName = e.target.getAttribute('data-interface');
-                if (interfaceName) {
-                    switchInterface(interfaceName);
-                }
+        if (!otherContainer || !wanContainer) return;
+        
+        // Add drag event listeners to OTHER interface cards
+        otherContainer.addEventListener('dragstart', function(e) {
+            if (e.target.classList.contains('other-interface-card')) {
+                e.target.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', e.target.getAttribute('data-interface'));
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        });
+        
+        otherContainer.addEventListener('dragend', function(e) {
+            if (e.target.classList.contains('other-interface-card')) {
+                e.target.classList.remove('dragging');
+            }
+        });
+        
+        // Add drop event listeners to WAN container
+        wanContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            wanContainer.classList.add('drag-over');
+        });
+        
+        wanContainer.addEventListener('dragleave', function(e) {
+            // Only remove drag-over class if we're actually leaving the container
+            if (!wanContainer.contains(e.relatedTarget)) {
+                wanContainer.classList.remove('drag-over');
+            }
+        });
+        
+        wanContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            wanContainer.classList.remove('drag-over');
+            
+            const interfaceName = e.dataTransfer.getData('text/plain');
+            if (interfaceName) {
+                console.log('Dropped interface:', interfaceName);
+                switchInterface(interfaceName);
             }
         });
     }
@@ -373,6 +426,81 @@
 
     function updateWLANCards() {
         generateWLANCards();
+    }
+
+    function generateOtherCards() {
+        const container = document.getElementById('other-interfaces-container');
+        if (!container) return;
+        
+        // Clear existing cards
+        container.innerHTML = '';
+        
+        // Add individual interface cards
+        otherInterfaces.forEach(interfaceData => {
+            const isOnline = interfaceData.link === 'up';
+            const isActive = interfaceData.active;
+            
+            // Create card element
+            const card = document.createElement('div');
+            card.className = 'other-interface-card';
+            card.setAttribute('data-interface', interfaceData.interface);
+            card.draggable = isOnline; // Only allow dragging if online
+            
+            // Add classes based on status
+            if (isActive) {
+                card.classList.add('active');
+            } else if (!isOnline) {
+                card.classList.add('offline');
+            }
+            
+            // Create card HTML WITHOUT button (drag and drop instead)
+            card.innerHTML = `
+                <div class="interface-header">
+                    <h4>${interfaceData.interface}</h4>
+                    <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
+                </div>
+                <div class="interface-details">
+                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
+                    <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
+                    ${isOnline ? '<p style="color: #4CAF50; font-size: 12px; margin-top: 8px;">Drag to WAN to use</p>' : ''}
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
+        
+        // Attach drag and drop event listeners
+        attachDragAndDropListeners();
+    }
+
+    function updateOtherCards() {
+        generateOtherCards();
+    }
+
+    function updateWANIPInfo() {
+        const wanIPv4Element = document.getElementById('wan-ipv4');
+        const wanIPv6Element = document.getElementById('wan-ipv6');
+        const wanCard = document.getElementById('wan-card');
+        
+        if (wanIPv4Element) {
+            wanIPv4Element.textContent = window.wanIP4 || 'N/A';
+        }
+        if (wanIPv6Element) {
+            wanIPv6Element.textContent = window.wanIP6 || 'N/A';
+        }
+        
+        // Apply CSS class based on WAN active status
+        if (wanCard) {
+            // Remove existing status classes
+            wanCard.classList.remove('wan-active', 'wan-inactive');
+            
+            // Add appropriate class based on active status
+            if (window.wanActive) {
+                wanCard.classList.add('wan-active');
+            } else {
+                wanCard.classList.add('wan-inactive');
+            }
+        }
     }
 
     function updateLANIPInfo() {
@@ -401,20 +529,21 @@
         }
     }
 
+
     async function switchInterface(interfaceName) {
-        console.log('Switching to WAN interface:', interfaceName);
+        console.log('Switching to interface:', interfaceName);
         
         if (!dataLoaded) {
             showStatusMessage('Data not loaded yet', 'error', 3000);
             return;
         }
         
-        // Only check WAN interfaces for switching
-        const interfaceData = wanInterfaces.find(iface => iface.interface === interfaceName);
+        // Check OTHER interfaces for switching (since only OTHER interfaces have buttons now)
+        const interfaceData = otherInterfaces.find(iface => iface.interface === interfaceName);
         
         if (!interfaceData) {
-            console.log('WAN Interface data not found for:', interfaceName);
-            showStatusMessage(`WAN Interface ${interfaceName} not found`, 'error', 3000);
+            console.log('Interface data not found for:', interfaceName);
+            showStatusMessage(`Interface ${interfaceName} not found`, 'error', 3000);
             return;
         }
         
@@ -439,15 +568,27 @@
             if (result.success) {
                 // Update local data with server response
                 if (result.wan) {
-                    wanInterfaces = result.wan.map(iface => ({
+                    // Process WAN data - IP addresses are now at WAN level
+                    const wanData = result.wan;
+                    const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
+                    const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
+                    const wanActive = wanData.active || false;
+                    
+                    // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
+                    wanInterfaces = (wanData.interfaces || []).map(iface => ({
                         interface: iface.interface,
-                        ip4: iface.ipv4.length > 0 ? iface.ipv4[0] : '',
-                        ip6: iface.ipv6.length > 0 ? iface.ipv6[0] : '',
+                        ip4: '', // No IP addresses on individual WAN interfaces anymore
+                        ip6: '', // No IP addresses on individual WAN interfaces anymore
                         link: iface.state,
                         device: iface.state,
                         active: iface.active,
                         mac: iface.mac
                     }));
+                    
+                    // Update WAN IP addresses and active status
+                    window.wanIP4 = wanIP4;
+                    window.wanIP6 = wanIP6;
+                    window.wanActive = wanActive;
                 }
                 
                 if (result.lan) {
@@ -474,9 +615,25 @@
                     window.lanActive = lanActive;
                 }
                 
+                if (result.other) {
+                    // Process OTHER data
+                    const otherData = result.other;
+                    
+                    // Process OTHER interfaces from 'other.interfaces' data
+                    otherInterfaces = (otherData.interfaces || []).map(iface => ({
+                        interface: iface.interface,
+                        link: iface.state,
+                        device: iface.state,
+                        active: iface.active,
+                        mac: iface.mac
+                    }));
+                }
+                
                 // Update UI
                 updateWANCards();
                 updateWLANCards();
+                updateOtherCards();
+                updateWANIPInfo();
                 updateLANIPInfo();
                 
                 // Show success message

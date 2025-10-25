@@ -40,6 +40,31 @@ def if_downup(ifname: str) -> None:
 
     s.close()
 
+def wan_get() -> str | None:
+    """
+    use trick how to get local IP - try external connection
+    """
+    ip = None
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        try:
+            s.connect(("1.1.1.1", 53))
+            ip = s.getsockname()[0]
+        except (OSError, socket.error):
+            # If it fails (no internet connection)
+            pass
+    finally:
+        s.close()
+
+    if ip is not None:
+        interfaces = psutil.net_if_addrs()
+        for ifname, addrs in interfaces.items():
+            for addr in addrs:
+                if addr.address == ip:
+                    return ifname
+
+    return None
+
 
 def bridge_list(ifname: str) -> list[str]:
     """
@@ -63,15 +88,6 @@ def ifaces_get() -> dict:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     try:
-        # use trick how to get local IP - try external connection first
-        local_ip = None
-        try:
-            s.connect(("1.1.1.1", 53))
-            local_ip = s.getsockname()[0]
-        except (OSError, socket.error):
-            # If it fails (no internet connection)
-            local_ip = None
-
         for ifname, addrs in interfaces.items():
             ret[ifname] = {}
             ret[ifname]["ipv4"] = []
@@ -85,8 +101,6 @@ def ifaces_get() -> dict:
                     ret[ifname]["mac"] = addr.address
                 # IPv4
                 if addr.family.name == "AF_INET" and addr.address:
-                    if local_ip and addr.address == local_ip:
-                        ret[ifname]["active"] = True
                     ret[ifname]["ipv4"].append(ipv4_to_cidr(addr.address, addr.netmask))
                 # IPv6
                 elif addr.family.name == "AF_INET6" and addr.address:
@@ -137,16 +151,39 @@ def handle_get():
             del ifaces[ifname]["active"]
             lan["interfaces"].append(ifaces[ifname])
 
-    # WAN
-    wan = []
+    # WAN interfaces
+    wan_ifname = wan_get()
+    wan = {}
+    other = {}
+    if wan_ifname is not None:
+        wan["active"] = True
+    else:
+        wan["active"] = False
+    wan["interfaces"] = []
+    other["interfaces"] = []
+    #del wan["state"]
+    #del wan["interface"]
     for ifname in ifaces:
-        if ifname in ["eth0", "eth1", "wlan1", "usb0"]:
-            wan.append(ifaces[ifname])
+        if ifname in lan_ifnames:
+            continue
+        if ifname in ["eth0", "eth1", "eth2", "wlan1", "usb0"]:
+            del ifaces[ifname]["active"]
+            if ifname == wan_ifname:
+                wan["ipv4"] = ifaces[ifname]["ipv4"]
+                wan["ipv6"] = ifaces[ifname]["ipv6"]
+                del ifaces[ifname]["ipv4"]
+                del ifaces[ifname]["ipv6"]
+                wan["interfaces"].append(ifaces[ifname])
+            else:
+                del ifaces[ifname]["ipv4"]
+                del ifaces[ifname]["ipv6"]
+                other["interfaces"].append(ifaces[ifname])
 
     response = {
         "success": True,
         "wan": wan,
-        "lan": lan
+        "lan": lan,
+        "other": other,
     }
     return response
 
@@ -183,11 +220,11 @@ def handle_post():
         interface_found = wan_interfaces[interface_name]
         
         # Check if interface is up
-        if interface_found["state"] != "up":
-            return {
-                "success": False,
-                "error": f"Cannot switch to {interface_name} - interface is down"
-            }
+        #if interface_found["state"] != "up":
+        #    return {
+        #        "success": False,
+        #        "error": f"Cannot switch to {interface_name} - interface is down"
+        #    }
         
         # Update active interface
         logging.debug("Set active interface {interface_name}")

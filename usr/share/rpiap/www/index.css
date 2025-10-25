@@ -385,19 +385,28 @@ body {
     margin-top: 20px;
 }
 
-/* LAN Card Status */
-.card.lan-active {
+/* Other Interface Cards */
+.other-interfaces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Card Status - Unified Colors */
+.card.lan-active, .card.wan-active {
     border-color: #4CAF50;
     background-color: #1a2a1a;
     box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
-.card.lan-inactive {
-    border-color: #666;
-    background-color: #1a1a1a;
+.card.lan-inactive, .card.wan-inactive {
+    border-color: #f44336;
+    background-color: #2a1a1a;
+    box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.3);
 }
 
-.wan-interface-card, .lan-interface-card {
+.wan-interface-card, .lan-interface-card, .other-interface-card {
     background-color: #1a1a1a;
     border: 1px solid #404040;
     border-radius: 8px;
@@ -406,19 +415,19 @@ body {
     position: relative;
 }
 
-.wan-interface-card:hover, .lan-interface-card:hover {
+.wan-interface-card:hover, .lan-interface-card:hover, .other-interface-card:hover {
     border-color: #606060;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.wan-interface-card.active, .lan-interface-card.active {
+.wan-interface-card.active, .lan-interface-card.active, .other-interface-card.active {
     border-color: #4CAF50;
     background-color: #1a2a1a;
     box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.3);
 }
 
-.wan-interface-card.offline, .lan-interface-card.offline {
+.wan-interface-card.offline, .lan-interface-card.offline, .other-interface-card.offline {
     /* Keep default styling - only red dot indicates offline status */
 }
 
@@ -596,27 +605,59 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Use Button for WAN interfaces */
-.use-btn {
-    width: 100%;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+/* Drag and Drop Styles */
+.other-interface-card {
+    cursor: grab;
+    user-select: none;
     transition: all 0.3s ease;
-    background-color: #4CAF50;
-    color: white;
 }
 
-.use-btn:hover {
-    background-color: #45a049;
-    transform: translateY(-1px);
+.other-interface-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.wan-interface-card.active .use-btn,
-.wan-interface-card.offline .use-btn {
+.other-interface-card.dragging {
+    opacity: 0.7;
+    transform: none;
+    z-index: 1000;
+    cursor: grabbing;
+}
+
+.other-interface-card.drag-over {
+    border-color: #4CAF50;
+    background-color: #1a2a1a;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+/* WAN drop zone styles */
+.wan-interfaces-grid {
+    position: relative;
+    min-height: 100px;
+    transition: all 0.3s ease;
+}
+
+.wan-interfaces-grid.drag-over {
+    background-color: rgba(76, 175, 80, 0.1);
+    border: 2px dashed #4CAF50;
+    border-radius: 8px;
+}
+
+.wan-interfaces-grid.drag-over::before {
+    content: "Drop interface here to use as WAN";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #4CAF50;
+    font-size: 16px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Use Button for WAN interfaces - removed for drag and drop */
+.use-btn {
     display: none;
 }
 
@@ -770,12 +811,12 @@ body {
         margin-left: 0;
     }
     
-    .wan-interfaces-grid {
+    .wan-interfaces-grid, .other-interfaces-grid {
         grid-template-columns: 1fr;
         gap: 10px;
     }
     
-    .wan-interface-card {
+    .wan-interface-card, .other-interface-card {
         padding: 12px;
     }
     
