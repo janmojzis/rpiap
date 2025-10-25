@@ -211,6 +211,10 @@ while True:
             if os.path.exists(f"/sys/class/net/{iface}/brif"):
                 logging.info(f'{iface}: is bridge, nothing to do')
                 continue
+            # lan bridge
+            if os.path.exists(f"/sys/class/net/lan/brif/{iface}"):
+                logging.info(f'{iface}: is assigned to lan bridge, nothing to do')
+                continue
             # link
             if old[iface]['link'] != current[iface]['link']:
                 for script in linkscripts:
