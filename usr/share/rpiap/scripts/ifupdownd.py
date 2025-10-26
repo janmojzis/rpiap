@@ -108,9 +108,9 @@ def netlink_parse(data: bytes) -> None:
                 if len(state) > 0:
                     state = state[0:-1]
                 if flags == 0:
-                    logging.info(f"{name}: {state}")
+                    logging.debug(f"{name}: {state}")
                 else:
-                    logging.info(f"{name}: {state}, otherflags = {flags}")
+                    logging.debug(f"{name}: {state}, otherflags = {flags}")
             else:
                 logging.warning(f"unknown nlmsg_type: {nlmsg_type}")
 
@@ -180,7 +180,7 @@ if (args.verbose > len(LOG_LEVELS) - 1):
     args.verbose = len(LOG_LEVELS) - 1
 
 logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s", level=LOG_LEVELS[args.verbose])
-logging.info('start')
+logging.debug('start')
 
 # bind netlink interface
 s = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, NETLINK_ROUTE)
@@ -216,20 +216,20 @@ while True:
         for iface in allowed:
             # bridge
             if os.path.exists(f"/sys/class/net/{iface}/brif"):
-                logging.info(f'{iface}: is bridge, nothing to do')
+                logging.debug(f'{iface}: is bridge, nothing to do')
                 continue
             # lan bridge
             if os.path.exists(f"/sys/class/net/lan/brif/{iface}"):
-                logging.info(f'{iface}: is assigned to lan bridge, nothing to do')
+                logging.debug(f'{iface}: is assigned to lan bridge, nothing to do')
                 continue
             # link
             if old[iface]['link'] != current[iface]['link']:
                 for script in linkscripts:
                     cmd = [script, iface, current[iface]['link']] + active
                     if old[iface]['link'] == 'none' and current[iface]['link'] != 'up':
-                        logging.info(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, nothing to do')
+                        logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, nothing to do')
                     else:
-                        logging.info(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
+                        logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
                         subprocess.run(cmd)
 
                     old[iface]['link'] = current[iface]['link']
@@ -238,7 +238,7 @@ while True:
             if old[iface]['device'] != current[iface]['device']:
                 for script in devicescripts:
                     cmd = [script, iface, current[iface]['device']]
-                    logging.info(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
+                    logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
                     subprocess.run(cmd)
 
                     old[iface]['device'] = current[iface]['device']
