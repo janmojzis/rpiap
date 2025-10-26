@@ -140,6 +140,17 @@ def iflist(allowed = []):
     return ret
 
 
+def scripts_get(directory: str) -> [str]:
+    """
+    """
+
+    result = []
+    for filename in os.listdir(directory):
+        result.append(f"{directory}/{filename}")
+    result.sort()
+    return result
+
+
 
 parser = argparse.ArgumentParser(description='ifupdown.py')
 parser.add_argument('-v', '--verbose',
@@ -152,12 +163,13 @@ parser.add_argument('-i', '--interface',
                         help='interface')
 
 parser.add_argument('-d', '--device',
-                        action='append',
-                        help='device up/down script')
+                        action='store',
+                        help='direcrtory containing device up/down scripts')
 
 parser.add_argument('-l', '--link',
-                        action='append',
-                        help='link up/down script')
+                        action='store',
+                        help='direcrtory containing link up/down scripts')
+
 
 args = parser.parse_args()
 
@@ -188,13 +200,8 @@ for iface in allowed:
     old[iface]['device'] = 'none'
 
 # scripts
-linkscripts = args.link
-if linkscripts is None:
-    linkscripts = []
-
-devicescripts = args.device
-if devicescripts is None:
-    devicescripts = []
+linkscripts = scripts_get(args.link)
+devicescripts = scripts_get(args.device)
 
 
 while True:

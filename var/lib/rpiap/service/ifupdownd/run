@@ -34,4 +34,4 @@ for interface in wlan1 eth0 eth1 eth2 usb0 pqccli0; do
   ip6tables -A FORWARD -i "${lan}" -o "${interface}" -j ACCEPT
 done
 
-exec /usr/share/rpiap/scripts/ifupdownd.py -i wlan0 -i eth0 -i wlan1 -i eth1 -i eth2 -i usb0 -l /usr/share/rpiap/scripts/ifupdownd-wpasupplicant.py -l /usr/share/rpiap/scripts/ifupdownd-udhcpc.py
+exec /usr/share/rpiap/scripts/ifupdownd.py -i wlan0 -i eth0 -i wlan1 -i eth1 -i eth2 -i usb0 -l /usr/share/rpiap/ifupdownd.link.d -d /usr/share/rpiap/ifupdownd.device.d
