@@ -232,7 +232,7 @@ while True:
                         logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
                         subprocess.run(cmd)
 
-                    old[iface]['link'] = current[iface]['link']
+                old[iface]['link'] = current[iface]['link']
 
             # device
             if old[iface]['device'] != current[iface]['device']:
@@ -241,7 +241,7 @@ while True:
                     logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
                     subprocess.run(cmd)
 
-                    old[iface]['device'] = current[iface]['device']
+                old[iface]['device'] = current[iface]['device']
 
     except Exception as e:
         logging.fatal('%s' % (e))
