@@ -199,13 +199,11 @@ for iface in allowed:
     old[iface]['link'] = 'none'
     old[iface]['device'] = 'none'
 
-# scripts
-linkscripts = scripts_get(args.link)
-devicescripts = scripts_get(args.device)
-
 
 while True:
     try:
+        linkscripts = scripts_get(args.link)
+        devicescripts = scripts_get(args.device)
         current = iflist(allowed)
 
         active = []
