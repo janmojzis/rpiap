@@ -66,6 +66,10 @@ if __name__ == "__main__":
     phase=sys.argv[2]
     logging.debug(f"phase = '{phase}'")
 
+    # LAN interfaces
+    laninterfaces=lan_interfaces()
+    logging.debug(f"laninterfaces = {laninterfaces}")
+
     # interface type LAN/WAN
     if interface not in laninterfaces:
         interfacetype = "WAN"
