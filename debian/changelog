@@ -1,3 +1,9 @@
+rpiap (20251026) unstable; urgency=medium
+
+  * ifupdownd: move scripts to ifupdownd.link.d and ifupdownd.device.d
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 26 Oct 2025 22:02:01 +0100
+
 rpiap (20251025) unstable; urgency=medium
 
   * create bridge lan for LAN interfaces
