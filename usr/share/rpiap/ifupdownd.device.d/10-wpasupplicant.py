@@ -91,7 +91,7 @@ if __name__ == "__main__":
         case "down":
             if interface not in laninterfaces:
                 if wpasupplicant_down(interface):
-                    log(f"stoping wpasupplicant on {interface}")
+                    log(f"stopping wpasupplicant on {interface}")
         case _:
             pass
 

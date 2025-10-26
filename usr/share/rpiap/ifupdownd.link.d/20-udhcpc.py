@@ -108,7 +108,7 @@ if __name__ == "__main__":
             if interface not in laninterfaces:
                 if len(bkinterfaces) == 0:
                     udhcpc_down()
-                    log("other interfaces are not active, stoping udhcpc")
+                    log("other interfaces are not active, stopping udhcpc")
                 else:
                     if interface == activeinterface:
                         bkiface = bkinterfaces[0]
