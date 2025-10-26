@@ -49,17 +49,11 @@ def udhcpc_down() -> None:
     """
     """
 
-    os.unlink(UDHCPC_ENV)
+    if os.path.exists(UDHCPC_ENV):
+        os.unlink(UDHCPC_ENV)
 
     with open(UDHCPC_CONTROL, "w") as f:
         f.write("d")
-
-
-def down(interface: str, bkinterface: str) -> None:
-    """
-    """
-
-    pass
 
 
 if __name__ == "__main__":
