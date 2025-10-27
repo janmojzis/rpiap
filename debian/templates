@@ -60,20 +60,20 @@ Type: multiselect
 Choices: wlan0, eth0, eth1, eth2, usb0
 Default: wlan0
 Description: Select LAN interfaces:
- This is an advanced option for experts only. Interfaces you select here
- will be part of your LAN bridge, providing network access to client
- devices.
+ This is an advanced option intended for expert users. The interfaces you
+ select here will be included in your LAN bridge, providing network access
+ to client devices.
  .
- All other available interfaces (those not selected here) will be automatically
- used as WAN connections if connected. This includes additional USB network
- adapters, mobile phones with tethering, etc.).
+ All other available interfaces (those not selected here) will automatically
+ be used as WAN connections if connected. This includes additional USB network
+ adapters, tethered mobile phones, and similar devices.
  .
- This option is only shown when "custom" mode is selected.
+ This option is only available when “custom” mode is selected.
  .
  Available interfaces:
-  - wlan0: Raspberry PI wireless interface
-  - eth0: Raspberry PI ethernet interface
-  - eth1, eth2, usb0: additional plug-and-play USB network interfaces
+  - wlan0: Raspberry Pi wireless interface
+  - eth0: Raspberry Pi Ethernet interface
+  - eth1, eth2, usb0: additional USB network interfaces
 
 Template: rpiap/restart
 Type: text
