@@ -1,0 +1,36 @@
+#!/bin/sh
+exec 2>&1
+
+if systemctl status wpa_supplicant.service >/dev/null; then
+  echo "WARNING: wpa_supplicant.service running, stopping it" >&2
+  systemctl stop wpa_supplicant.service
+  systemctl mask wpa_supplicant.service
+fi
+
+umask 027
+
+# directory /etc/rpiap/wpasupplicant can contain passwords, keys, ...
+chmod 750 /etc/rpiap/wpasupplicant /etc/rpiap/wpasupplicant/*
+
+# try to unblock wifi
+rfkill unblock wifi || :
+
+# run wpa_supplicant under random UID/GID
+exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
+
+  rm -rf ./conf ./bin
+  mkdir -p ./conf ./bin
+
+  # config
+  cp -pr /etc/rpiap/wpasupplicant/* ./conf
+  chown -R "0:${GID}" ./conf
+
+  # binary
+  cp /usr/sbin/wpa_supplicant ./bin/wpa_supplicant
+  chmod +x ./bin/wpa_supplicant
+  chown "0:${GID}" ./bin ./bin/wpa_supplicant
+  setcap cap_net_raw,cap_net_admin+ep ./bin/wpa_supplicant
+
+  # run wpa_supplican under random UID/GID
+  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/wpa_supplicant -D wired -i eth2 -c ./conf/eth2.conf
+'

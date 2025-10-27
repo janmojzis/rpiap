@@ -1,0 +1,14 @@
+#!/bin/sh
+
+PATH="/usr/share/rpiap/scripts:${PATH}"
+export PATH
+
+DIR="/var/log/rpiap/`pwd | awk 'BEGIN { FS="/" }{ print $(NF-1) }'`"
+export DIR
+
+exec randomuidgid.py sh -c '
+  mkdir -p "${DIR}"
+  chown "${UID}:${GID}" "${DIR}"
+  chown "${UID}:${GID}" "${DIR}"/* || :
+  exec setuidgid.py multilog t !"gzip -9" n5 s1024000 "${DIR}"
+'
