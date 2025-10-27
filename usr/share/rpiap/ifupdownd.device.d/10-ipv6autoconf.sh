@@ -10,7 +10,7 @@ if [ ! -f /var/lib/rpiap/env/lan ] && [ x"${interface}" = xwlan0 ]; then
   exit 0
 fi
 
-if grep "^${interface}"'$' /var/lib/rpiap/env/lan 2>/dev/null; then
+if grep -q "^${interface}"'$' /var/lib/rpiap/env/lan 2>/dev/null; then
   # LAN
   exit 0
 fi
