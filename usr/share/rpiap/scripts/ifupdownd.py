@@ -144,6 +144,9 @@ def scripts_get(directory: str) -> [str]:
     """
     """
 
+    if directory is None:
+        return []
+
     result = []
     for filename in os.listdir(directory):
         result.append(f"{directory}/{filename}")
@@ -164,11 +167,15 @@ parser.add_argument('-i', '--interface',
 
 parser.add_argument('-d', '--device',
                         action='store',
-                        help='direcrtory containing device up/down scripts')
+                        help='directory containing device up/down scripts')
 
 parser.add_argument('-l', '--link',
                         action='store',
-                        help='direcrtory containing link up/down scripts')
+                        help='directory containing link up/down scripts')
+
+parser.add_argument('-b', '--bridge',
+                        action='store',
+                        help='directory containing bridge up/down scripts')
 
 
 args = parser.parse_args()
@@ -204,6 +211,7 @@ while True:
     try:
         linkscripts = scripts_get(args.link)
         devicescripts = scripts_get(args.device)
+        bridgescripts = scripts_get(args.bridge)
         current = iflist(allowed)
 
         active = []
@@ -212,33 +220,31 @@ while True:
                 active.append(iface)
 
         for iface in allowed:
-            # bridge
-            if os.path.exists(f"/sys/class/net/{iface}/brif"):
-                logging.debug(f'{iface}: is bridge, nothing to do')
-                continue
-            # lan bridge
-            if os.path.exists(f"/sys/class/net/lan/brif/{iface}"):
-                logging.debug(f'{iface}: is assigned to lan bridge, nothing to do')
-                continue
             # link
             if old[iface]['link'] != current[iface]['link']:
-                for script in linkscripts:
-                    cmd = [script, iface, current[iface]['link']] + active
-                    if old[iface]['link'] == 'none' and current[iface]['link'] != 'up':
-                        logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, nothing to do')
-                    else:
-                        logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
-                        subprocess.run(cmd)
-
+                if not os.path.exists(f"/sys/class/net/{iface}/brif"):
+                    for script in linkscripts:
+                        cmd = [script, iface, current[iface]['link']] + active
+                        if old[iface]['link'] == 'none' and current[iface]['link'] != 'up':
+                            logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, nothing to do')
+                        else:
+                            logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
+                            subprocess.run(cmd)
                 old[iface]['link'] = current[iface]['link']
 
-            # device
             if old[iface]['device'] != current[iface]['device']:
-                for script in devicescripts:
-                    cmd = [script, iface, current[iface]['device']]
-                    logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
-                    subprocess.run(cmd)
-
+                # device
+                if not os.path.exists(f"/sys/class/net/{iface}/brif"):
+                    for script in devicescripts:
+                        cmd = [script, iface, current[iface]['device']]
+                        logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
+                        subprocess.run(cmd)
+                # bridge
+                else:
+                    for script in bridgescripts:
+                        cmd = [script, iface, current[iface]['device']]
+                        logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
+                        subprocess.run(cmd)
                 old[iface]['device'] = current[iface]['device']
 
     except Exception as e:
