@@ -40,23 +40,20 @@ Description: Use DNS server from DHCP?
 Template: rpiap/mode
 Type: select
 Default: ap
-Choices: ap, client, custom
+Choices: ap, custom
 Description: Select operating mode:
  Choose the operating mode for your setup.
  .
  ap - Access Point mode (default):
-     WiFi interface acts as an access point, providing a wireless LAN network
-     for client devices to connect. Ethernet interface or plug-and-play USB
-     devices (like mobile phones with tethering) can be used for WAN connection
-     to the internet. This is the standard home router configuration.
- .
- client - Wireless Client mode:
-     Ethernet interface provides wired LAN for client devices, while WiFi
-     interface connects to an external wireless network as WAN. Other interfaces
-     can be used as optional WAN connections if needed.
+     In this mode, the WiFi interface operates as an access point,
+     creating a wireless LAN network for client devices to connect to.
+     The Ethernet interface or USB devices (such as a mobile phone via
+     tethering) can be used as the WAN connection to the Internet.
+     This is the standard configuration for a home router.
  .
  custom - Custom mode:
-     Select your own combination of LAN interfaces (for experts only).
+     Allows you to select your own combination of LAN interfaces.
+     For advanced users only.
 
 Template: rpiap/laninterfaces
 Type: multiselect
