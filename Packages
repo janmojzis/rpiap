@@ -1,25 +1,4 @@
 Package: rpiap
-Version: 20251025
-Architecture: all
-Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
-Installed-Size: 210
-Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-legacy-cgi, python3-pqconnect, python3-psutil, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
-Conflicts: dhcpcd5, isc-dhcp-client, isc-dhcp-server, pqconnect
-Filename: ./trixie/rpiap_20251025_all.deb
-Size: 29756
-MD5sum: a19c6a63eed45c7160f6c5db0f53ad37
-SHA1: e839b92662653c4cb5bc8d1a625e0a76b9520000
-SHA256: 71374947deb2e25826ff8dbb6e57f14cec3c214b0f38eec0ddf81ac52ebd0e60
-Section: misc
-Priority: optional
-Description: Raspberry PI - AP
- A configuration package that transforms a Raspberry Pi into a wireless access
- point. The Wi-Fi AP is powered by hostapd. It includes a DHCP server (udhcpd)
- and client (udhcpc). DNS services are handled by dqcache with support for
- the DNSCurve protocol. PQConnect is used to encrypt network traffic.
- All daemons are managed through daemontools.
-
-Package: rpiap
 Version: 20251026
 Architecture: all
 Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
@@ -31,6 +10,27 @@ Size: 30572
 MD5sum: aaddb0481497b589e3e52801630ca7ab
 SHA1: cab8a97ab87fd00d07250ded6dc5521908bf066c
 SHA256: b2da3a8c6bee6c6a7f7f0cf9baf0bb3fbd995f6539f5f1e2e4ab35c4f725a8f6
+Section: misc
+Priority: optional
+Description: Raspberry PI - AP
+ A configuration package that transforms a Raspberry Pi into a wireless access
+ point. The Wi-Fi AP is powered by hostapd. It includes a DHCP server (udhcpd)
+ and client (udhcpc). DNS services are handled by dqcache with support for
+ the DNSCurve protocol. PQConnect is used to encrypt network traffic.
+ All daemons are managed through daemontools.
+
+Package: rpiap
+Version: 20251027
+Architecture: all
+Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
+Installed-Size: 231
+Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-legacy-cgi, python3-pqconnect, python3-psutil, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
+Conflicts: dhcpcd5, isc-dhcp-client, isc-dhcp-server, pqconnect
+Filename: ./trixie/rpiap_20251027_all.deb
+Size: 31968
+MD5sum: 2662d4a872ef41da63daecf7d8eddd74
+SHA1: f245bb551299c77e65cc8757cdd5ba10ff6b985e
+SHA256: adf55bdaada41e891966dcf06a0cc09e39c5b643bfdf7636c52dbe75ad4a64cd
 Section: misc
 Priority: optional
 Description: Raspberry PI - AP
