@@ -37,6 +37,47 @@ Description: Use DNS server from DHCP?
  zones, select 'Yes'. To use the internal DNS server and benefit from support
  for encrypted DNS (DNSCurve), leave the default setting as 'No'.
 
+Template: rpiap/mode
+Type: select
+Default: ap
+Choices: ap, client, custom
+Description: Select operating mode:
+ Choose the operating mode for your setup.
+ .
+ ap - Access Point mode (default):
+     WiFi interface acts as an access point, providing a wireless LAN network
+     for client devices to connect. Ethernet interface or plug-and-play USB
+     devices (like mobile phones with tethering) can be used for WAN connection
+     to the internet. This is the standard home router configuration.
+ .
+ client - Wireless Client mode:
+     Ethernet interface provides wired LAN for client devices, while WiFi
+     interface connects to an external wireless network as WAN. Other interfaces
+     can be used as optional WAN connections if needed.
+ .
+ custom - Custom mode:
+     Select your own combination of LAN interfaces (for experts only).
+
+Template: rpiap/laninterfaces
+Type: multiselect
+Choices: wlan0, eth0, eth1, eth2, usb0
+Default: wlan0
+Description: Select LAN interfaces:
+ This is an advanced option for experts only. Interfaces you select here
+ will be part of your LAN bridge, providing network access to client
+ devices.
+ .
+ All other available interfaces (those not selected here) will be automatically
+ used as WAN connections if connected. This includes additional USB network
+ adapters, mobile phones with tethering, etc.).
+ .
+ This option is only shown when "custom" mode is selected.
+ .
+ Available interfaces:
+  - wlan0: Raspberry PI wireless interface
+  - eth0: Raspberry PI ethernet interface
+  - eth1, eth2, usb0: additional plug-and-play USB network interfaces
+
 Template: rpiap/restart
 Type: text
 Description: Restart services.

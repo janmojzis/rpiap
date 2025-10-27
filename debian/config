@@ -40,6 +40,61 @@ dbdo() {
   fi
 }
 
+# Determine initial mode based on ${var}/lan file
+dbname="rpiap/mode"
+if [ -f "${var}/lan" ]; then
+  lan_value=`cat "${var}/lan"`
+  case "${lan_value}" in
+    wlan0)
+      db_set "${dbname}" "ap"
+      ;;
+    eth0)
+      db_set "${dbname}" "client"
+      ;;
+    *)
+      db_set "${dbname}" "custom"
+      ;;
+  esac
+else
+  db_set "${dbname}" "ap"
+fi
+db_input critical "${dbname}" || true
+db_go
+
+db_get "${dbname}"
+mode_value="${RET}"
+
+# Handle custom mode separately
+if [ "${mode_value}" = "custom" ]; then
+  # Show custom LAN interfaces selection
+  dbname="rpiap/laninterfaces"
+  if [ -f "${var}/lan" ]; then
+    # Load previous custom selection
+    previous_interfaces=`cat "${var}/lan" | awk 'NR==1 {out=$0} NR>1 {out=out", "$0} END {print out}'`
+    db_set "${dbname}" "${previous_interfaces}"
+  else
+    db_set "${dbname}" "wlan0"
+  fi
+  db_input critical "${dbname}" || true
+  db_go
+
+  db_get "${dbname}"
+  lan_interfaces="${RET}"
+else
+  # Use predefined mode values
+  case "${mode_value}" in
+    ap)
+      lan_interfaces="wlan0"
+      ;;
+    client)
+      lan_interfaces="eth0"
+      ;;
+  esac
+fi
+
+echo "${lan_interfaces}" | tr -s ',' '\n' | sed 's/^ //' > "${var}/lan"
+chown rpiap:rpiap "${var}/lan"
+
 dbdo wlanssid
 dbdo wlanpassword _
 dbdo wlanchannel
