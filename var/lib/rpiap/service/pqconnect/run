@@ -11,6 +11,9 @@ if ! getent passwd pqconnect > /dev/null; then
   adduser --quiet --system --no-create-home --disabled-password --home /etc/pqconnect --ingroup pqconnect --gecos "pqconnect user" pqconnect
 fi
 
+# FORWARDING/NAT
+/usr/share/rpiap/ifupdownd.link.d/50-iptables.sh pqccli0 up
+
 # pqconnect - add prerouting hook (from dqcache to the client)
 nft add table inet rpiap-pqconnect-filter
 nft add chain inet rpiap-pqconnect-filter prerouting '{ type filter hook prerouting priority -10; policy accept; }'
