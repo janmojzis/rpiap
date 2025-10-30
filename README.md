@@ -1,7 +1,7 @@
 # Intro
 Raspberry PI models 3B+, 4, and 5 integrated Wi-Fi interfaces supporting both 2.4 GHz and 5 GHz bands.
 
-The `rpiap` package provides flexible network configuration capabilities, allowing you to use different combinations of WiFi, Ethernet, and USB network interfaces for LAN and WAN connectivity. Depending on the selected operating mode, the Raspberry Pi can create its own wireless network, connect as a client to an existing network, integrate into your existing LAN infrastructure, or be configured in custom topologies. The package handles network interface management, DHCP services, DNS resolution, and network address translation (NAT) automatically.
+The `rpiap` package provides flexible network configuration capabilities, allowing you to use different combinations of WiFi, Ethernet, and USB network interfaces for LAN and WAN connectivity. Depending on the selected operating mode, the Raspberry Pi can create its own wireless network, connect as a client to an existing Wifi network, integrate into your existing LAN infrastructure, or be configured in custom topologies. The package handles network interface management, DHCP services, DNS resolution, and network address translation (NAT) automatically.
 
 # Operating Modes
 
