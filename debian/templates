@@ -1,10 +1,10 @@
-Template: rpiap/wlanssid
+Template: rpiap/wlan_ssid
 Type: string
 Default: rpiap
 Description: Enter SSID:
  Enter the name (SSID) of your wireless network (WLAN).
 
-Template: rpiap/wlanpassword
+Template: rpiap/wlan_password
 Type: password
 Description: Enter password:
  Set a WPA password for your WLAN.
@@ -12,7 +12,7 @@ Description: Enter password:
  If you are reconfiguring the package, leaving this field blank will keep the
  current password unchanged.
 
-Template: rpiap/wlanchannel
+Template: rpiap/wlan_channel
 Type: string
 Default: 6
 Description: Enter WLAN channel:
@@ -21,7 +21,7 @@ Description: Enter WLAN channel:
  For 5 GHz, you can use 36, 40, 44, or 48.
  If you are not sure, just keep the default (6).
 
-Template: rpiap/wlancountry
+Template: rpiap/wlan_country
 Type: string
 Default: CZ
 Description: Enter WLAN country code:

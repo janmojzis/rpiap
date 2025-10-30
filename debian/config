@@ -145,11 +145,11 @@ if [ _"${mode_value}" = "_custom" ] || [ _"${mode_value}" = "_bridge" ]; then
   fi
 fi
 
-dbdo wlanssid
-dbdo wlanpassword _
-dbdo wlanchannel
-dbdo wlancountry
+dbdo wlan_ssid
+dbdo wlan_password _
 if [ _"${mode_value}" = "_custom" ]; then
+  dbdo wlan_country
+  dbdo wlan_channel
   dbdo dns_standalone
 fi
 dbdo restart
