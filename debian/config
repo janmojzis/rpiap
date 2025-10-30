@@ -87,18 +87,18 @@ db_set "${dbname}" "${lan_interfaces}"
 echo "${lan_interfaces}" | tr -s ',' '\n' | sed 's/^ //' > "${var}/lan"
 chown rpiap:rpiap "${var}/lan"
 
+# XXX - stop udhcpd and radvd in bridge mode
+if [ _"${mode_value}" = "_bridge" ]; then
+  touch /var/lib/rpiap/service/udhcpd/down
+  touch /var/lib/rpiap/service/radvd/down
+else
+  rm -f /var/lib/rpiap/service/udhcpd/down
+  rm -f /var/lib/rpiap/service/radvd/down
+fi
+
 # Handle services configuration in custom mode
 if [ _"${mode_value}" = "_custom" ] || [ _"${mode_value}" = "_bridge" ]; then
   dbname="rpiap/services"
-
-  # XXX - stop udhcpd and radvd in bridge mode
-  if [ _"${mode_value}" = "_bridge" ]; then
-    touch /var/lib/rpiap/service/udhcpd/down
-    touch /var/lib/rpiap/service/radvd/down
-  else
-    rm -f /var/lib/rpiap/service/udhcpd/down
-    rm -f /var/lib/rpiap/service/radvd/down
-  fi
   
   # Define allowed services (must match template choices)
   allowed_services="dqcache httpd pqconnect radvd udhcpd"
