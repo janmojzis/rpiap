@@ -34,8 +34,8 @@ Type: boolean
 Default: false
 Description: Use standalone DNS server?
  If you need to use local DNS resolvers, for example to resolve internal DNS
- zones, select 'No'. To use the internal standalone DNS server and benefit from
- support for encrypted DNS (DNSCurve), leave the default setting as 'Yes'.
+ zones, leave the default setting as  'No'. To use the internal standalone DNS
+ server and benefit from support for encrypted DNS (DNSCurve), select 'Yes'.
 
 Template: rpiap/mode
 Type: select
