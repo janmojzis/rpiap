@@ -12,15 +12,6 @@ Description: Enter password:
  If you are reconfiguring the package, leaving this field blank will keep the
  current password unchanged.
 
-Template: rpiap/wlan_channel
-Type: string
-Default: 6
-Description: Enter WLAN channel:
- Choose a WLAN channel if you want to use a specific one.
- For 2.4 GHz, recommended channels are 1, 6, or 11.
- For 5 GHz, you can use 36, 40, 44, or 48.
- If you are not sure, just keep the default (6).
-
 Template: rpiap/wlan_country
 Type: string
 Default: CZ
@@ -28,6 +19,16 @@ Description: Enter WLAN country code:
  Country code (ISO/IEC 3166-1) used to set the regulatory domain.
  This may limit available channels and transmit power.
  Default: CZ
+
+Template: rpiap/wlan_channel
+Type: string
+Default: 0
+Description: Specify WLAN channel
+ You can manually select a WLAN channel if you prefer a specific frequency.
+ For the 2.4 GHz band, channels 1, 6, and 11 are recommended.
+ For the 5 GHz band, you may choose from 36, 40, 44, or 48.
+ If you are uncertain, keep the default value (0) to enable automatic channel
+ selection.
 
 Template: rpiap/dns_standalone
 Type: boolean
