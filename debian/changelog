@@ -1,8 +1,8 @@
-rpiap (20251028) UNRELEASED; urgency=medium
+rpiap (20251030) unstable; urgency=medium
 
   * update operation modes to: ap, client, bridge, custom
 
- -- Jan Mojžíš <janmojzis@debian.org>  Thu, 30 Oct 2025 12:48:34 +0100
+ -- Jan Mojžíš <janmojzis@debian.org>  Thu, 30 Oct 2025 22:03:56 +0100
 
 rpiap (20251027) unstable; urgency=medium
 
