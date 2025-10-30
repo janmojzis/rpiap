@@ -40,60 +40,110 @@ dbdo() {
   fi
 }
 
-# Determine initial mode based on ${var}/lan file
+# Determine mode based on ${var}/lan file
 dbname="rpiap/mode"
-if [ -f "${var}/lan" ]; then
-  lan_value=`cat "${var}/lan"`
-  case "${lan_value}" in
-    wlan0)
-      db_set "${dbname}" "ap"
-      ;;
-    eth0)
-      db_set "${dbname}" "client"
-      ;;
-    *)
-      db_set "${dbname}" "custom"
-      ;;
-  esac
-else
-  db_set "${dbname}" "ap"
-fi
+previous_interfaces=`( cat "${var}/lan" 2>/dev/null || echo wlan0 ) | sort | awk 'NR==1 {out=$0} NR>1 {out=out", "$0} END {print out}'`
+case _"${previous_interfaces}" in
+  '_wlan0')
+    db_set "${dbname}" 'ap'
+    ;;
+  '_eth0')
+    db_set "${dbname}" 'client'
+    ;;
+  '_eth0, wlan0')
+    db_set "${dbname}" 'bridge'
+    ;;
+  *)
+    db_set "${dbname}" 'custom'
+    ;;
+esac
 db_input critical "${dbname}" || true
 db_go
-
 db_get "${dbname}"
 mode_value="${RET}"
 
 # Handle custom mode separately
-if [ "${mode_value}" = "custom" ]; then
-  # Show custom LAN interfaces selection
-  dbname="rpiap/laninterfaces"
-  if [ -f "${var}/lan" ]; then
-    # Load previous custom selection
-    previous_interfaces=`cat "${var}/lan" | awk 'NR==1 {out=$0} NR>1 {out=out", "$0} END {print out}'`
+dbname="rpiap/laninterfaces"
+case _"${mode_value}" in
+  '_ap')
+    lan_interfaces='wlan0'
+    ;;
+  '_client')
+    lan_interfaces='eth0'
+    ;;
+  '_bridge')
+    lan_interfaces='eth0, wlan0'
+    ;;
+  *)
     db_set "${dbname}" "${previous_interfaces}"
-  else
-    db_set "${dbname}" "wlan0"
-  fi
-  db_input critical "${dbname}" || true
-  db_go
-
-  db_get "${dbname}"
-  lan_interfaces="${RET}"
-else
-  # Use predefined mode values
-  case "${mode_value}" in
-    ap)
-      lan_interfaces="wlan0"
-      ;;
-    client)
-      lan_interfaces="eth0"
-      ;;
-  esac
-fi
+    db_input critical "${dbname}" || true
+    db_go
+    db_get "${dbname}"
+    lan_interfaces="${RET}"
+    ;;
+esac
+db_set "${dbname}" "${lan_interfaces}"
 
 echo "${lan_interfaces}" | tr -s ',' '\n' | sed 's/^ //' > "${var}/lan"
 chown rpiap:rpiap "${var}/lan"
+
+# Handle services configuration in custom mode
+if [ _"${mode_value}" = "_custom" ] || [ _"${mode_value}" = "_bridge" ]; then
+  dbname="rpiap/services"
+
+  # XXX - stop udhcpd and radvd in bridge mode
+  if [ _"${mode_value}" = "_bridge" ]; then
+    touch /var/lib/rpiap/service/udhcpd/down
+    touch /var/lib/rpiap/service/radvd/down
+  else
+    rm -f /var/lib/rpiap/service/udhcpd/down
+    rm -f /var/lib/rpiap/service/radvd/down
+  fi
+  
+  # Define allowed services (must match template choices)
+  allowed_services="dqcache httpd pqconnect radvd udhcpd"
+  
+  # Get currently active services (those without 'down' file)
+  servicedir="/var/lib/rpiap/service"
+  if [ -d "${servicedir}" ]; then
+    active_services=""
+    for servicename in ${allowed_services}; do
+      service="${servicedir}/${servicename}"
+      if [ -d "${service}" ] && [ ! -f "${service}/down" ]; then
+        if [ -z "${active_services}" ]; then
+          active_services="${servicename}"
+        else
+          active_services="${active_services}, ${servicename}"
+        fi
+      fi
+    done
+    db_set "${dbname}" "${active_services}"
+  fi
+  
+  db_input critical "${dbname}" || true
+  db_go
+  
+  db_get "${dbname}"
+  selected_services="${RET}"
+  
+  # Create/remove 'down' files based on selection (only for allowed services)
+  if [ -d "${servicedir}" ]; then
+    for servicename in ${allowed_services}; do
+      service="${servicedir}/${servicename}"
+      if [ -d "${service}" ]; then
+        # Check if service is in the selected list (exact match)
+        # Use grep with word boundaries to avoid partial matches
+        if echo ", ${selected_services}," | grep -q ", ${servicename},"; then
+          # Service selected - remove 'down' file
+          rm -f "${service}/down"
+        else
+          # Service not selected - create 'down' file
+          touch "${service}/down"
+        fi
+      fi
+    done
+  fi
+fi
 
 dbdo wlanssid
 dbdo wlanpassword _

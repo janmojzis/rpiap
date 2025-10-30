@@ -15,9 +15,6 @@ def lan_interfaces() -> [str]:
     """
     """
 
-    if not os.path.exists(LAN_ENV):
-        return "wlan0" # XXX: backward compatibility
-
     with open(LAN_ENV, "r") as f:
         return f.read().strip().split("\n")
 

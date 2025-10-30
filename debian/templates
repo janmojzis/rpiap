@@ -40,7 +40,7 @@ Description: Use DNS server from DHCP?
 Template: rpiap/mode
 Type: select
 Default: ap
-Choices: ap, custom
+Choices: ap, client, bridge, custom
 Description: Select operating mode:
  Choose the operating mode for your setup.
  .
@@ -51,6 +51,21 @@ Description: Select operating mode:
      tethering) can be used as the WAN connection to the Internet.
      This is the standard configuration for a home router.
  .
+ client - Wireless Client mode:
+     In this mode, the Ethernet interface is used to provide LAN connectivity
+     for connected wired devices. The WiFi interface connects to another access
+     point as a client, providing WAN Internet access through the wireless
+     connection. This mode is useful when you want to extend Internet access to
+     wired devices through an existing WiFi network.
+ .
+ bridge - Bridge mode:
+     This mode bridges the Ethernet and wireless interfaces together,
+     integrating the wireless access point directly into your existing LAN
+     infrastructure. All devices, whether connected via Ethernet or WiFi,
+     will be on the same network segment, sharing the same IP address range
+     and network resources.
+     For advanced users only.
+ .
  custom - Custom mode:
      Allows you to select your own combination of LAN interfaces.
      For advanced users only.
@@ -60,20 +75,43 @@ Type: multiselect
 Choices: wlan0, eth0, eth1, eth2, usb0
 Default: wlan0
 Description: Select LAN interfaces:
- This is an advanced option intended for expert users. The interfaces you
- select here will be included in your LAN bridge, providing network access
- to client devices.
+ This is an advanced option intended for expert users.
+ .
+ The interfaces you select here will be included in your LAN bridge, providing
+ network access to client devices.
  .
  All other available interfaces (those not selected here) will automatically
  be used as WAN connections if connected. This includes additional USB network
  adapters, tethered mobile phones, and similar devices.
  .
- This option is only available when “custom” mode is selected.
- .
  Available interfaces:
   - wlan0: Raspberry Pi wireless interface
   - eth0: Raspberry Pi Ethernet interface
   - eth1, eth2, usb0: additional USB network interfaces
+ .
+ For advanced users only !!!.
+
+Template: rpiap/services
+Type: multiselect
+Choices: dqcache, httpd, pqconnect, radvd, udhcpd
+Default: dqcache, pqconnect, udhcpd
+Description: Select active services:
+ This is an advanced option intended for expert users.
+ .
+ This option allows you to control which services should be started.
+ .
+ When operating in bridge mode, it is recommended to disable 'udhcpd' and
+ 'radvd' to prevent interference with the existing DHCP and router
+ advertisement services of the LAN.
+ .
+ Services:
+  - dqcache: DNS cache server
+  - httpd: Web interface server
+  - pqconnect: PQconnect connection manager
+  - radvd: IPv6 router advertisement daemon
+  - udhcpd: DHCP server
+ .
+ For advanced users only !!!.
 
 Template: rpiap/restart
 Type: text

@@ -7,7 +7,7 @@ auto lan
 iface lan inet static
     address 192.168.137.1
     netmask 255.255.255.0
-    bridge_ports wlan0
+    bridge_ports none
     bridge_stp off
     bridge_fd 0
     bridge_maxwait 0
