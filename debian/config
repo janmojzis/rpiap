@@ -145,8 +145,17 @@ if [ _"${mode_value}" = "_custom" ] || [ _"${mode_value}" = "_bridge" ]; then
   fi
 fi
 
-dbdo wlan_ssid
-dbdo wlan_password _
+if [ _"${mode_value}" = "_client" ]; then
+  # Show informational message about wpa_supplicant configuration
+  dbname="rpiap/wpasupplicant_config"
+  db_input critical "${dbname}" || true
+  db_go
+else
+  # For AP mode, ask for SSID and password
+  dbdo wlan_ssid
+  dbdo wlan_password _
+fi
+
 if [ _"${mode_value}" = "_custom" ]; then
   dbdo wlan_country
   dbdo wlan_channel

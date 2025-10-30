@@ -12,6 +12,25 @@ Description: Enter password:
  If you are reconfiguring the package, leaving this field blank will keep the
  current password unchanged.
 
+Template: rpiap/wpasupplicant_config
+Type: text
+Description: wpa_supplicant configuration for client mode:
+ In client mode, you need to manually configure the wpa_supplicant configuration
+ file. This configuration cannot be set up through debconf at this time.
+ .
+ Please manually edit the file:
+   /etc/rpiap/wpasupplicant/wlan0.conf
+ .
+ network={
+     ssid="network_name"
+     psk="password"
+ }
+ .
+ network={
+     ssid="another_network"
+     psk="another_password"
+ }
+
 Template: rpiap/wlan_country
 Type: string
 Default: CZ
