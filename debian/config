@@ -149,7 +149,9 @@ dbdo wlanssid
 dbdo wlanpassword _
 dbdo wlanchannel
 dbdo wlancountry
-dbdo dhcpdns
+if [ _"${mode_value}" = "_custom" ]; then
+  dbdo dns_standalone
+fi
 dbdo restart
 
 exit 0

@@ -29,13 +29,13 @@ Description: Enter WLAN country code:
  This may limit available channels and transmit power.
  Default: CZ
 
-Template: rpiap/dhcpdns
+Template: rpiap/dns_standalone
 Type: boolean
 Default: false
-Description: Use DNS server from DHCP?
+Description: Use standalone DNS server?
  If you need to use local DNS resolvers, for example to resolve internal DNS
- zones, select 'Yes'. To use the internal DNS server and benefit from support
- for encrypted DNS (DNSCurve), leave the default setting as 'No'.
+ zones, select 'No'. To use the internal standalone DNS server and benefit from
+ support for encrypted DNS (DNSCurve), leave the default setting as 'Yes'.
 
 Template: rpiap/mode
 Type: select

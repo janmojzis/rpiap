@@ -19,7 +19,7 @@ if [ ! -d ./root/dump ]; then
 fi
 
 dhcpdns="`envdir /var/lib/rpiap/env printenv dhcpdns`"
-if [ x"${dhcpdns}" = xtrue ] && [ -s /var/lib/rpiap/service/udhcpc/var/@ ]; then
+if [ x"${dns_standalone}" != xtrue ] && [ -s /var/lib/rpiap/service/udhcpc/var/@ ]; then
   cat /var/lib/rpiap/service/udhcpc/var/@ > ./root/servers/@
   FORWARDONLY='yes'; export FORWARDONLY
 else
