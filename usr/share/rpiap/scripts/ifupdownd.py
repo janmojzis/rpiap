@@ -16,6 +16,7 @@ RTM_DELADDR = 21
 # Netlink constants
 NETLINK_ROUTE = 0
 RTMGRP_LINK = 1
+RTMGRP_IPV4_IFADDR = 0x10
 RTMGRP_IPV6_IFADDR = 0x100  # IPv6 address notifications
 
 # Flags from ifinfomsg
@@ -120,14 +121,22 @@ def netlink_parse(data: bytes) -> None:
                     family, prefixlen, flags, scope, index = struct.unpack("BBBBI", msg[:8])
                     attrs = msg[8:]
 
+                    # Try to get interface name from index
+                    try:
+                        ifname = socket.if_indextoname(index)
+                    except OSError:
+                        ifname = f"if{index}"
+
                     while len(attrs) >= 4:
                         rta_len, rta_type = struct.unpack("HH", attrs[:4])
                         value = attrs[4:rta_len]
                         if rta_type == 1:  # IFA_ADDRESS
-                            ip_hex = value
-                            if len(ip_hex) == 16:  # IPv6
-                                ipv6 = socket.inet_ntop(socket.AF_INET6, ip_hex)
-                                logging.debug(f"IPv6 {event}: {ipv6}")
+                            if family == socket.AF_INET6 and len(value) == 16:  # IPv6
+                                ipv6 = socket.inet_ntop(socket.AF_INET6, value)
+                                logging.debug(f"{ifname}: IPv6 {event}: {ipv6}")
+                            elif family == socket.AF_INET and len(value) == 4:  # IPv4
+                                ipv4 = socket.inet_ntop(socket.AF_INET, value)
+                                logging.debug(f"{ifname}: IPv4 {event}: {ipv4}")
                         attrs = attrs[(rta_len + 3) & ~3:]  # align to 4 bytes
             else:
                 logging.warning(f"unknown nlmsg_type: {nlmsg_type}")
@@ -202,7 +211,7 @@ logging.debug('start')
 
 # bind netlink interface
 s = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, NETLINK_ROUTE)
-s.bind((0, RTMGRP_LINK | RTMGRP_IPV6_IFADDR))
+s.bind((0, RTMGRP_LINK | RTMGRP_IPV4_IFADDR | RTMGRP_IPV6_IFADDR))
 
 # old dictionary
 old = {}
@@ -239,7 +248,6 @@ while True:
                     else:
                         logging.debug(f'{iface}: {old[iface]["link"]} -> {current[iface]["link"]}, running {cmd}')
                         subprocess.run(cmd)
-
                 old[iface]['link'] = current[iface]['link']
 
             # device
@@ -248,7 +256,6 @@ while True:
                     cmd = [script, iface, current[iface]['device']]
                     logging.debug(f'{iface}: {old[iface]["device"]} -> {current[iface]["device"]}, running {cmd}')
                     subprocess.run(cmd)
-
                 old[iface]['device'] = current[iface]['device']
 
     except Exception as e:
