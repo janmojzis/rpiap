@@ -10,10 +10,13 @@ import subprocess
 
 RTM_NEWLINK = 16
 RTM_DELLINK = 17
+RTM_NEWADDR = 20
+RTM_DELADDR = 21
 
 # Netlink constants
 NETLINK_ROUTE = 0
 RTMGRP_LINK = 1
+RTMGRP_IPV6_IFADDR = 0x100  # IPv6 address notifications
 
 # Flags from ifinfomsg
 IFF_UP = 0x1
@@ -111,6 +114,21 @@ def netlink_parse(data: bytes) -> None:
                     logging.debug(f"{name}: {state}")
                 else:
                     logging.debug(f"{name}: {state}, otherflags = {flags}")
+            elif nlmsg_type in (RTM_NEWADDR, RTM_DELADDR):
+                event = "ADDED" if nlmsg_type == RTM_NEWADDR else "REMOVED"
+                if len(msg) >= 8:
+                    family, prefixlen, flags, scope, index = struct.unpack("BBBBI", msg[:8])
+                    attrs = msg[8:]
+
+                    while len(attrs) >= 4:
+                        rta_len, rta_type = struct.unpack("HH", attrs[:4])
+                        value = attrs[4:rta_len]
+                        if rta_type == 1:  # IFA_ADDRESS
+                            ip_hex = value
+                            if len(ip_hex) == 16:  # IPv6
+                                ipv6 = socket.inet_ntop(socket.AF_INET6, ip_hex)
+                                logging.debug(f"IPv6 {event}: {ipv6}")
+                        attrs = attrs[(rta_len + 3) & ~3:]  # align to 4 bytes
             else:
                 logging.warning(f"unknown nlmsg_type: {nlmsg_type}")
 
@@ -184,7 +202,7 @@ logging.debug('start')
 
 # bind netlink interface
 s = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW, NETLINK_ROUTE)
-s.bind((0, RTMGRP_LINK))
+s.bind((0, RTMGRP_LINK | RTMGRP_IPV6_IFADDR))
 
 # old dictionary
 old = {}
@@ -212,14 +230,6 @@ while True:
                 active.append(iface)
 
         for iface in allowed:
-            # bridge
-            if os.path.exists(f"/sys/class/net/{iface}/brif"):
-                logging.debug(f'{iface}: is bridge, nothing to do')
-                continue
-            # lan bridge
-            if os.path.exists(f"/sys/class/net/lan/brif/{iface}"):
-                logging.debug(f'{iface}: is assigned to lan bridge, nothing to do')
-                continue
             # link
             if old[iface]['link'] != current[iface]['link']:
                 for script in linkscripts:
