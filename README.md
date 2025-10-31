@@ -30,31 +30,44 @@ Allows you to select your own combination of LAN interfaces. For advanced users 
 
 # Installation
 
-## Install Trixie Raspberry Pi OS Lite, install SSH, add ssh-ed25519 public-key
-- https://www.raspberrypi.com/software/operating-systems/
-- and install Your favorite SSH server (I prefer TinySSH) and insert Your ssh-ed25519 public-key to /root/.ssh/authorized_keys 
-~~~
-apt-get install tinysshd
-echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your@email' >>  /root/.ssh/authorized_keys
-~~~
-Note: replace `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your@email` with Your ssh-ed25519 public-key
+Follow these steps to install and configure rpiap on your Raspberry Pi.
 
-## Install rpiap package
-~~~
+## Step 1: Prepare Your Raspberry Pi
+
+### Install Raspberry Pi OS Lite (Trixie)
+
+1. Download **Raspberry Pi OS Lite (Trixie)** from the official website:
+   - 🔗 [raspberrypi.com/software/operating-systems/](https://www.raspberrypi.com/software/operating-systems/)
+2. Flash the image to your SD card using your preferred tool (e.g., Raspberry Pi Imager)
+
+## Step 2: Install rpiap
+
+Boot your Raspberry Pi and connect (via console or SSH). Then add the rpiap repository and install:
+
+```bash
 echo 'deb [trusted=yes] https://raw.githubusercontent.com/janmojzis/rpiap/refs/heads trixie/' > /etc/apt/sources.list.d/rpiap.list
 apt-get update
 apt-get install rpiap
-~~~
+```
 
-## Reconfigure rpiap package
+> **What happens next:** The installation process will guide you through interactive configuration. The default setup creates a wireless access point network.
 
-After installation, a local WLAN is created with the network range `192.168.137.0/24`.
-The Raspberry Pi uses the address `192.168.137.1`.
+**Default network configuration:**
+- IP range: `192.168.137.0/24`
+- Gateway: `192.168.137.1`
+- After installation, connect to the WLAN network to access the device
 
-Reconfiguration can then be performed via an SSH connection:
-~~~
+## Step 3: Reconfigure (Optional)
+
+You can reconfigure rpiap settings at any time. Connect via SSH or locally:
+
+```bash
+# If connecting remotely:
 ssh root@192.168.137.1
-~~~
-~~~
+
+# Then reconfigure:
 dpkg-reconfigure rpiap
-~~~
+```
+
+This allows you to change operating modes (ap, client, bridge, custom) and network settings.
+
