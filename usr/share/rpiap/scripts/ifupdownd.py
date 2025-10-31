@@ -38,6 +38,9 @@ IFF_ECHO = 1<<18
 # Attribute types (from linux/if_link.h)
 IFLA_IFNAME = 3
 
+# Attribute types (from linux/if_addr.h)
+IFA_ADDRESS = 1
+
 def rtattr_parse(data):
     """Parse TLV-encoded Netlink attributes."""
     attrs = {}
@@ -119,7 +122,7 @@ def netlink_parse(data: bytes) -> None:
                 event = "ADDED" if nlmsg_type == RTM_NEWADDR else "REMOVED"
                 if len(msg) >= 8:
                     family, prefixlen, flags, scope, index = struct.unpack("BBBBI", msg[:8])
-                    attrs = msg[8:]
+                    attrs = rtattr_parse(msg[8:])
 
                     # Try to get interface name from index
                     try:
@@ -127,17 +130,14 @@ def netlink_parse(data: bytes) -> None:
                     except OSError:
                         ifname = f"if{index}"
 
-                    while len(attrs) >= 4:
-                        rta_len, rta_type = struct.unpack("HH", attrs[:4])
-                        value = attrs[4:rta_len]
-                        if rta_type == 1:  # IFA_ADDRESS
-                            if family == socket.AF_INET6 and len(value) == 16:  # IPv6
-                                ipv6 = socket.inet_ntop(socket.AF_INET6, value)
-                                logging.debug(f"{ifname}: IPv6 {event}: {ipv6}")
-                            elif family == socket.AF_INET and len(value) == 4:  # IPv4
-                                ipv4 = socket.inet_ntop(socket.AF_INET, value)
-                                logging.debug(f"{ifname}: IPv4 {event}: {ipv4}")
-                        attrs = attrs[(rta_len + 3) & ~3:]  # align to 4 bytes
+                    value = attrs.get(IFA_ADDRESS)
+                    if value:
+                        if family == socket.AF_INET6 and len(value) == 16:  # IPv6
+                            ipv6 = socket.inet_ntop(socket.AF_INET6, value)
+                            logging.debug(f"{ifname}: IPv6 {event}: {ipv6}")
+                        elif family == socket.AF_INET and len(value) == 4:  # IPv4
+                            ipv4 = socket.inet_ntop(socket.AF_INET, value)
+                            logging.debug(f"{ifname}: IPv4 {event}: {ipv4}")
             else:
                 logging.warning(f"unknown nlmsg_type: {nlmsg_type}")
 
