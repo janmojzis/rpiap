@@ -1,3 +1,9 @@
+rpiap (20251102) UNRELEASED; urgency=medium
+
+  * wpasupplicant: generate client config from debconf credentials
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 02 Nov 2025 16:29:58 +0100
+
 rpiap (20251030) unstable; urgency=medium
 
   * update operation modes to: ap, client, bridge, custom

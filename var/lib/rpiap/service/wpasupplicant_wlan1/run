@@ -9,28 +9,66 @@ fi
 
 umask 027
 
-# directory /etc/rpiap/wpasupplicant can contain passwords, keys, ...
-chmod 750 /etc/rpiap/wpasupplicant /etc/rpiap/wpasupplicant/*
-
 # try to unblock wifi
 rfkill unblock wifi || :
+
+# create directories
+rm -rf ./conf ./bin
+mkdir -p ./conf ./bin
+
+# copy custom config files first
+if [ -d /etc/rpiap/wpasupplicant ]; then
+  cp -pr /etc/rpiap/wpasupplicant/* ./conf 2>/dev/null || :
+fi
+
+# interface
+interface=wlan1
+export interface
+
+case "${interface}" in
+  eth*)
+    config=/etc/rpiap/wpasupplicant/eth.conf
+    driver=wired
+    export driver
+  ;;
+  wlan*)
+    config=/etc/rpiap/wpasupplicant/wlan.conf
+    driver=nl80211
+    export driver
+  ;;
+esac
+
+# generate config from template
+(
+  if [ -f "/etc/rpiap/wpasupplicant/${interface}.conf" ]; then
+    cat "/etc/rpiap/wpasupplicant/${interface}.conf"
+  else
+    cat "${config}"
+  fi
+  if [ _"${driver}" != _wired ]; then
+    envdir /var/lib/rpiap/env sh -c '
+      if [ _"${wpasupplicant_ssid}" != _ ]; then
+        if [ _"${wpasupplicant_password}" != _ ]; then
+          wpa_passphrase "${wpasupplicant_ssid}" "${wpasupplicant_password}"
+        fi
+      fi
+    '
+  fi
+) | grep -v '#' > ./conf/wpasupplicant.conf
 
 # run wpa_supplicant under random UID/GID
 exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
 
-  rm -rf ./conf ./bin
-  mkdir -p ./conf ./bin
-
-  # config
-  cp -pr /etc/rpiap/wpasupplicant/* ./conf
-  chown -R "0:${GID}" ./conf
 
   # binary
   cp /usr/sbin/wpa_supplicant ./bin/wpa_supplicant
   chmod +x ./bin/wpa_supplicant
   chown "0:${GID}" ./bin ./bin/wpa_supplicant
   setcap cap_net_raw,cap_net_admin+ep ./bin/wpa_supplicant
+  # config
+  chown "0:${GID}" ./conf ./conf/*
 
-  # run wpa_supplican under random UID/GID
-  exec /usr/share/rpiap/scripts/setuidgid.py ./bin/wpa_supplicant -i wlan1 -c ./conf/wlan1.conf
+  # run wpa_supplicant under random UID/GID
+  cd ./conf
+  exec /usr/share/rpiap/scripts/setuidgid.py ../bin/wpa_supplicant -i "${interface}" -D "${driver}" -c wpasupplicant.conf
 '

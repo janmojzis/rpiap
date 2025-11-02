@@ -4,26 +4,17 @@ ifname=$1
 phase=$2
 basename="`basename $0`"
 
-if ! grep -Fxq -- "${ifname}" /var/lib/rpiap/env/lan; then
-  iftype=WAN
-else
+if grep -Fxq -- "${ifname}" /var/lib/rpiap/env/lan; then
   iftype=LAN
+  exit 0
+else
+  iftype=WAN
 fi
 
 log() {
   text=$1
   echo "${basename}: INFO: ${iftype} ${ifname}: ${phase}: ${text}"
 }
-
-if grep -Fxq -- "${ifname}" /var/lib/rpiap/env/lan; then
-  # ifname is in LAN configuration
-  exit 0
-fi
-
-if [ ! -f "/etc/rpiap/wpasupplicant/${ifname}.conf" ]; then
-  # configuration for the ifname doesn't exist
-  exit 0
-fi
 
 if [ ! -h "/etc/service/rpiap_wpasupplicant_${ifname}" ]; then
   # wpasupplicant service for the ifname doesn't exist

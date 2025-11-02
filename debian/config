@@ -62,7 +62,6 @@ db_go
 db_get "${dbname}"
 mode_value="${RET}"
 
-# Handle custom mode separately
 dbname="rpiap/laninterfaces"
 case _"${mode_value}" in
   '_ap')
@@ -75,6 +74,7 @@ case _"${mode_value}" in
     lan_interfaces='eth0, wlan0'
     ;;
   *)
+    # Handle custom mode separately
     db_set "${dbname}" "${previous_interfaces}"
     db_input critical "${dbname}" || true
     db_go
@@ -145,15 +145,14 @@ if [ _"${mode_value}" = "_custom" ] || [ _"${mode_value}" = "_bridge" ]; then
   fi
 fi
 
-if [ _"${mode_value}" = "_client" ]; then
-  # Show informational message about wpa_supplicant configuration
-  dbname="rpiap/wpasupplicant_config"
-  db_input critical "${dbname}" || true
-  db_go
-else
-  # For AP mode, ask for SSID and password
+if echo ", ${lan_interfaces}," | grep -q ", wlan0,"; then
+  # For ap/bridge mode, ask for hostapd SSID and password
   dbdo wlan_ssid
   dbdo wlan_password _
+else
+  # For client/custom mode, ask for wpasupplicant SSID and password
+  dbdo wpasupplicant_ssid
+  dbdo wpasupplicant_password _
 fi
 
 if [ _"${mode_value}" = "_custom" ]; then
