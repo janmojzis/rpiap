@@ -20,17 +20,17 @@ Description: Raspberry PI - AP
  All daemons are managed through daemontools.
 
 Package: rpiap
-Version: 20251030
+Version: 20251102
 Architecture: all
 Maintainer: Jan Mojzis <jan.mojzis@gmail.com>
-Installed-Size: 237
+Installed-Size: 245
 Depends: adduser, busybox, daemontools-run, dqcache, hostapd, iptables, nftables, python3, python3-legacy-cgi, python3-pqconnect, python3-psutil, radvd, rfkill, usbmuxd, wpasupplicant, debconf (>= 0.5) | debconf-2.0
 Conflicts: dhcpcd5, isc-dhcp-client, isc-dhcp-server, pqconnect
-Filename: ./trixie/rpiap_20251030_all.deb
-Size: 33352
-MD5sum: 3184bee034f7a6d5224898369015e922
-SHA1: d2ede524a7eb86921219b362c3a2aa11ce72bac2
-SHA256: 1471d57e05ee3ab26e236cb56e3f8c4f65f796a547dde4701e62a3060db2f280
+Filename: ./trixie/rpiap_20251102_all.deb
+Size: 33948
+MD5sum: e33873a7f3c174c27815cc62f62dc7af
+SHA1: 75805d5e754ab2f61d4c4ce6484083ded4c0d8d5
+SHA256: 27dd8bb438abb037092ede0f23df1033ecb79f6808f0334647498d1781d138f7
 Section: misc
 Priority: optional
 Description: Raspberry PI - AP
