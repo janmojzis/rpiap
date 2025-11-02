@@ -1,9 +1,9 @@
-rpiap (20251102) UNRELEASED; urgency=medium
+rpiap (20251102) unstable; urgency=medium
 
   * wpasupplicant: generate client config from debconf credentials
   * ifupdownd.py: log IPv4/IPv6 RTM_NEWADDR, RTM_DELADDR netlink events
 
- -- Jan Mojžíš <janmojzis@debian.org>  Sun, 02 Nov 2025 16:29:58 +0100
+ -- Jan Mojžíš <janmojzis@debian.org>  Sun, 02 Nov 2025 17:07:04 +0100
 
 rpiap (20251030) unstable; urgency=medium
 
