@@ -16,23 +16,7 @@ fi
 # config
 rm -rf ./conf
 mkdir -p ./conf
-envdir /var/lib/rpiap/env sh -c '
-
-  wlan_channel="${wlan_channel:-0}"
-  wlan_country="${wlan_country:-CZ}"
-
-  if [ "${wlan_channel}" -gt 0 ] && [ "${wlan_channel}" -lt 14 ]; then
-    _wlan_mode=g
-  else
-    _wlan_mode=a
-  fi
-
-  sed -e "s/__PASS__/${wlan_password}/"\
-      -e "s/__SSID__/${wlan_ssid}/"\
-      -e "s/__MODE__/${_wlan_mode}/"\
-      -e "s/__COUNTRY__/${wlan_country}/"\
-      -e "s/__CHANNEL__/${wlan_channel}/" < /etc/rpiap/hostapd.conf | grep -v "^#" > ./conf/hostapd.conf
-'
+envdir /var/lib/rpiap/env /usr/share/rpiap/scripts/hostapd-conf.py /etc/rpiap/hostapd.conf > ./conf/hostapd.conf
 
 # run hostapd under random UID/GID
 exec /usr/share/rpiap/scripts/randomuidgid.py sh -c '
