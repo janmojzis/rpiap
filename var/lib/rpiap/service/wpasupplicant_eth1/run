@@ -22,7 +22,7 @@ if [ -d /etc/rpiap/wpasupplicant ]; then
 fi
 
 # interface
-interface=eth1
+interface="$(basename $(pwd) | cut -d _ -f2)"
 export interface
 
 case "${interface}" in
