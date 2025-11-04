@@ -44,20 +44,16 @@
         
         countrySelect.innerHTML = '';
         
-        // Add empty option (not selected)
-        const emptyOpt = document.createElement('option');
-        emptyOpt.value = '';
-        emptyOpt.textContent = '(Not set)';
-        countrySelect.appendChild(emptyOpt);
-        
+        // Populate from JSON data (including "Not set" entry)
         countriesData.forEach(({ code, name }) => {
             const opt = document.createElement('option');
             opt.value = code;
-            opt.textContent = `${code} (${name})`;
+            // If code is empty, show just the name, otherwise show "code (name)"
+            opt.textContent = code ? `${code} (${name})` : name;
             countrySelect.appendChild(opt);
         });
         
-        console.log('Countries populated:', countriesData.length + 1);
+        console.log('Countries populated:', countriesData.length);
     }
 
     function populateAllChannels() {
@@ -105,21 +101,12 @@
             return;
         }
         
-        // If country is not selected, enable all channels
-        if (!countryCode) {
-            [...channelSelect.options].forEach((opt) => {
-                opt.disabled = false;
-                opt.textContent = opt.textContent.replace(' (unavailable)', '');
-            });
-            return;
-        }
-        
+        // Find country in JSON data (including empty code for "Not set")
         const country = countriesData.find((c) => c.code === countryCode);
         if (!country) return;
 
+        // Get allowed channels from country data
         const allowed = country.allowed_channels.map((ch) => String(ch.id));
-        // "Auto" (0) option is always available
-        allowed.push('0');
         
         [...channelSelect.options].forEach((opt) => {
             const available = allowed.includes(opt.value);

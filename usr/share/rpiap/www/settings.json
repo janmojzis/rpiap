@@ -1,9 +1,17 @@
 {
   "countries": [
     {
+      "code": "",
+      "name": "Not set",
+      "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" }
+      ]
+    },
+    {
       "code": "CZ",
       "name": "Czech Republic",
       "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
         { "id": 1, "description": "1 (2.4GHz)" },
         { "id": 2, "description": "2 (2.4GHz)" },
         { "id": 3, "description": "3 (2.4GHz)" },
@@ -26,8 +34,9 @@
     },
     {
       "code": "US",
-      "name": "United Stated of Amerika",
+      "name": "United States of America",
       "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
         { "id": 1, "description": "1 (2.4GHz)" },
         { "id": 2, "description": "2 (2.4GHz)" },
         { "id": 3, "description": "3 (2.4GHz)" },
@@ -57,6 +66,7 @@
       "code": "BAD",
       "name": "will trigger error",
       "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
         { "id": 1, "description": "1 (2.4GHz)" },
         { "id": 2, "description": "2 (2.4GHz)" },
         { "id": 3, "description": "3 (2.4GHz)" },
