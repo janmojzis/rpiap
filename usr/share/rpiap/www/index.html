@@ -156,11 +156,7 @@
                     
                     <div class="speed-test-container">
                         <div class="speed-test-controls">
-                            <button id="start-speed-test" class="btn btn-primary"
-                                    hx-post="/cgi-bin/speedtest.py?action=start&format=html"
-                                    hx-target="#speed-test-results"
-                                    hx-swap="innerHTML"
-                                    hx-indicator="#start-speed-test">
+                            <button id="start-speed-test" class="btn btn-primary" onclick="startSpeedTest()">
                                 <span class="test-icon">🚀</span>
                                 Start Speed Test
                             </button>
