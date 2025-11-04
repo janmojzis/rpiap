@@ -104,20 +104,32 @@
             return;
         }
         
+        // Convert undefined/null to empty string for "Not set" country
+        const code = countryCode || '';
+        
         // Find country in JSON data (including empty code for "Not set")
-        const country = countriesData.find((c) => c.code === countryCode);
-        if (!country) return;
+        const country = countriesData.find((c) => c.code === code);
+        if (!country) {
+            console.warn('Country not found for code:', code);
+            return;
+        }
 
         // Get allowed channels from country data
         const allowed = country.allowed_channels.map((ch) => String(ch.id));
         
+        console.log('Updating channels for country:', code, 'allowed channels:', allowed);
+        
         [...channelSelect.options].forEach((opt) => {
             const available = allowed.includes(opt.value);
             opt.disabled = !available;
-            if (!available && !opt.textContent.includes('(unavailable)')) {
-                opt.textContent += ' (unavailable)';
+            
+            // Clean up text content - remove "(unavailable)" if present
+            const baseText = opt.textContent.replace(' (unavailable)', '');
+            
+            if (!available && !baseText.includes('(unavailable)')) {
+                opt.textContent = baseText + ' (unavailable)';
             } else if (available) {
-                opt.textContent = opt.textContent.replace(' (unavailable)', '');
+                opt.textContent = baseText;
             }
         });
     }
@@ -165,8 +177,9 @@
             
             // Set country and update channels
             if (countrySelect) {
-                countrySelect.value = hostapd_country || '';
-                updateChannelsForCountry(hostapd_country);
+                const countryValue = hostapd_country || '';
+                countrySelect.value = countryValue;
+                updateChannelsForCountry(countryValue);
             } else {
                 console.warn('Country select not found');
             }
@@ -265,6 +278,12 @@
             
             // Wait a bit for DOM to be ready
             await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Initialize with default "Not set" country if no country is selected
+            if (countrySelect && !countrySelect.value) {
+                countrySelect.value = '';
+                updateChannelsForCountry('');
+            }
             
             // Load current settings
             await loadCurrentSettings();
