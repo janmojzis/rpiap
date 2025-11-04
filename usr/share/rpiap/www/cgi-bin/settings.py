@@ -119,21 +119,27 @@ if __name__ == "__main__":
                     raise HTTPException(400, "Password must be at least 8 characters")
                 settings["hostapd_password"] = hostapd_password
 
-            # validate hostapd_channel
+            # validate hostapd_channel - if not set, use 0 (auto-detect)
             hostapd_channel = form.getvalue("hostapd_channel", "").strip()
-            try:
-                ch = int(hostapd_channel)
-                if ch < 1 or ch > 165:
-                    raise ValueError("Channel out of range")
-            except ValueError:
-                raise HTTPException(400, f"Invalid channel number '{hostapd_channel}'")
+            if not hostapd_channel:
+                hostapd_channel = "0"
+            else:
+                try:
+                    ch = int(hostapd_channel)
+                    if ch < 0 or ch > 165:
+                        raise ValueError("Channel out of range")
+                    # If 0 is set, it's valid (auto-detect)
+                except ValueError:
+                    raise HTTPException(400, f"Invalid channel number '{hostapd_channel}'")
             settings["hostapd_channel"] = hostapd_channel
 
-            # validate hostapd_country
+            # validate hostapd_country - if not set, don't save it
             hostapd_country = form.getvalue("hostapd_country", "").strip()
-            if len(hostapd_country) != 2 or not hostapd_country.isalpha():
-                raise HTTPException(400, f"Invalid country code '{hostapd_country}'")
-            settings["hostapd_country"] = hostapd_country
+            if hostapd_country:
+                if len(hostapd_country) != 2 or not hostapd_country.isalpha():
+                    raise HTTPException(400, f"Invalid country code '{hostapd_country}'")
+                settings["hostapd_country"] = hostapd_country
+            # If not set, don't save it (won't be in settings)
 
             message = save_settings(settings)
         else:

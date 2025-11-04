@@ -43,6 +43,13 @@
         }
         
         countrySelect.innerHTML = '';
+        
+        // Add empty option (not selected)
+        const emptyOpt = document.createElement('option');
+        emptyOpt.value = '';
+        emptyOpt.textContent = '(Not set)';
+        countrySelect.appendChild(emptyOpt);
+        
         countriesData.forEach(({ code, name }) => {
             const opt = document.createElement('option');
             opt.value = code;
@@ -50,7 +57,7 @@
             countrySelect.appendChild(opt);
         });
         
-        console.log('Countries populated:', countriesData.length);
+        console.log('Countries populated:', countriesData.length + 1);
     }
 
     function populateAllChannels() {
@@ -60,6 +67,13 @@
         }
         
         channelSelect.innerHTML = '';
+        
+        // Add "Auto" (0) option as first
+        const autoOpt = document.createElement('option');
+        autoOpt.value = '0';
+        autoOpt.textContent = '0 (Auto)';
+        channelSelect.appendChild(autoOpt);
+        
         const seen = new Map();
 
         countriesData.forEach((country) => {
@@ -79,7 +93,7 @@
             channelSelect.appendChild(opt);
         });
         
-        console.log('Channels populated:', allChannels.length);
+        console.log('Channels populated:', allChannels.length + 1);
     }
 
     // ------------------------------
@@ -91,10 +105,22 @@
             return;
         }
         
+        // If country is not selected, enable all channels
+        if (!countryCode) {
+            [...channelSelect.options].forEach((opt) => {
+                opt.disabled = false;
+                opt.textContent = opt.textContent.replace(' (unavailable)', '');
+            });
+            return;
+        }
+        
         const country = countriesData.find((c) => c.code === countryCode);
         if (!country) return;
 
         const allowed = country.allowed_channels.map((ch) => String(ch.id));
+        // "Auto" (0) option is always available
+        allowed.push('0');
+        
         [...channelSelect.options].forEach((opt) => {
             const available = allowed.includes(opt.value);
             opt.disabled = !available;
@@ -155,9 +181,9 @@
                 console.warn('Country select not found');
             }
             
-            // Set channel
+            // Set channel - if not set, use 0
             if (channelSelect) {
-                channelSelect.value = String(hostapd_channel || '');
+                channelSelect.value = String(hostapd_channel || '0');
             } else {
                 console.warn('Channel select not found');
             }
