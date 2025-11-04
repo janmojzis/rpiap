@@ -113,8 +113,8 @@
         // Ensure DOM elements are available
         if (!form) {
             form = document.getElementById('wlan-form');
-            countrySelect = document.getElementById('wlancountry');
-            channelSelect = document.getElementById('wlanchannel');
+            countrySelect = document.getElementById('hostapd_country');
+            channelSelect = document.getElementById('hostapd_channel');
         }
         
         try {
@@ -129,40 +129,40 @@
                 throw new Error(result.error || 'Invalid response format');
             }
 
-            const { wlanssid, wlanpassword, wlanchannel, wlancountry } = result.settings;
+            const { hostapd_ssid, hostapd_password, hostapd_channel, hostapd_country } = result.settings;
 
             // Set form values
-            const ssidField = document.getElementById('wlanssid');
-            const passwordField = document.getElementById('wlanpassword');
+            const ssidField = document.getElementById('hostapd_ssid');
+            const passwordField = document.getElementById('hostapd_password');
             
             if (ssidField) {
-                ssidField.value = wlanssid || '';
+                ssidField.value = hostapd_ssid || '';
             } else {
                 console.warn('SSID field not found');
             }
             
             if (passwordField) {
-                passwordField.value = wlanpassword || '';
+                passwordField.value = hostapd_password || '';
             } else {
                 console.warn('Password field not found');
             }
             
             // Set country and update channels
             if (countrySelect) {
-                countrySelect.value = wlancountry || '';
-                updateChannelsForCountry(wlancountry);
+                countrySelect.value = hostapd_country || '';
+                updateChannelsForCountry(hostapd_country);
             } else {
                 console.warn('Country select not found');
             }
             
             // Set channel
             if (channelSelect) {
-                channelSelect.value = String(wlanchannel || '');
+                channelSelect.value = String(hostapd_channel || '');
             } else {
                 console.warn('Channel select not found');
             }
             
-            console.log('Settings loaded successfully:', { wlanssid, wlanchannel, wlancountry });
+            console.log('Settings loaded successfully:', { hostapd_ssid, hostapd_channel, hostapd_country });
             
             if (window.showStatusMessage) {
                 window.showStatusMessage('Settings loaded successfully', 'success', 3000);
@@ -228,8 +228,8 @@
     async function initializeWLANData() {
         // Get DOM elements when actually needed
         form = document.getElementById('wlan-form');
-        countrySelect = document.getElementById('wlancountry');
-        channelSelect = document.getElementById('wlanchannel');
+        countrySelect = document.getElementById('hostapd_country');
+        channelSelect = document.getElementById('hostapd_channel');
 
         if (!form || !countrySelect || !channelSelect) {
             console.error('WLAN form elements not found');

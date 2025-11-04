@@ -10,17 +10,6 @@ import traceback
 # settings directory
 ENV_DIR = "/var/lib/rpiap/env"
 
-# Mapping from form field names to environment variable names
-FORM_TO_ENV_MAP = {
-    "wlanssid": "hostapd_ssid",
-    "wlanpassword": "hostapd_password",
-    "wlanchannel": "hostapd_channel",
-    "wlancountry": "hostapd_country",
-}
-
-# Reverse mapping from environment variable names to form field names
-ENV_TO_FORM_MAP = {v: k for k, v in FORM_TO_ENV_MAP.items()}
-
 class HTTPException(Exception):
     """
     Custom HTTP exception with a status code and message.
@@ -52,7 +41,6 @@ def send_json(status_code=200, message="OK", data=None):
 def load_settings():
     """
     Load settings from individual files in ENV_DIR
-    Maps environment variable names back to form field names for frontend compatibility
     """
     settings = {}
     logmsg = ""
@@ -63,14 +51,11 @@ def load_settings():
         except Exception:
             continue
 
-        # Map environment variable name to form field name if mapping exists
-        form_key = ENV_TO_FORM_MAP.get(key, key)
-        
         if "password" in key:
-            settings[form_key] = ""
+            settings[key] = ""
             logmsg += f"{key}: [HIDDEN], "
         else:
-            settings[form_key] = value
+            settings[key] = value
             logmsg += f"{key}: {value}, "
 
     if logmsg.endswith(", "):
@@ -81,26 +66,22 @@ def load_settings():
 def save_settings(settings):
     """
     Save provided settings to files
-    Maps form field names to environment variable names before saving
     """
     logmsg = ""
-    for form_key, value in settings.items():
-        # Map form field name to environment variable name if mapping exists
-        env_key = FORM_TO_ENV_MAP.get(form_key, form_key)
-        
+    for key, value in settings.items():
         try:
-            with open(env_key, 'r') as f:
+            with open(key, 'r') as f:
                 old_value = f.read().strip()
         except FileNotFoundError:
             old_value = ""
         
         if old_value != value:
-            with open(env_key, 'w') as f:
+            with open(key, 'w') as f:
                 f.write(value)
-            if "password" in env_key:
-                logmsg += f"{env_key}: updated, "
+            if "password" in key:
+                logmsg += f"{key}: updated, "
             else:
-                logmsg += f"{env_key}: {old_value} -> {value}, "
+                logmsg += f"{key}: {old_value} -> {value}, "
 
     if logmsg.endswith(", "):
         logmsg = logmsg[:-2]
@@ -125,34 +106,34 @@ if __name__ == "__main__":
         if flagpostdata:
             settings = {}
 
-            # validate wlanssid
-            wlanssid = form.getvalue("wlanssid", "").strip()
-            if not wlanssid:
+            # validate hostapd_ssid
+            hostapd_ssid = form.getvalue("hostapd_ssid", "").strip()
+            if not hostapd_ssid:
                 raise HTTPException(400, "SSID is required")
-            settings["wlanssid"] = wlanssid
+            settings["hostapd_ssid"] = hostapd_ssid
 
-            # validate wlanpassword
-            wlanpassword = form.getvalue("wlanpassword", "").strip()
-            if wlanpassword:
-                if len(wlanpassword) < 8:
+            # validate hostapd_password
+            hostapd_password = form.getvalue("hostapd_password", "").strip()
+            if hostapd_password:
+                if len(hostapd_password) < 8:
                     raise HTTPException(400, "Password must be at least 8 characters")
-                settings["wlanpassword"] = wlanpassword
+                settings["hostapd_password"] = hostapd_password
 
-            # validate wlanchannel
-            wlanchannel = form.getvalue("wlanchannel", "").strip()
+            # validate hostapd_channel
+            hostapd_channel = form.getvalue("hostapd_channel", "").strip()
             try:
-                ch = int(wlanchannel)
+                ch = int(hostapd_channel)
                 if ch < 1 or ch > 165:
                     raise ValueError("Channel out of range")
             except ValueError:
-                raise HTTPException(400, f"Invalid channel number '{wlanchannel}'")
-            settings["wlanchannel"] = wlanchannel
+                raise HTTPException(400, f"Invalid channel number '{hostapd_channel}'")
+            settings["hostapd_channel"] = hostapd_channel
 
-            # validate wlancountry
-            wlancountry = form.getvalue("wlancountry", "").strip()
-            if len(wlancountry) != 2 or not wlancountry.isalpha():
-                raise HTTPException(400, f"Invalid country code '{wlancountry}'")
-            settings["wlancountry"] = wlancountry
+            # validate hostapd_country
+            hostapd_country = form.getvalue("hostapd_country", "").strip()
+            if len(hostapd_country) != 2 or not hostapd_country.isalpha():
+                raise HTTPException(400, f"Invalid country code '{hostapd_country}'")
+            settings["hostapd_country"] = hostapd_country
 
             message = save_settings(settings)
         else:

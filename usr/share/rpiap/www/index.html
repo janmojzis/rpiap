@@ -94,30 +94,30 @@
                     
                     <form id="wlan-form" class="form-container">
                         <div class="form-group">
-                            <label for="wlanssid">Network Name (SSID):</label>
-                            <input type="text" id="wlanssid" name="wlanssid" placeholder="Enter network name" required>
+                            <label for="hostapd_ssid">Network Name (SSID):</label>
+                            <input type="text" id="hostapd_ssid" name="hostapd_ssid" placeholder="Enter network name" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="wlanpassword">Password:</label>
+                            <label for="hostapd_password">Password:</label>
                             <div class="password-input-container">
-                                <input type="password" id="wlanpassword" name="wlanpassword" minlength="8" placeholder="Enter password (min 8 characters)">
-                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('wlanpassword')">
+                                <input type="password" id="hostapd_password" name="hostapd_password" minlength="8" placeholder="Enter password (min 8 characters)">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('hostapd_password')">
                                     <span class="password-icon">👁️</span>
                                 </button>
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="wlanchannel">Channel:</label>
-                            <select id="wlanchannel" name="wlanchannel">
+                            <label for="hostapd_channel">Channel:</label>
+                            <select id="hostapd_channel" name="hostapd_channel">
                                 <!-- Options will be loaded dynamically -->
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label for="wlancountry">Country:</label>
-                            <select id="wlancountry" name="wlancountry">
+                            <label for="hostapd_country">Country:</label>
+                            <select id="hostapd_country" name="hostapd_country">
                                 <!-- Options will be loaded dynamically -->
                             </select>
                         </div>
