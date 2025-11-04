@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import hashlib, binascii, sys, os, re
+import hashlib, binascii, sys, os
+from jinja2 import Template
 
 ssid = os.getenv("hostapd_ssid")
 if ssid is None:
@@ -28,11 +29,8 @@ if country is None:
 psk = hashlib.pbkdf2_hmac("sha1", password.encode('utf-8'), ssid.encode('utf-8'), 4096, 32)
 psk = binascii.hexlify(psk).decode()
 
-data = open(sys.argv[1]).read()
-data = re.sub("__SSID__", ssid, data)
-data = re.sub("__PSK__", psk, data)
-data = re.sub("__COUNTRY__", country, data)
-data = re.sub("__CHANNEL__", channel, data)
-data = re.sub("__MODE__", mode, data)
+template_content = open(sys.argv[1]).read()
+template = Template(template_content)
+output = template.render(ssid=ssid, psk=psk, channel=channel, mode=mode, country=country)
 
-print(data)
+print(output)
