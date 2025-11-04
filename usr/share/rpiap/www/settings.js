@@ -106,121 +106,8 @@
         });
     }
 
-    // ------------------------------
-    // Settings Management
-    // ------------------------------
-    async function loadCurrentSettings() {
-        // Ensure DOM elements are available
-        if (!form) {
-            form = document.getElementById('wlan-form');
-            countrySelect = document.getElementById('wlancountry');
-            channelSelect = document.getElementById('wlanchannel');
-        }
-        
-        try {
-            console.log('Loading current settings...');
-            const response = await fetch('/cgi-bin/settings.py');
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-
-            const result = await response.json();
-            console.log('Settings response:', result);
-            
-            if (!result.success || !result.settings) {
-                throw new Error(result.error || 'Invalid response format');
-            }
-
-            const { wlanssid, wlanpassword, wlanchannel, wlancountry } = result.settings;
-
-            // Set form values
-            const ssidField = document.getElementById('wlanssid');
-            const passwordField = document.getElementById('wlanpassword');
-            
-            if (ssidField) {
-                ssidField.value = wlanssid || '';
-            } else {
-                console.warn('SSID field not found');
-            }
-            
-            if (passwordField) {
-                passwordField.value = wlanpassword || '';
-            } else {
-                console.warn('Password field not found');
-            }
-            
-            // Set country and update channels
-            if (countrySelect) {
-                countrySelect.value = wlancountry || '';
-                updateChannelsForCountry(wlancountry);
-            } else {
-                console.warn('Country select not found');
-            }
-            
-            // Set channel
-            if (channelSelect) {
-                channelSelect.value = String(wlanchannel || '');
-            } else {
-                console.warn('Channel select not found');
-            }
-            
-            console.log('Settings loaded successfully:', { wlanssid, wlanchannel, wlancountry });
-            
-            if (window.showStatusMessage) {
-                window.showStatusMessage('Settings loaded successfully', 'success', 3000);
-            }
-        } catch (err) {
-            console.error('Failed to load current settings:', err);
-            if (window.showStatusMessage) {
-                window.showStatusMessage('Error loading settings: ' + err.message, 'error', 5000);
-            }
-        }
-    }
-
-    // ------------------------------
-    // Form Handling
-    // ------------------------------
-    async function onFormSubmit(e) {
-        e.preventDefault();
-
-        if (!form) {
-            console.error('Form not found');
-            return;
-        }
-
-        const formData = new FormData(form);
-        disable(form, true);
-
-        try {
-            const response = await fetch('/cgi-bin/settings.py', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const res = await response.json();
-
-            if (response.ok && res.success) {
-                if (window.showStatusMessage) {
-                    window.showStatusMessage(res.message || 'Settings saved successfully.', 'success');
-                }
-            } else {
-                const msg = res.error || 'Error saving settings.';
-                if (res.traceback) console.error('Server traceback:', res.traceback);
-                if (window.showStatusMessage) {
-                    window.showStatusMessage(msg, 'error');
-                }
-            }
-        } catch (err) {
-            console.error('Network or parsing error:', err);
-            if (window.showStatusMessage) {
-                window.showStatusMessage('Network error or invalid response.', 'error');
-            }
-        } finally {
-            disable(form, false);
-        }
-    }
-
-    function disable(form, on) {
-        Array.from(form.elements).forEach((el) => (el.disabled = !!on));
-    }
+    // Settings management is now handled by HTMX
+    // Form submission and loading are done via HTMX attributes
 
     // ------------------------------
     // WLAN Data Initialization
@@ -239,31 +126,24 @@
         console.log('Initializing WLAN data, form found:', !!form);
 
         try {
-            // Attach form submit event listener
-            form.removeEventListener('submit', onFormSubmit); // Remove any existing listener
-            form.addEventListener('submit', onFormSubmit);
-            console.log('Form submit event listener attached');
-
-            // Load JSON data first
+            // Load JSON data for country options
             await loadCountriesAndChannels();
             
-            // Wait a bit for DOM to be ready
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Load current settings
-            await loadCurrentSettings();
-
-            // Handle country change
-            countrySelect.removeEventListener('change', onCountryChange); // Remove any existing listener
-            countrySelect.addEventListener('change', onCountryChange);
+            // Load current settings via HTMX
+            // The form will be loaded via HTMX when the section is shown
+            // Just trigger the HTMX load if form is empty
+            const ssidInput = form.querySelector('input[name="wlanssid"]');
+            if (ssidInput && !ssidInput.value && typeof htmx !== 'undefined') {
+                htmx.ajax('GET', '/cgi-bin/settings.py?format=html', {
+                    target: '#wlan-form',
+                    swap: 'outerHTML'
+                });
+            }
 
             wlanDataLoaded = true;
             console.log('WLAN data initialization completed');
         } catch (err) {
             console.error('Failed to initialize WLAN data:', err);
-            if (window.showStatusMessage) {
-                window.showStatusMessage('Error initializing WLAN settings', 'error', 5000);
-            }
         }
     }
 
@@ -275,7 +155,6 @@
     // Global Functions
     // ------------------------------
     window.initializeWLANData = initializeWLANData;
-    window.loadCurrentSettings = loadCurrentSettings;
     
     console.log('Settings.js loaded successfully');
 })();

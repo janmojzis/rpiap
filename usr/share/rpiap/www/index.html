@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raspberry PI - Access Point</title>
     <link rel="stylesheet" href="index.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
     <!-- Admin Bar -->
@@ -43,7 +44,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Status Bar -->
-            <div class="status-bar" id="statusBar">
+            <div class="status-bar" id="statusBar" hx-swap-oob="true">
                 <span id="statusMessage"></span>
             </div>
 
@@ -55,13 +56,20 @@
                     <p>LAN/WAN statistics</p>
                     
                     <div class="dashboard-controls">
-                        <button class="btn btn-primary refresh-btn" onclick="refreshDashboard()">
+                        <button class="btn btn-primary refresh-btn" 
+                                hx-get="/cgi-bin/interfaces.py?format=html"
+                                hx-target="#dashboard-content"
+                                hx-swap="innerHTML"
+                                hx-indicator=".refresh-btn">
                             <span class="refresh-icon">🔄</span>
                             Refresh Dashboard
                         </button>
                     </div>
                     
-                    <div class="content-grid">
+                    <div class="content-grid" id="dashboard-content"
+                         hx-get="/cgi-bin/interfaces.py?format=html"
+                         hx-trigger="load"
+                         hx-swap="innerHTML">
                         <div class="card" id="lan-card">
                             <h3>LAN Interfaces</h3>
                             <p>IPv4: <span id="lan-ipv4">Loading...</span></p>
@@ -92,7 +100,11 @@
                     <h1>WLAN Settings</h1>
                     <p>Configure wireless network parameters</p>
                     
-                    <form id="wlan-form" class="form-container">
+                    <form id="wlan-form" class="form-container"
+                          hx-post="/cgi-bin/settings.py?format=html"
+                          hx-target="#statusBar"
+                          hx-swap="outerHTML"
+                          hx-indicator=".btn-success">
                         <div class="form-group">
                             <label for="wlanssid">Network Name (SSID):</label>
                             <input type="text" id="wlanssid" name="wlanssid" placeholder="Enter network name" required>
@@ -117,14 +129,22 @@
                         
                         <div class="form-group">
                             <label for="wlancountry">Country:</label>
-                            <select id="wlancountry" name="wlancountry">
+                            <select id="wlancountry" name="wlancountry"
+                                    hx-get="/cgi-bin/settings.py?action=channels&format=html"
+                                    hx-target="#wlanchannel"
+                                    hx-swap="innerHTML"
+                                    hx-trigger="change"
+                                    hx-include="[name='wlancountry']">
                                 <!-- Options will be loaded dynamically -->
                             </select>
                         </div>
                         
                         <div class="button-group">
                             <button type="submit" class="btn btn-success">Save Settings</button>
-                            <button type="button" class="btn btn-secondary" onclick="loadCurrentSettings()">Load Current</button>
+                            <button type="button" class="btn btn-secondary"
+                                    hx-get="/cgi-bin/settings.py?format=html"
+                                    hx-target="#wlan-form"
+                                    hx-swap="outerHTML">Load Current</button>
                         </div>
                     </form>
                 </div>
@@ -136,7 +156,11 @@
                     
                     <div class="speed-test-container">
                         <div class="speed-test-controls">
-                            <button id="start-speed-test" class="btn btn-primary" onclick="startSpeedTest()">
+                            <button id="start-speed-test" class="btn btn-primary"
+                                    hx-post="/cgi-bin/speedtest.py?action=start&format=html"
+                                    hx-target="#speed-test-results"
+                                    hx-swap="innerHTML"
+                                    hx-indicator="#start-speed-test">
                                 <span class="test-icon">🚀</span>
                                 Start Speed Test
                             </button>

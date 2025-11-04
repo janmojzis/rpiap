@@ -2,7 +2,7 @@
 """
 Simple Speed Test CGI Script
 Accepts ping and download parameters
-Returns JSON with success, message, and data fields
+Returns JSON or HTML with success, message, and data fields
 """
 
 import os
@@ -11,9 +11,13 @@ import json
 import time
 import hashlib
 import binascii
+from urllib.parse import parse_qs
 
 os.chdir("/var/lib/rpiap/empty")
 os.chroot(".")
+
+# Test state storage (simple file-based approach)
+TEST_STATE_FILE = "/var/lib/rpiap/speedtest_state.json"
 
 def handle_ping():
     """Handle ping test - returns empty data"""
@@ -70,20 +74,69 @@ def handle_download():
         "hash": data_hash_hex
     }
 
+def generate_html_results(ping=None, download_speed=None, progress=0, status="Ready to start"):
+    """Generate HTML fragment for speed test results"""
+    ping_display = f"{ping}" if ping is not None else "--"
+    speed_display = f"{download_speed:.2f}" if download_speed is not None else "--"
+    
+    return f'''<div class="speed-metrics">
+        <div class="metric-card">
+            <h3>Download Speed</h3>
+            <div class="metric-value" id="download-speed">{speed_display}</div>
+            <div class="metric-unit">Mbps</div>
+        </div>
+        <div class="metric-card">
+            <h3>Ping</h3>
+            <div class="metric-value" id="ping-value">{ping_display}</div>
+            <div class="metric-unit">ms</div>
+        </div>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-label">Test Progress</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: {progress}%"></div>
+        </div>
+        <div class="progress-text" id="progress-text">{status}</div>
+    </div>
+    
+    <div class="test-details" id="test-details">
+        <h4>Test Details</h4>
+        <div class="detail-item">
+            <span class="detail-label">Test Duration:</span>
+            <span class="detail-value" id="test-duration">--</span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label">Data Transferred:</span>
+            <span class="detail-value" id="data-transferred">--</span>
+        </div>
+    </div>'''
+
 def main():
     """Main function"""
-    # Set JSON content type
-    print("Content-Type: application/json")
-    print()
+    query_string = os.environ.get('QUERY_STRING', '')
+    query_params = parse_qs(query_string)
+    format_type = query_params.get('format', ['json'])[0]
+    action = query_params.get('action', [''])[0]
+    request_method = os.environ.get('REQUEST_METHOD', 'GET')
     
     try:
-        # Get test type from query string
-        query_string = os.environ.get('QUERY_STRING', '')
+        if request_method == 'POST' and action == 'start' and format_type == 'html':
+            # Start test - return initial HTML
+            print("Content-Type: text/html\n")
+            print(generate_html_results(status="Starting test...", progress=0))
+            sys.exit(0)
         
+        # Get test type from query string
         if 'test=ping' in query_string:
             result = handle_ping()
         elif 'test=download' in query_string:
             result = handle_download()
+        elif format_type == 'html':
+            # Return HTML results
+            print("Content-Type: text/html\n")
+            print(generate_html_results(status="Test in progress...", progress=50))
+            sys.exit(0)
         else:
             result = {
                 "success": False,
@@ -92,16 +145,31 @@ def main():
             }
         
         # Output JSON
-        #print(result)
-        print(json.dumps(result))
+        if format_type == 'html':
+            print("Content-Type: text/html\n")
+            ping = result.get('ping') if 'ping' in result else None
+            download = result.get('download_speed') if 'download_speed' in result else None
+            print(generate_html_results(ping=ping, download_speed=download, progress=100, status="Test completed"))
+        else:
+            print("Content-Type: application/json\n")
+            print(json.dumps(result))
         
     except Exception as e:
-        error_result = {
-            "success": False,
-            "message": f"Error: {str(e)}",
-            "data": ""
-        }
-        print(json.dumps(error_result))
+        if format_type == 'html':
+            print("Content-Type: text/html\n")
+            error_html = f'''<div class="status-bar error visible" id="statusBar" hx-swap-oob="true">
+                <span id="statusMessage">Speed test error: {str(e)}</span>
+                <button class="status-close" onclick="document.getElementById('statusBar').classList.remove('visible')">×</button>
+            </div>'''
+            print(error_html)
+        else:
+            error_result = {
+                "success": False,
+                "message": f"Error: {str(e)}",
+                "data": ""
+            }
+            print("Content-Type: application/json\n")
+            print(json.dumps(error_result))
 
 if __name__ == "__main__":
     main()

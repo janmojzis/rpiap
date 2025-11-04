@@ -4,10 +4,6 @@
     // State management
     let isMenuOpen = false;
     let openSubmenu = null;
-    let wanInterfaces = [];
-    let lanInterfaces = [];
-    let otherInterfaces = [];
-    let dataLoaded = false;
 
     // DOM elements
     const statusBar = document.getElementById('statusBar');
@@ -23,77 +19,13 @@
             document.getElementById('sidebar').classList.add('hidden');
         }
 
-        // Status banner close handler
-        if (statusBar) {
-            statusBar.addEventListener('click', (e) => {
-                if (e.target === statusBar || e.target === statusMessage) {
-                    hideStatusMessage();
-                }
-            });
-        }
+        // Status banner close handler - handled by HTMX
         
-        // Load all data from server
-        await loadAllData();
+        // Attach drag and drop listeners on initial load
+        attachDragAndDropListeners();
     });
 
-    // ------------------------------
-    // Status Message Functions
-    // ------------------------------
-    function showStatusMessage(message, type = 'success', duration = 5000) {
-        if (!statusBar || !statusMessage) return;
-
-        // Create close button
-        const closeButton = document.createElement('button');
-        closeButton.className = 'status-close';
-        closeButton.innerHTML = '×';
-        closeButton.onclick = function(e) {
-            e.stopPropagation();
-            hideStatusMessage();
-        };
-        
-        // Set message, type and close button
-        statusMessage.textContent = message;
-        statusBar.className = `status-bar ${type}`;
-        statusBar.innerHTML = '';
-        statusBar.appendChild(statusMessage);
-        statusBar.appendChild(closeButton);
-        
-        // Show status bar
-        setTimeout(() => {
-            statusBar.classList.add('visible');
-            if (mainContent) {
-                mainContent.classList.add('status-bar-visible');
-            }
-        }, 50);
-        
-        // Hide status bar after specified duration
-        statusBar.timeoutId = setTimeout(() => {
-            hideStatusMessage();
-        }, duration);
-    }
-
-    function hideStatusMessage() {
-        if (!statusBar || !statusMessage) return;
-        
-        // Cancel timeout if exists
-        if (statusBar.timeoutId) {
-            clearTimeout(statusBar.timeoutId);
-            statusBar.timeoutId = null;
-        }
-        
-        // Hide status bar
-        statusBar.classList.remove('visible');
-        if (mainContent) {
-            mainContent.classList.remove('status-bar-visible');
-        }
-        
-        // Clean up after animation completes
-        setTimeout(() => {
-            statusMessage.textContent = '';
-            statusBar.className = 'status-bar';
-            statusBar.innerHTML = '<span id="statusMessage"></span>';
-        }, 300);
-    }
+    // Status messages are now handled by HTMX via hx-swap-oob
 
     // ------------------------------
     // Content Navigation
@@ -128,7 +60,20 @@
     }
 
     function showUserMenu() {
-        showStatusMessage('User menu - feature will be implemented later', 'error', 3000);
+        // Use HTMX to show status message
+        const statusHtml = `<div class="status-bar error visible" id="statusBar" hx-swap-oob="true">
+            <span id="statusMessage">User menu - feature will be implemented later</span>
+            <button class="status-close" onclick="document.getElementById('statusBar').classList.remove('visible')">×</button>
+        </div>`;
+        htmx.ajax('GET', 'about:blank', {
+            swap: 'none',
+            headers: {'X-HTML': statusHtml}
+        });
+        // Simple approach - just update the status bar directly
+        if (statusBar && statusMessage) {
+            statusBar.className = 'status-bar error visible';
+            statusBar.innerHTML = '<span id="statusMessage">User menu - feature will be implemented later</span><button class="status-close" onclick="document.getElementById(\'statusBar\').classList.remove(\'visible\')">×</button>';
+        }
     }
 
     function togglePasswordVisibility(inputId) {
@@ -153,224 +98,19 @@
     }
 
     // ------------------------------
-    // Data Management
+    // HTMX Event Handlers
     // ------------------------------
-    async function loadAllData() {
-        try {
-            const response = await fetch('/cgi-bin/interfaces.py');
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            if (data.success) {
-                // Process WAN data - IP addresses are now at WAN level, not individual interfaces
-                const wanData = data.wan || {};
-                const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
-                const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
-                const wanActive = wanData.active || false;
-                
-                // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
-                wanInterfaces = (wanData.interfaces || []).map(iface => ({
-                    interface: iface.interface,
-                    ip4: '', // No IP addresses on individual WAN interfaces anymore
-                    ip6: '', // No IP addresses on individual WAN interfaces anymore
-                    link: iface.state,
-                    device: iface.state,
-                    active: iface.active,
-                    mac: iface.mac
-                }));
-                
-                // Store WAN IP addresses and active status separately for display
-                window.wanIP4 = wanIP4;
-                window.wanIP6 = wanIP6;
-                window.wanActive = wanActive;
-                
-                // Process LAN data - IP addresses are now at LAN level, not individual interfaces
-                const lanData = data.lan || {};
-                const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
-                const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
-                const lanActive = lanData.active || false;
-                
-                // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
-                lanInterfaces = (lanData.interfaces || []).map(iface => ({
-                    interface: iface.interface,
-                    ip4: '', // No IP addresses on individual LAN interfaces anymore
-                    ip6: '', // No IP addresses on individual LAN interfaces anymore
-                    link: iface.state,
-                    device: iface.state,
-                    active: iface.active,
-                    mac: iface.mac
-                }));
-                
-                // Store LAN IP addresses and active status separately for display
-                window.lanIP4 = lanIP4;
-                window.lanIP6 = lanIP6;
-                window.lanActive = lanActive;
-                
-                // Process OTHER interfaces
-                const otherData = data.other || {};
-                
-                // Process OTHER interfaces from 'other.interfaces' data
-                otherInterfaces = (otherData.interfaces || []).map(iface => ({
-                    interface: iface.interface,
-                    link: iface.state,
-                    device: iface.state,
-                    active: iface.active,
-                    mac: iface.mac
-                }));
-                
-                dataLoaded = true;
-                
-                console.log('All data loaded:', { wanInterfaces, lanInterfaces, otherInterfaces });
-                
-                updateWANCards();
-                updateWLANCards();
-                updateOtherCards();
-                updateWANIPInfo();
-                updateLANIPInfo();
-            } else {
-                throw new Error(data.error || 'Invalid response format');
-            }
-        } catch (error) {
-            console.error('Failed to load data:', error);
-            showStatusMessage('Failed to load data: ' + error.message, 'error', 5000);
+    // Listen for HTMX events to reattach drag and drop listeners after content swap
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        // Reattach drag and drop listeners after dashboard content is swapped
+        if (event.detail.target.id === 'dashboard-content') {
+            attachDragAndDropListeners();
         }
-    }
-
-    async function refreshDashboard() {
-        const refreshBtn = document.querySelector('.refresh-btn');
-        const refreshIcon = document.querySelector('.refresh-icon');
-        
-        if (!refreshBtn || !refreshIcon) return;
-        
-        // Disable button and show loading animation
-        refreshBtn.disabled = true;
-        refreshBtn.classList.add('loading');
-        refreshIcon.textContent = '🔄';
-        
-        try {
-            // Reset data loaded flag
-            dataLoaded = false;
-            
-            // Show loading states
-            showLoadingStates();
-            
-            // Load fresh data
-            await loadAllData();
-            
-            // Show success message
-            showStatusMessage('Dashboard refreshed successfully', 'success', 3000);
-            
-        } catch (error) {
-            console.error('Failed to refresh dashboard:', error);
-            showStatusMessage('Failed to refresh dashboard: ' + error.message, 'error', 5000);
-        } finally {
-            // Re-enable button and stop loading animation
-            refreshBtn.disabled = false;
-            refreshBtn.classList.remove('loading');
-            refreshIcon.textContent = '🔄';
-        }
-    }
-
-    function showLoadingStates() {
-        // Clear WAN interface container and show loading message
-        const wanContainer = document.getElementById('wan-interfaces-container');
-        if (wanContainer) {
-            wanContainer.innerHTML = '<div class="loading-message">Loading WAN interfaces...</div>';
-        }
-        
-        // Clear WLAN interface container and show loading message
-        const wlanContainer = document.getElementById('lan-interfaces-container');
-        if (wlanContainer) {
-            wlanContainer.innerHTML = '<div class="loading-message">Loading LAN/WLAN interfaces...</div>';
-        }
-    }
+    });
 
     // ------------------------------
     // Interface Management
     // ------------------------------
-    function generateWANCards() {
-        const container = document.getElementById('wan-interfaces-container');
-        if (!container) return;
-        
-        // Clear existing cards
-        container.innerHTML = '';
-        
-        wanInterfaces.forEach(interfaceData => {
-            const isOnline = interfaceData.link === 'up';
-            const isActive = interfaceData.active;
-            
-            // Create card element
-            const card = document.createElement('div');
-            card.className = 'wan-interface-card';
-            card.setAttribute('data-interface', interfaceData.interface);
-            
-            // Add classes based on status
-            if (isActive) {
-                card.classList.add('active');
-            } else if (!isOnline) {
-                card.classList.add('offline');
-            }
-            
-            // Create card HTML WITHOUT IP addresses and WITHOUT button
-            card.innerHTML = `
-                <div class="interface-header">
-                    <h4>${interfaceData.interface}</h4>
-                    <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
-                </div>
-                <div class="interface-details">
-                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
-                    <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
-                </div>
-            `;
-            
-            container.appendChild(card);
-        });
-    }
-
-    function generateWLANCards() {
-        const container = document.getElementById('lan-interfaces-container');
-        if (!container) return;
-        
-        // Clear existing cards
-        container.innerHTML = '';
-        
-        // Add individual interface cards (without IP addresses)
-        lanInterfaces.forEach(interfaceData => {
-            const isOnline = interfaceData.link === 'up';
-            const isActive = interfaceData.active;
-            
-            // Create card element
-            const card = document.createElement('div');
-            card.className = 'lan-interface-card';
-            card.setAttribute('data-interface', interfaceData.interface);
-            
-            // Add classes based on status
-            if (isActive) {
-                card.classList.add('active');
-            } else if (!isOnline) {
-                card.classList.add('offline');
-            }
-            
-            // Create card HTML WITHOUT IP addresses and WITHOUT button
-            card.innerHTML = `
-                <div class="interface-header">
-                    <h4>${interfaceData.interface}</h4>
-                    <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
-                </div>
-                <div class="interface-details">
-                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
-                    <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
-                </div>
-            `;
-            
-            container.appendChild(card);
-        });
-    }
-
-    // Button listeners removed - now using drag and drop
-
     function attachDragAndDropListeners() {
         const otherContainer = document.getElementById('other-interfaces-container');
         const wanContainer = document.getElementById('wan-interfaces-container');
@@ -379,16 +119,18 @@
         
         // Add drag event listeners to OTHER interface cards
         otherContainer.addEventListener('dragstart', function(e) {
-            if (e.target.classList.contains('other-interface-card')) {
-                e.target.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', e.target.getAttribute('data-interface'));
+            const card = e.target.closest('.other-interface-card');
+            if (card) {
+                card.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', card.getAttribute('data-interface'));
                 e.dataTransfer.effectAllowed = 'move';
             }
         });
         
         otherContainer.addEventListener('dragend', function(e) {
-            if (e.target.classList.contains('other-interface-card')) {
-                e.target.classList.remove('dragging');
+            const card = e.target.closest('.other-interface-card');
+            if (card) {
+                card.classList.remove('dragging');
             }
         });
         
@@ -418,234 +160,29 @@
         });
     }
 
-    // WLAN button listeners removed - WLAN interfaces don't have buttons
 
-    function updateWANCards() {
-        generateWANCards();
-    }
-
-    function updateWLANCards() {
-        generateWLANCards();
-    }
-
-    function generateOtherCards() {
-        const container = document.getElementById('other-interfaces-container');
-        if (!container) return;
-        
-        // Clear existing cards
-        container.innerHTML = '';
-        
-        // Add individual interface cards
-        otherInterfaces.forEach(interfaceData => {
-            const isOnline = interfaceData.link === 'up';
-            const isActive = interfaceData.active;
-            
-            // Create card element
-            const card = document.createElement('div');
-            card.className = 'other-interface-card';
-            card.setAttribute('data-interface', interfaceData.interface);
-            card.draggable = isOnline; // Only allow dragging if online
-            
-            // Add classes based on status
-            if (isActive) {
-                card.classList.add('active');
-            } else if (!isOnline) {
-                card.classList.add('offline');
-            }
-            
-            // Create card HTML WITHOUT button (drag and drop instead)
-            card.innerHTML = `
-                <div class="interface-header">
-                    <h4>${interfaceData.interface}</h4>
-                    <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
-                </div>
-                <div class="interface-details">
-                    <p>MAC: ${interfaceData.mac || 'N/A'}</p>
-                    <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
-                    ${isOnline ? '<p style="color: #4CAF50; font-size: 12px; margin-top: 8px;">Drag to WAN to use</p>' : ''}
-                </div>
-            `;
-            
-            container.appendChild(card);
-        });
-        
-        // Attach drag and drop event listeners
-        attachDragAndDropListeners();
-    }
-
-    function updateOtherCards() {
-        generateOtherCards();
-    }
-
-    function updateWANIPInfo() {
-        const wanIPv4Element = document.getElementById('wan-ipv4');
-        const wanIPv6Element = document.getElementById('wan-ipv6');
-        const wanCard = document.getElementById('wan-card');
-        
-        if (wanIPv4Element) {
-            wanIPv4Element.textContent = window.wanIP4 || 'N/A';
-        }
-        if (wanIPv6Element) {
-            wanIPv6Element.textContent = window.wanIP6 || 'N/A';
-        }
-        
-        // Apply CSS class based on WAN active status
-        if (wanCard) {
-            // Remove existing status classes
-            wanCard.classList.remove('wan-active', 'wan-inactive');
-            
-            // Add appropriate class based on active status
-            if (window.wanActive) {
-                wanCard.classList.add('wan-active');
-            } else {
-                wanCard.classList.add('wan-inactive');
-            }
-        }
-    }
-
-    function updateLANIPInfo() {
-        const lanIPv4Element = document.getElementById('lan-ipv4');
-        const lanIPv6Element = document.getElementById('lan-ipv6');
-        const lanCard = document.getElementById('lan-card');
-        
-        if (lanIPv4Element) {
-            lanIPv4Element.textContent = window.lanIP4 || 'N/A';
-        }
-        if (lanIPv6Element) {
-            lanIPv6Element.textContent = window.lanIP6 || 'N/A';
-        }
-        
-        // Apply CSS class based on LAN active status
-        if (lanCard) {
-            // Remove existing status classes
-            lanCard.classList.remove('lan-active', 'lan-inactive');
-            
-            // Add appropriate class based on active status
-            if (window.lanActive) {
-                lanCard.classList.add('lan-active');
-            } else {
-                lanCard.classList.add('lan-inactive');
-            }
-        }
-    }
-
-
-    async function switchInterface(interfaceName) {
+    function switchInterface(interfaceName) {
         console.log('Switching to interface:', interfaceName);
         
-        if (!dataLoaded) {
-            showStatusMessage('Data not loaded yet', 'error', 3000);
+        // Check if interface card exists and is online
+        const interfaceCard = document.querySelector(`[data-interface="${interfaceName}"]`);
+        if (!interfaceCard) {
+            console.log('Interface card not found for:', interfaceName);
             return;
         }
         
-        // Check OTHER interfaces for switching (since only OTHER interfaces have buttons now)
-        const interfaceData = otherInterfaces.find(iface => iface.interface === interfaceName);
-        
-        if (!interfaceData) {
-            console.log('Interface data not found for:', interfaceName);
-            showStatusMessage(`Interface ${interfaceName} not found`, 'error', 3000);
+        // Check if interface is online (draggable attribute indicates online status)
+        if (!interfaceCard.draggable) {
+            console.log('Interface is not online:', interfaceName);
             return;
         }
         
-        // Check if interface is up
-        if (interfaceData.link !== 'up') {
-            showStatusMessage(`Cannot switch to ${interfaceName} - interface is down`, 'error', 3000);
-            return;
-        }
-        
-        try {
-            // Send POST request to switch interface
-            const formData = new FormData();
-            formData.append('interface', interfaceName);
-            
-            const response = await fetch('/cgi-bin/interfaces.py', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                // Update local data with server response
-                if (result.wan) {
-                    // Process WAN data - IP addresses are now at WAN level
-                    const wanData = result.wan;
-                    const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
-                    const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
-                    const wanActive = wanData.active || false;
-                    
-                    // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
-                    wanInterfaces = (wanData.interfaces || []).map(iface => ({
-                        interface: iface.interface,
-                        ip4: '', // No IP addresses on individual WAN interfaces anymore
-                        ip6: '', // No IP addresses on individual WAN interfaces anymore
-                        link: iface.state,
-                        device: iface.state,
-                        active: iface.active,
-                        mac: iface.mac
-                    }));
-                    
-                    // Update WAN IP addresses and active status
-                    window.wanIP4 = wanIP4;
-                    window.wanIP6 = wanIP6;
-                    window.wanActive = wanActive;
-                }
-                
-                if (result.lan) {
-                    // Process LAN data - IP addresses are now at LAN level
-                    const lanData = result.lan;
-                    const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
-                    const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
-                    const lanActive = lanData.active || false;
-                    
-                    // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
-                    lanInterfaces = (lanData.interfaces || []).map(iface => ({
-                        interface: iface.interface,
-                        ip4: '', // No IP addresses on individual LAN interfaces anymore
-                        ip6: '', // No IP addresses on individual LAN interfaces anymore
-                        link: iface.state,
-                        device: iface.state,
-                        active: iface.active,
-                        mac: iface.mac
-                    }));
-                    
-                    // Update LAN IP addresses and active status
-                    window.lanIP4 = lanIP4;
-                    window.lanIP6 = lanIP6;
-                    window.lanActive = lanActive;
-                }
-                
-                if (result.other) {
-                    // Process OTHER data
-                    const otherData = result.other;
-                    
-                    // Process OTHER interfaces from 'other.interfaces' data
-                    otherInterfaces = (otherData.interfaces || []).map(iface => ({
-                        interface: iface.interface,
-                        link: iface.state,
-                        device: iface.state,
-                        active: iface.active,
-                        mac: iface.mac
-                    }));
-                }
-                
-                // Update UI
-                updateWANCards();
-                updateWLANCards();
-                updateOtherCards();
-                updateWANIPInfo();
-                updateLANIPInfo();
-                
-                // Show success message
-                showStatusMessage(result.message || `Switched to ${interfaceName}`, 'success', 3000);
-                console.log('Successfully switched to:', interfaceName);
-            } else {
-                showStatusMessage(result.error || 'Failed to switch interface', 'error', 5000);
-            }
-        } catch (error) {
-            console.error('Error switching interface:', error);
-            showStatusMessage('Error switching interface: ' + error.message, 'error', 5000);
-        }
+        // Use HTMX to switch interface
+        htmx.ajax('POST', '/cgi-bin/interfaces.py?format=html', {
+            values: {interface: interfaceName},
+            target: '#dashboard-content',
+            swap: 'innerHTML'
+        });
     }
 
     // ------------------------------
@@ -751,11 +288,8 @@
     window.toggleSubmenu = toggleSubmenu;
     window.showContent = showContent;
     window.showUserMenu = showUserMenu;
-    window.showStatusMessage = showStatusMessage;
-    window.hideStatusMessage = hideStatusMessage;
     window.togglePasswordVisibility = togglePasswordVisibility;
     window.switchInterface = switchInterface;
-    window.refreshDashboard = refreshDashboard;
     
     console.log('Index.js loaded successfully');
 })();

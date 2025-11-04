@@ -8,6 +8,7 @@ import struct
 import fcntl
 import logging
 import cgi
+from urllib.parse import parse_qs
 
 
 os.chdir("/sys")
@@ -131,9 +132,8 @@ def ifaces_get() -> dict:
 
     return ret
 
-def handle_get():
-    """Handle GET request - return all data"""
-
+def get_interface_data():
+    """Get structured interface data"""
     # ALL interfaces
     ifaces = ifaces_get()
 
@@ -161,8 +161,6 @@ def handle_get():
         wan["active"] = False
     wan["interfaces"] = []
     other["interfaces"] = []
-    #del wan["state"]
-    #del wan["interface"]
     for ifname in ifaces:
         if ifname in lan_ifnames:
             continue
@@ -179,11 +177,95 @@ def handle_get():
                 del ifaces[ifname]["ipv6"]
                 other["interfaces"].append(ifaces[ifname])
 
+    return {"wan": wan, "lan": lan, "other": other}
+
+def generate_interface_card(interface_data, card_type):
+    """Generate HTML for a single interface card"""
+    is_online = interface_data.get("state") == "up"
+    is_active = interface_data.get("active", False)
+    mac = interface_data.get("mac", "N/A")
+    
+    card_class = f"{card_type}-interface-card"
+    if is_active:
+        card_class += " active"
+    elif not is_online:
+        card_class += " offline"
+    
+    return f'''<div class="{card_class}" data-interface="{interface_data['interface']}">
+                <div class="interface-header">
+                    <h4>{interface_data['interface']}</h4>
+                    <span class="status-indicator {'online' if is_online else 'offline'}"></span>
+                </div>
+                <div class="interface-details">
+                    <p>MAC: {mac}</p>
+                    <p>Status: {'Online' if is_online else 'Offline'}</p>
+                    {('<p style="color: #4CAF50; font-size: 12px; margin-top: 8px;">Drag to WAN to use</p>' if (card_type == 'other' and is_online) else '')}
+                </div>
+            </div>'''
+
+def generate_html_dashboard():
+    """Generate HTML fragment for dashboard"""
+    data = get_interface_data()
+    wan = data["wan"]
+    lan = data["lan"]
+    other = data["other"]
+    
+    # LAN IP addresses
+    lan_ipv4 = lan.get("ipv4", [])
+    lan_ipv4_str = lan_ipv4[0] if lan_ipv4 else "N/A"
+    lan_ipv6 = lan.get("ipv6", [])
+    lan_ipv6_str = lan_ipv6[0] if lan_ipv6 else "N/A"
+    lan_active = lan.get("active", False)
+    
+    # WAN IP addresses
+    wan_ipv4 = wan.get("ipv4", [])
+    wan_ipv4_str = wan_ipv4[0] if wan_ipv4 else "N/A"
+    wan_ipv6 = wan.get("ipv6", [])
+    wan_ipv6_str = wan_ipv6[0] if wan_ipv6 else "N/A"
+    wan_active = wan.get("active", False)
+    
+    # Generate interface cards
+    lan_cards = "".join([generate_interface_card(iface, "lan") for iface in lan.get("interfaces", [])])
+    wan_cards = "".join([generate_interface_card(iface, "wan") for iface in wan.get("interfaces", [])])
+    other_cards = "".join([generate_interface_card(iface, "other") for iface in other.get("interfaces", [])])
+    
+    # Card classes
+    lan_card_class = "card lan-active" if lan_active else "card lan-inactive"
+    wan_card_class = "card wan-active" if wan_active else "card wan-inactive"
+    
+    html = f'''<div class="{lan_card_class}" id="lan-card">
+            <h3>LAN Interfaces</h3>
+            <p>IPv4: <span id="lan-ipv4">{lan_ipv4_str}</span></p>
+            <p>IPv6: <span id="lan-ipv6">{lan_ipv6_str}</span></p>
+            <div class="lan-interfaces-grid" id="lan-interfaces-container">
+                {lan_cards if lan_cards else '<div class="loading-message">No LAN interfaces</div>'}
+            </div>
+        </div>
+        <div class="{wan_card_class}" id="wan-card">
+            <h3>WAN Interfaces</h3>
+            <p>IPv4: <span id="wan-ipv4">{wan_ipv4_str}</span></p>
+            <p>IPv6: <span id="wan-ipv6">{wan_ipv6_str}</span></p>
+            <div class="wan-interfaces-grid" id="wan-interfaces-container">
+                {wan_cards if wan_cards else '<div class="loading-message">No WAN interfaces</div>'}
+            </div>
+        </div>
+        <div class="card" id="other-card">
+            <h3>Other Interfaces</h3>
+            <div class="other-interfaces-grid" id="other-interfaces-container">
+                {other_cards if other_cards else '<div class="loading-message">No other interfaces</div>'}
+            </div>
+        </div>'''
+    
+    return html
+
+def handle_get():
+    """Handle GET request - return all data"""
+    data = get_interface_data()
     response = {
         "success": True,
-        "wan": wan,
-        "lan": lan,
-        "other": other,
+        "wan": data["wan"],
+        "lan": data["lan"],
+        "other": data["other"],
     }
     return response
 
@@ -219,23 +301,18 @@ def handle_post():
         
         interface_found = wan_interfaces[interface_name]
         
-        # Check if interface is up
-        #if interface_found["state"] != "up":
-        #    return {
-        #        "success": False,
-        #        "error": f"Cannot switch to {interface_name} - interface is down"
-        #    }
-        
         # Update active interface
-        logging.debug("Set active interface {interface_name}")
+        logging.debug(f"Set active interface {interface_name}")
         if_downup(interface_name)
         
-        # Return updated data
+        # Return updated data using get_interface_data
+        data = get_interface_data()
         return {
             "success": True,
             "message": f"Successfully switched to {interface_name}",
-            "wan": [ifaces[ifname] for ifname in ifaces if ifname in ["eth0", "eth1", "wlan1", "usb0"]],
-            "lan": [ifaces[ifname] for ifname in ifaces if ifname in ["wlan0"]]
+            "wan": data["wan"],
+            "lan": data["lan"],
+            "other": data["other"]
         }
         
     except Exception as e:
@@ -247,21 +324,65 @@ def handle_post():
 if __name__ == "__main__":
     logging.basicConfig(format="%(filename)s: %(levelname)s: %(message)s", level=logging.DEBUG)
 
-    print("Content-Type: application/json\n")
-
-    # Main logic
+    # Check format parameter
+    query_string = os.environ.get('QUERY_STRING', '')
+    query_params = parse_qs(query_string)
+    format_type = query_params.get('format', ['json'])[0]
+    
     try:
         if os.environ.get('REQUEST_METHOD') == 'POST':
             response = handle_post()
+            
+            if format_type == 'html':
+                # Return HTML fragment with updated dashboard
+                print("Content-Type: text/html\n")
+                
+                # Generate status message
+                if response.get("success"):
+                    status_msg = response.get("message", "Operation successful")
+                    status_type = "success"
+                else:
+                    status_msg = response.get("error", "Operation failed")
+                    status_type = "error"
+                
+                # Status bar HTML
+                status_html = f'''<div class="status-bar {status_type} visible" id="statusBar" hx-swap-oob="true">
+                    <span id="statusMessage">{status_msg}</span>
+                    <button class="status-close" onclick="document.getElementById('statusBar').classList.remove('visible')">×</button>
+                </div>'''
+                
+                # Dashboard HTML
+                data = get_interface_data()
+                dashboard_html = generate_html_dashboard()
+                
+                print(status_html + dashboard_html)
+            else:
+                # Return JSON
+                print("Content-Type: application/json\n")
+                print(json.dumps(response, indent=2))
         else:
-            response = handle_get()
-        
-        print(json.dumps(response, indent=2))
-
+            # GET request
+            if format_type == 'html':
+                print("Content-Type: text/html\n")
+                print(generate_html_dashboard())
+            else:
+                # Return JSON
+                response = handle_get()
+                print("Content-Type: application/json\n")
+                print(json.dumps(response, indent=2))
 
     except Exception as e:
-        error_response = {
-            "success": False,
-            "error": f"Server error: {str(e)}"
-        }
-        print(json.dumps(error_response, indent=2))
+        if format_type == 'html':
+            print("Content-Type: text/html\n")
+            error_html = f'''<div class="status-bar error visible" id="statusBar" hx-swap-oob="true">
+                <span id="statusMessage">Server error: {str(e)}</span>
+                <button class="status-close" onclick="document.getElementById('statusBar').classList.remove('visible')">×</button>
+            </div>'''
+            print(error_html)
+        else:
+            error_response = {
+                "success": False,
+                "error": f"Server error: {str(e)}"
+            }
+            print("Content-Type: application/json\n")
+            print(json.dumps(error_response, indent=2))
