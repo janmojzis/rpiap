@@ -74,7 +74,10 @@
 
         countriesData.forEach((country) => {
             country.allowed_channels.forEach((ch) => {
-                if (!seen.has(ch.id)) seen.set(ch.id, ch.description);
+                // Skip channel 0, as it's already added manually
+                if (ch.id !== 0 && !seen.has(ch.id)) {
+                    seen.set(ch.id, ch.description);
+                }
             });
         });
 
