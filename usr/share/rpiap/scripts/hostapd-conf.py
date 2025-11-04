@@ -23,8 +23,6 @@ else:
     mode = "a"
 
 country = os.getenv("hostapd_country")
-if country is None:
-    country = "CZ"
 
 psk = hashlib.pbkdf2_hmac("sha1", password.encode('utf-8'), ssid.encode('utf-8'), 4096, 32)
 psk = binascii.hexlify(psk).decode()
