@@ -10,6 +10,17 @@ import traceback
 # settings directory
 ENV_DIR = "/var/lib/rpiap/env"
 
+# Mapping from form field names to environment variable names
+FORM_TO_ENV_MAP = {
+    "wlanssid": "hostapd_ssid",
+    "wlanpassword": "hostapd_password",
+    "wlanchannel": "hostapd_channel",
+    "wlancountry": "hostapd_country",
+}
+
+# Reverse mapping from environment variable names to form field names
+ENV_TO_FORM_MAP = {v: k for k, v in FORM_TO_ENV_MAP.items()}
+
 class HTTPException(Exception):
     """
     Custom HTTP exception with a status code and message.
@@ -41,6 +52,7 @@ def send_json(status_code=200, message="OK", data=None):
 def load_settings():
     """
     Load settings from individual files in ENV_DIR
+    Maps environment variable names back to form field names for frontend compatibility
     """
     settings = {}
     logmsg = ""
@@ -51,11 +63,14 @@ def load_settings():
         except Exception:
             continue
 
+        # Map environment variable name to form field name if mapping exists
+        form_key = ENV_TO_FORM_MAP.get(key, key)
+        
         if "password" in key:
-            settings[key] = ""
+            settings[form_key] = ""
             logmsg += f"{key}: [HIDDEN], "
         else:
-            settings[key] = value
+            settings[form_key] = value
             logmsg += f"{key}: {value}, "
 
     if logmsg.endswith(", "):
@@ -66,18 +81,26 @@ def load_settings():
 def save_settings(settings):
     """
     Save provided settings to files
+    Maps form field names to environment variable names before saving
     """
     logmsg = ""
-    for key, value in settings.items():
-        with open(key, 'r') as f:
-            old_value = f.read().strip()
+    for form_key, value in settings.items():
+        # Map form field name to environment variable name if mapping exists
+        env_key = FORM_TO_ENV_MAP.get(form_key, form_key)
+        
+        try:
+            with open(env_key, 'r') as f:
+                old_value = f.read().strip()
+        except FileNotFoundError:
+            old_value = ""
+        
         if old_value != value:
-            with open(key, 'w') as f:
+            with open(env_key, 'w') as f:
                 f.write(value)
-            if "password" in key:
-                logmsg += f"{key}: updated, "
+            if "password" in env_key:
+                logmsg += f"{env_key}: updated, "
             else:
-                logmsg += f"{key}: {old_value} -> {value}, "
+                logmsg += f"{env_key}: {old_value} -> {value}, "
 
     if logmsg.endswith(", "):
         logmsg = logmsg[:-2]
