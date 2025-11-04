@@ -133,13 +133,16 @@ if __name__ == "__main__":
                     raise HTTPException(400, f"Invalid channel number '{hostapd_channel}'")
             settings["hostapd_channel"] = hostapd_channel
 
-            # validate hostapd_country - if not set, don't save it
+            # validate hostapd_country - if not set, save empty string
             hostapd_country = form.getvalue("hostapd_country", "").strip()
             if hostapd_country:
+                # If country is set, validate it
                 if len(hostapd_country) != 2 or not hostapd_country.isalpha():
                     raise HTTPException(400, f"Invalid country code '{hostapd_country}'")
                 settings["hostapd_country"] = hostapd_country
-            # If not set, don't save it (won't be in settings)
+            else:
+                # If not set, save empty string
+                settings["hostapd_country"] = ""
 
             message = save_settings(settings)
         else:
