@@ -69,8 +69,12 @@ def save_settings(settings):
     """
     logmsg = ""
     for key, value in settings.items():
-        with open(key, 'r') as f:
-            old_value = f.read().strip()
+        try:
+            with open(key, 'r') as f:
+                old_value = f.read().strip()
+        except FileNotFoundError:
+            old_value = ""
+        
         if old_value != value:
             with open(key, 'w') as f:
                 f.write(value)
@@ -102,34 +106,43 @@ if __name__ == "__main__":
         if flagpostdata:
             settings = {}
 
-            # validate wlanssid
-            wlanssid = form.getvalue("wlanssid", "").strip()
-            if not wlanssid:
+            # validate hostapd_ssid
+            hostapd_ssid = form.getvalue("hostapd_ssid", "").strip()
+            if not hostapd_ssid:
                 raise HTTPException(400, "SSID is required")
-            settings["wlanssid"] = wlanssid
+            settings["hostapd_ssid"] = hostapd_ssid
 
-            # validate wlanpassword
-            wlanpassword = form.getvalue("wlanpassword", "").strip()
-            if wlanpassword:
-                if len(wlanpassword) < 8:
+            # validate hostapd_password
+            hostapd_password = form.getvalue("hostapd_password", "").strip()
+            if hostapd_password:
+                if len(hostapd_password) < 8:
                     raise HTTPException(400, "Password must be at least 8 characters")
-                settings["wlanpassword"] = wlanpassword
+                settings["hostapd_password"] = hostapd_password
 
-            # validate wlanchannel
-            wlanchannel = form.getvalue("wlanchannel", "").strip()
-            try:
-                ch = int(wlanchannel)
-                if ch < 1 or ch > 165:
-                    raise ValueError("Channel out of range")
-            except ValueError:
-                raise HTTPException(400, f"Invalid channel number '{wlanchannel}'")
-            settings["wlanchannel"] = wlanchannel
+            # validate hostapd_channel - if not set, use 0 (auto-detect)
+            hostapd_channel = form.getvalue("hostapd_channel", "").strip()
+            if not hostapd_channel:
+                hostapd_channel = "0"
+            else:
+                try:
+                    ch = int(hostapd_channel)
+                    if ch < 0 or ch > 165:
+                        raise ValueError("Channel out of range")
+                    # If 0 is set, it's valid (auto-detect)
+                except ValueError:
+                    raise HTTPException(400, f"Invalid channel number '{hostapd_channel}'")
+            settings["hostapd_channel"] = hostapd_channel
 
-            # validate wlancountry
-            wlancountry = form.getvalue("wlancountry", "").strip()
-            if len(wlancountry) != 2 or not wlancountry.isalpha():
-                raise HTTPException(400, f"Invalid country code '{wlancountry}'")
-            settings["wlancountry"] = wlancountry
+            # validate hostapd_country - if not set, save empty string
+            hostapd_country = form.getvalue("hostapd_country", "").strip()
+            if hostapd_country:
+                # If country is set, validate it
+                if len(hostapd_country) != 2 or not hostapd_country.isalpha():
+                    raise HTTPException(400, f"Invalid country code '{hostapd_country}'")
+                settings["hostapd_country"] = hostapd_country
+            else:
+                # If not set, save empty string
+                settings["hostapd_country"] = ""
 
             message = save_settings(settings)
         else:
