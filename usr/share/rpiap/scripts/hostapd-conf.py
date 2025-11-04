@@ -2,17 +2,17 @@
 
 import hashlib, binascii, sys, os, re
 
-ssid = os.getenv("wlan_ssid")
+ssid = os.getenv("hostapd_ssid")
 if ssid is None:
-    raise Exception("$wlan_ssid not set")
+    raise Exception("$hostapd_ssid not set")
 
-password = os.getenv("wlan_password")
+password = os.getenv("hostapd_password")
 if password is None:
-    raise Exception("$wlan_password not set")
+    raise Exception("$hostapd_password not set")
 if len(password) < 8:
-    raise Exception("$wlan_password must be at least 8 characters")
+    raise Exception("$hostapd_password must be at least 8 characters")
 
-channel = os.getenv("wlan_channel")
+channel = os.getenv("hostapd_channel")
 if channel is None:
     channel = "0"
 
@@ -21,7 +21,7 @@ if int(channel) > 0 and int(channel) < 14:
 else:
     mode = "a"
 
-country = os.getenv("wlan_country")
+country = os.getenv("hostapd_country")
 if country is None:
     country = "CZ"
 

@@ -147,8 +147,8 @@ fi
 
 if echo ", ${lan_interfaces}," | grep -q ", wlan0,"; then
   # For ap/bridge mode, ask for hostapd SSID and password
-  dbdo wlan_ssid
-  dbdo wlan_password _
+  dbdo hostapd_ssid
+  dbdo hostapd_password _
 else
   # For client/custom mode, ask for wpasupplicant SSID and password
   dbdo wpasupplicant_ssid
@@ -156,8 +156,8 @@ else
 fi
 
 if [ _"${mode_value}" = "_custom" ]; then
-  dbdo wlan_country
-  dbdo wlan_channel
+  dbdo hostapd_country
+  dbdo hostapd_channel
   dbdo dns_standalone
 fi
 dbdo restart

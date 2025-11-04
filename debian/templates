@@ -1,10 +1,10 @@
-Template: rpiap/wlan_ssid
+Template: rpiap/hostapd_ssid
 Type: string
 Default: rpiap
 Description: Enter SSID:
  Enter the name (SSID) of your wireless network (WLAN).
 
-Template: rpiap/wlan_password
+Template: rpiap/hostapd_password
 Type: password
 Description: Enter password:
  Set a WPA password for your WLAN.
@@ -25,7 +25,7 @@ Description: Enter password:
  If you are reconfiguring the package, leaving this field blank will keep the
  current password unchanged.
 
-Template: rpiap/wlan_country
+Template: rpiap/hostapd_country
 Type: string
 Default: CZ
 Description: Enter WLAN country code:
@@ -33,7 +33,7 @@ Description: Enter WLAN country code:
  This may limit available channels and transmit power.
  Default: CZ
 
-Template: rpiap/wlan_channel
+Template: rpiap/hostapd_channel
 Type: string
 Default: 0
 Description: Specify WLAN channel
