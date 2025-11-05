@@ -475,6 +475,17 @@ body {
     line-height: 1.4;
 }
 
+/* IPv4/IPv6 Status Indicators */
+.ipv4-active, .ipv6-active {
+    color: #4CAF50;
+    font-weight: 500;
+}
+
+.ipv4-inactive, .ipv6-inactive {
+    color: #f44336;
+    font-weight: 500;
+}
+
 .loading-message {
     grid-column: 1 / -1;
     text-align: center;

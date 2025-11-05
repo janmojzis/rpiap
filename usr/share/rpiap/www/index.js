@@ -164,33 +164,31 @@
             
             const data = await response.json();
             if (data.success) {
-                // Process WAN data - IP addresses are now at WAN level, not individual interfaces
+                // Process WAN data - IP addresses are now at interface level, same as OTHERS
                 const wanData = data.wan || {};
-                const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
-                const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
-                const wanActive = wanData.active || false;
                 
-                // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
+                // Process WAN interfaces from 'wan.interfaces' data (with IP addresses)
                 wanInterfaces = (wanData.interfaces || []).map(iface => ({
                     interface: iface.interface,
-                    ip4: '', // No IP addresses on individual WAN interfaces anymore
-                    ip6: '', // No IP addresses on individual WAN interfaces anymore
                     link: iface.state,
                     device: iface.state,
                     active: iface.active,
-                    mac: iface.mac
+                    mac: iface.mac,
+                    ipv4: iface.ipv4 || [],
+                    ipv6: iface.ipv6 || [],
+                    ipv4active: iface.ipv4active,
+                    ipv6active: iface.ipv6active
                 }));
                 
-                // Store WAN IP addresses and active status separately for display
-                window.wanIP4 = wanIP4;
-                window.wanIP6 = wanIP6;
+                // Determine WAN active status based on interfaces (if at least one interface is active)
+                const wanActive = wanInterfaces.some(iface => iface.ipv4active || iface.ipv6active);
                 window.wanActive = wanActive;
                 
                 // Process LAN data - IP addresses are now at LAN level, not individual interfaces
                 const lanData = data.lan || {};
                 const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
                 const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
-                const lanActive = lanData.active || false;
+                const lanActive = lanData.ipv4active || lanData.ipv6active || false;
                 
                 // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
                 lanInterfaces = (lanData.interfaces || []).map(iface => ({
@@ -207,6 +205,8 @@
                 window.lanIP4 = lanIP4;
                 window.lanIP6 = lanIP6;
                 window.lanActive = lanActive;
+                window.lanIPv4active = lanData.ipv4active;
+                window.lanIPv6active = lanData.ipv6active;
                 
                 // Process OTHER interfaces
                 const otherData = data.other || {};
@@ -217,7 +217,11 @@
                     link: iface.state,
                     device: iface.state,
                     active: iface.active,
-                    mac: iface.mac
+                    mac: iface.mac,
+                    ipv4: iface.ipv4 || [],
+                    ipv6: iface.ipv6 || [],
+                    ipv4active: iface.ipv4active,
+                    ipv6active: iface.ipv6active
                 }));
                 
                 dataLoaded = true;
@@ -313,7 +317,29 @@
                 card.classList.add('offline');
             }
             
-            // Create card HTML WITHOUT IP addresses and WITHOUT button
+            // Build IP addresses display with status indicators
+            const ipv4List = interfaceData.ipv4 || [];
+            const ipv6List = interfaceData.ipv6 || [];
+            const ipv4Display = ipv4List.length > 0 ? ipv4List.join(', ') : 'None';
+            const ipv6Display = ipv6List.length > 0 ? ipv6List.join(', ') : 'None';
+            
+            // Build IPv4 status indicator if available
+            let ipv4StatusHtml = '';
+            if (interfaceData.ipv4active !== undefined) {
+                const ipv4Status = interfaceData.ipv4active ? '✓ Active' : '✗ Inactive';
+                const ipv4Class = interfaceData.ipv4active ? 'ipv4-active' : 'ipv4-inactive';
+                ipv4StatusHtml = ` <span class="${ipv4Class}">(${ipv4Status})</span>`;
+            }
+            
+            // Build IPv6 status indicator if available
+            let ipv6StatusHtml = '';
+            if (interfaceData.ipv6active !== undefined) {
+                const ipv6Status = interfaceData.ipv6active ? '✓ Active' : '✗ Inactive';
+                const ipv6Class = interfaceData.ipv6active ? 'ipv6-active' : 'ipv6-inactive';
+                ipv6StatusHtml = ` <span class="${ipv6Class}">(${ipv6Status})</span>`;
+            }
+            
+            // Create card HTML WITH IP addresses (same as OTHERS)
             card.innerHTML = `
                 <div class="interface-header">
                     <h4>${interfaceData.interface}</h4>
@@ -322,6 +348,8 @@
                 <div class="interface-details">
                     <p>MAC: ${interfaceData.mac || 'N/A'}</p>
                     <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
+                    <p>IPv4: ${ipv4Display}${ipv4StatusHtml}</p>
+                    <p>IPv6: ${ipv6Display}${ipv6StatusHtml}</p>
                 </div>
             `;
             
@@ -453,7 +481,29 @@
                 card.classList.add('offline');
             }
             
-            // Create card HTML WITHOUT button (drag and drop instead)
+            // Build IP addresses display with status indicators
+            const ipv4List = interfaceData.ipv4 || [];
+            const ipv6List = interfaceData.ipv6 || [];
+            const ipv4Display = ipv4List.length > 0 ? ipv4List.join(', ') : 'None';
+            const ipv6Display = ipv6List.length > 0 ? ipv6List.join(', ') : 'None';
+            
+            // Build IPv4 status indicator if available
+            let ipv4StatusHtml = '';
+            if (interfaceData.ipv4active !== undefined) {
+                const ipv4Status = interfaceData.ipv4active ? '✓ Active' : '✗ Inactive';
+                const ipv4Class = interfaceData.ipv4active ? 'ipv4-active' : 'ipv4-inactive';
+                ipv4StatusHtml = ` <span class="${ipv4Class}">(${ipv4Status})</span>`;
+            }
+            
+            // Build IPv6 status indicator if available
+            let ipv6StatusHtml = '';
+            if (interfaceData.ipv6active !== undefined) {
+                const ipv6Status = interfaceData.ipv6active ? '✓ Active' : '✗ Inactive';
+                const ipv6Class = interfaceData.ipv6active ? 'ipv6-active' : 'ipv6-inactive';
+                ipv6StatusHtml = ` <span class="${ipv6Class}">(${ipv6Status})</span>`;
+            }
+            
+            // Create card HTML WITH IP addresses (drag and drop instead of button)
             card.innerHTML = `
                 <div class="interface-header">
                     <h4>${interfaceData.interface}</h4>
@@ -462,6 +512,8 @@
                 <div class="interface-details">
                     <p>MAC: ${interfaceData.mac || 'N/A'}</p>
                     <p>Status: ${isOnline ? 'Online' : 'Offline'}</p>
+                    <p>IPv4: ${ipv4Display}${ipv4StatusHtml}</p>
+                    <p>IPv6: ${ipv6Display}${ipv6StatusHtml}</p>
                     ${isOnline ? '<p style="color: #4CAF50; font-size: 12px; margin-top: 8px;">Drag to WAN to use</p>' : ''}
                 </div>
             `;
@@ -478,16 +530,7 @@
     }
 
     function updateWANIPInfo() {
-        const wanIPv4Element = document.getElementById('wan-ipv4');
-        const wanIPv6Element = document.getElementById('wan-ipv6');
         const wanCard = document.getElementById('wan-card');
-        
-        if (wanIPv4Element) {
-            wanIPv4Element.textContent = window.wanIP4 || 'N/A';
-        }
-        if (wanIPv6Element) {
-            wanIPv6Element.textContent = window.wanIP6 || 'N/A';
-        }
         
         // Apply CSS class based on WAN active status
         if (wanCard) {
@@ -508,11 +551,27 @@
         const lanIPv6Element = document.getElementById('lan-ipv6');
         const lanCard = document.getElementById('lan-card');
         
+        // Build IPv4 status indicator if available
+        let ipv4StatusHtml = '';
+        if (window.lanIPv4active !== undefined) {
+            const ipv4Status = window.lanIPv4active ? '✓ Active' : '✗ Inactive';
+            const ipv4Class = window.lanIPv4active ? 'ipv4-active' : 'ipv4-inactive';
+            ipv4StatusHtml = ` <span class="${ipv4Class}">(${ipv4Status})</span>`;
+        }
+        
+        // Build IPv6 status indicator if available
+        let ipv6StatusHtml = '';
+        if (window.lanIPv6active !== undefined) {
+            const ipv6Status = window.lanIPv6active ? '✓ Active' : '✗ Inactive';
+            const ipv6Class = window.lanIPv6active ? 'ipv6-active' : 'ipv6-inactive';
+            ipv6StatusHtml = ` <span class="${ipv6Class}">(${ipv6Status})</span>`;
+        }
+        
         if (lanIPv4Element) {
-            lanIPv4Element.textContent = window.lanIP4 || 'N/A';
+            lanIPv4Element.innerHTML = (window.lanIP4 || 'N/A') + ipv4StatusHtml;
         }
         if (lanIPv6Element) {
-            lanIPv6Element.textContent = window.lanIP6 || 'N/A';
+            lanIPv6Element.innerHTML = (window.lanIP6 || 'N/A') + ipv6StatusHtml;
         }
         
         // Apply CSS class based on LAN active status
@@ -568,26 +627,24 @@
             if (result.success) {
                 // Update local data with server response
                 if (result.wan) {
-                    // Process WAN data - IP addresses are now at WAN level
+                    // Process WAN data - IP addresses are now at interface level, same as OTHERS
                     const wanData = result.wan;
-                    const wanIP4 = wanData.ipv4 && wanData.ipv4.length > 0 ? wanData.ipv4[0] : '';
-                    const wanIP6 = wanData.ipv6 && wanData.ipv6.length > 0 ? wanData.ipv6[0] : '';
-                    const wanActive = wanData.active || false;
                     
-                    // Process WAN interfaces from 'wan.interfaces' data (without IP addresses)
+                    // Process WAN interfaces from 'wan.interfaces' data (with IP addresses)
                     wanInterfaces = (wanData.interfaces || []).map(iface => ({
                         interface: iface.interface,
-                        ip4: '', // No IP addresses on individual WAN interfaces anymore
-                        ip6: '', // No IP addresses on individual WAN interfaces anymore
                         link: iface.state,
                         device: iface.state,
                         active: iface.active,
-                        mac: iface.mac
+                        mac: iface.mac,
+                        ipv4: iface.ipv4 || [],
+                        ipv6: iface.ipv6 || [],
+                        ipv4active: iface.ipv4active,
+                        ipv6active: iface.ipv6active
                     }));
                     
-                    // Update WAN IP addresses and active status
-                    window.wanIP4 = wanIP4;
-                    window.wanIP6 = wanIP6;
+                    // Determine WAN active status based on interfaces
+                    const wanActive = wanInterfaces.some(iface => iface.ipv4active || iface.ipv6active);
                     window.wanActive = wanActive;
                 }
                 
@@ -596,7 +653,7 @@
                     const lanData = result.lan;
                     const lanIP4 = lanData.ipv4 && lanData.ipv4.length > 0 ? lanData.ipv4[0] : '';
                     const lanIP6 = lanData.ipv6 && lanData.ipv6.length > 0 ? lanData.ipv6[0] : '';
-                    const lanActive = lanData.active || false;
+                    const lanActive = lanData.ipv4active || lanData.ipv6active || false;
                     
                     // Process LAN interfaces from 'lan.interfaces' data (without IP addresses)
                     lanInterfaces = (lanData.interfaces || []).map(iface => ({
@@ -613,6 +670,8 @@
                     window.lanIP4 = lanIP4;
                     window.lanIP6 = lanIP6;
                     window.lanActive = lanActive;
+                    window.lanIPv4active = lanData.ipv4active;
+                    window.lanIPv6active = lanData.ipv6active;
                 }
                 
                 if (result.other) {
@@ -625,7 +684,11 @@
                         link: iface.state,
                         device: iface.state,
                         active: iface.active,
-                        mac: iface.mac
+                        mac: iface.mac,
+                        ipv4: iface.ipv4 || [],
+                        ipv6: iface.ipv6 || [],
+                        ipv4active: iface.ipv4active,
+                        ipv6active: iface.ipv6active
                     }));
                 }
                 
