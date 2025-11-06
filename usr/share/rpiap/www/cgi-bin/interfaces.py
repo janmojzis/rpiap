@@ -9,9 +9,13 @@ import fcntl
 import logging
 import cgi
 
+with open("/var/lib/rpiap/env/lan") as f:
+    lan_interfaces = f.read().strip().split("\n")
 
-os.chdir("/sys")
+os.chdir("/var/lib/rpiap/empty")
 os.chroot(".")
+
+allowed_interfaces = ["eth0", "eth1", "eth2", "wlan0", "wlan1", "usb0"]
 
 SIOCGIFFLAGS = 0x8913  # get flags
 SIOCSIFFLAGS = 0x8914  # set flags
@@ -40,7 +44,7 @@ def if_downup(ifname: str) -> None:
 
     s.close()
 
-def wan_get() -> str | None:
+def if_ip4_isactive(name: str) -> bool:
     """
     use trick how to get local IP - try external connection
     """
@@ -51,6 +55,7 @@ def wan_get() -> str | None:
             s.connect(("1.1.1.1", 53))
             ip = s.getsockname()[0]
         except (OSError, socket.error):
+            raise
             # If it fails (no internet connection)
             pass
     finally:
@@ -61,16 +66,36 @@ def wan_get() -> str | None:
         for ifname, addrs in interfaces.items():
             for addr in addrs:
                 if addr.address == ip:
-                    return ifname
+                    return ifname == name
 
-    return None
+    return False
 
 
-def bridge_list(ifname: str) -> list[str]:
-    """
-    """
+def if_ip6_isactive(name: str) -> bool:
+    """         
+    use trick how to get local IP - try external connection
+    """             
+    ip = None       
+    s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+    try:            
+        try:        
+            s.connect(("2606:4700:4700::1111", 53))
+            ip = s.getsockname()[0]
+        except (OSError, socket.error):
+            # If it fails (no internet connection)
+            pass
+    finally:    
+        s.close()
 
-    return os.listdir(f"/class/net/{ifname}/brif/")
+    if ip is not None:
+        interfaces = psutil.net_if_addrs()
+        for ifname, addrs in interfaces.items():
+            for addr in addrs:
+                if addr.address == ip:
+                    return ifname == name
+
+    return False
+
 
 def ipv4_to_cidr(addr: str, mask: str) -> str:
     prefixlen = ipaddress.IPv4Network(f"0.0.0.0/{mask}").prefixlen
@@ -92,7 +117,7 @@ def ifaces_get() -> dict:
             ret[ifname] = {}
             ret[ifname]["ipv4"] = []
             ret[ifname]["ipv6"] = []
-            ret[ifname]["active"] = False
+            #ret[ifname]["active"] = False
             ret[ifname]["interface"] = ifname
 
             for addr in addrs:
@@ -138,45 +163,38 @@ def handle_get():
     ifaces = ifaces_get()
 
     # LAN interfaces
-    lan_ifnames = bridge_list("lan")
     lan = ifaces["lan"]
-    lan["active"] = True
     lan["interfaces"] = []
-    del lan["state"]
-    del lan["interface"]
-    for ifname in ifaces:
-        if ifname in lan_ifnames:
-            del ifaces[ifname]["ipv4"]
-            del ifaces[ifname]["ipv6"]
-            del ifaces[ifname]["active"]
-            lan["interfaces"].append(ifaces[ifname])
+    lan["ipv4active"] = len(lan["ipv4"]) > 0
+    lan["ipv6active"] = len(lan["ipv6"]) > 0
+    for ifname in lan_interfaces:
+        tmp = {}
+        try:
+            tmp["state"] = ifaces[ifname]["state"]
+            tmp["interface"] = ifaces[ifname]["interface"]
+            tmp["mac"] = ifaces[ifname]["mac"]
+        except KeyError:
+            # interface is down
+            tmp["state"] = "down"
+            tmp["interface"] = ifname
+        lan["interfaces"].append(tmp)
+            
 
-    # WAN interfaces
-    wan_ifname = wan_get()
+    # WAN/OTHER interfaces
     wan = {}
     other = {}
-    if wan_ifname is not None:
-        wan["active"] = True
-    else:
-        wan["active"] = False
     wan["interfaces"] = []
     other["interfaces"] = []
-    #del wan["state"]
-    #del wan["interface"]
     for ifname in ifaces:
-        if ifname in lan_ifnames:
+        if ifname in lan_interfaces:
             continue
-        if ifname in ["eth0", "eth1", "eth2", "wlan1", "usb0"]:
-            del ifaces[ifname]["active"]
-            if ifname == wan_ifname:
-                wan["ipv4"] = ifaces[ifname]["ipv4"]
-                wan["ipv6"] = ifaces[ifname]["ipv6"]
-                del ifaces[ifname]["ipv4"]
-                del ifaces[ifname]["ipv6"]
+        if ifname in allowed_interfaces:
+            ifaces[ifname]["ipv4active"] = if_ip4_isactive(ifname)
+            ifaces[ifname]["ipv6active"] = if_ip6_isactive(ifname)
+            #if ifaces[ifname]["ipv6active"] or ifaces[ifname]["ipv4active"]:
+            if ifaces[ifname]["ipv4active"]:
                 wan["interfaces"].append(ifaces[ifname])
             else:
-                del ifaces[ifname]["ipv4"]
-                del ifaces[ifname]["ipv6"]
                 other["interfaces"].append(ifaces[ifname])
 
     response = {
@@ -205,26 +223,15 @@ def handle_post():
         ifaces = ifaces_get()
         
         # Only allow WAN interfaces for switching
-        wan_interfaces = {}
+        flagfound = False
         for ifname in ifaces:
-            if ifname in ["eth0", "eth1", "wlan1", "usb0"]:
-                wan_interfaces[ifname] = ifaces[ifname]
-        
-        # Find interface in WAN list only
-        if interface_name not in wan_interfaces:
-            return {
-                "success": False,
-                "error": f"WAN Interface {interface_name} not found. Only WAN interfaces can be switched."
-            }
-        
-        interface_found = wan_interfaces[interface_name]
-        
-        # Check if interface is up
-        #if interface_found["state"] != "up":
-        #    return {
-        #        "success": False,
-        #        "error": f"Cannot switch to {interface_name} - interface is down"
-        #    }
+            if ifname in allowed_interfaces:
+                if ifname not in lan_interfaces:
+                    if ifname == interface_name:
+                        flagfound = True
+
+        if not flagfound:
+            raise Exception(f"unable to add {interface_name} as WAN")
         
         # Update active interface
         logging.debug("Set active interface {interface_name}")
