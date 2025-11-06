@@ -191,8 +191,7 @@ def handle_get():
         if ifname in allowed_interfaces:
             ifaces[ifname]["ipv4active"] = if_ip4_isactive(ifname)
             ifaces[ifname]["ipv6active"] = if_ip6_isactive(ifname)
-            #if ifaces[ifname]["ipv6active"] or ifaces[ifname]["ipv4active"]:
-            if ifaces[ifname]["ipv4active"]:
+            if ifaces[ifname]["ipv6active"] or ifaces[ifname]["ipv4active"]:
                 wan["interfaces"].append(ifaces[ifname])
             else:
                 other["interfaces"].append(ifaces[ifname])
