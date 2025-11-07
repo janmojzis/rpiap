@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry PI - Access Point</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <!-- Admin Bar -->
+    <div class="admin-bar">
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </div>
+        <div class="user-icon" onclick="showUserMenu()">
+            <div class="user-avatar">R</div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar Menu -->
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="/"><span class="menu-icon">🏠</span>Home</a></li>
+                <li><a href="/settings"><span class="menu-icon">⚙️</span>Settings</a></li>
+                <li><a href="/system"><span class="menu-icon">🖥️</span>System</a></li>
+                <li><a href="/speedtest"><span class="menu-icon">🚀</span>Speed Test</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <span id="statusMessage"></span>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Home Content -->
+                <div id="home-content" class="content-section">
+                    <h1>Home</h1>
+                    <p>LAN/WAN statistics</p>
+                    
+                    <div class="dashboard-controls">
+                        <button class="btn btn-primary refresh-btn" onclick="refreshDashboard()">
+                            <span class="refresh-icon">🔄</span>
+                            Refresh Dashboard
+                        </button>
+                    </div>
+                    
+                    <div class="content-grid">
+                        <div class="card" id="lan-card">
+                            <h3>LAN Interfaces</h3>
+                            <p>IPv4: <span id="lan-ipv4">Loading...</span></p>
+                            <p>IPv6: <span id="lan-ipv6">Loading...</span></p>
+                            <div class="lan-interfaces-grid" id="lan-interfaces-container">
+                                <!-- LAN Interface cards will be dynamically generated from 'lan' data -->
+                            </div>
+                        </div>
+                        <div class="card" id="wan-card">
+                            <h3>WAN Interfaces</h3>
+                            <div class="wan-interfaces-grid" id="wan-interfaces-container">
+                                <!-- WAN Interface cards will be dynamically generated from 'wan' data -->
+                            </div>
+                        </div>
+                        <div class="card" id="other-card">
+                            <h3>Other Interfaces</h3>
+                            <div class="other-interfaces-grid" id="other-interfaces-container">
+                                <!-- Other Interface cards will be dynamically generated from 'other' data -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/index.js"></script>
+</body>
+</html>
+

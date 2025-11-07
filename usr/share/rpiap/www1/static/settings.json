@@ -1,0 +1,95 @@
+{
+  "countries": [
+    {
+      "code": "",
+      "name": "Not set",
+      "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" }
+      ]
+    },
+    {
+      "code": "CZ",
+      "name": "Czech Republic",
+      "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
+        { "id": 1, "description": "1 (2.4GHz)" },
+        { "id": 2, "description": "2 (2.4GHz)" },
+        { "id": 3, "description": "3 (2.4GHz)" },
+        { "id": 4, "description": "4 (2.4GHz)" },
+        { "id": 5, "description": "5 (2.4GHz)" },
+        { "id": 6, "description": "6 (2.4GHz)" },
+        { "id": 7, "description": "7 (2.4GHz)" },
+        { "id": 8, "description": "8 (2.4GHz)" },
+        { "id": 9, "description": "9 (2.4GHz)" },
+        { "id": 10, "description": "10 (2.4GHz)" },
+        { "id": 11, "description": "11 (2.4GHz)" },
+        { "id": 12, "description": "12 (2.4GHz)" },
+        { "id": 13, "description": "13 (2.4GHz)" },
+        { "id": 36, "description": "36 (5GHz)" },
+        { "id": 40, "description": "40 (5GHz)" },
+        { "id": 44, "description": "44 (5GHz)" },
+        { "id": 48, "description": "48 (5GHz)" },
+        { "id": 666, "description": "666 (will trigger error)" }
+      ]
+    },
+    {
+      "code": "US",
+      "name": "United States of America",
+      "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
+        { "id": 1, "description": "1 (2.4GHz)" },
+        { "id": 2, "description": "2 (2.4GHz)" },
+        { "id": 3, "description": "3 (2.4GHz)" },
+        { "id": 4, "description": "4 (2.4GHz)" },
+        { "id": 5, "description": "5 (2.4GHz)" },
+        { "id": 6, "description": "6 (2.4GHz)" },
+        { "id": 7, "description": "7 (2.4GHz)" },
+        { "id": 8, "description": "8 (2.4GHz)" },
+        { "id": 9, "description": "9 (2.4GHz)" },
+        { "id": 10, "description": "10 (2.4GHz)" },
+        { "id": 11, "description": "11 (2.4GHz)" },
+        { "id": 12, "description": "12 (2.4GHz)" },
+        { "id": 13, "description": "13 (2.4GHz)" },
+        { "id": 36, "description": "36 (5GHz)" },
+        { "id": 40, "description": "40 (5GHz)" },
+        { "id": 44, "description": "44 (5GHz)" },
+        { "id": 48, "description": "48 (5GHz)" },
+        { "id": 149, "description": "149 (5GHz)" },
+        { "id": 153, "description": "153 (5GHz)" },
+        { "id": 157, "description": "157 (5GHz)" },
+        { "id": 161, "description": "161 (5GHz)" },
+        { "id": 165, "description": "165 (5GHz)" },
+        { "id": 666, "description": "666 (will trigger error)" }
+      ]
+    },
+    {
+      "code": "BAD",
+      "name": "will trigger error",
+      "allowed_channels": [
+        { "id": 0, "description": "0 (Auto)" },
+        { "id": 1, "description": "1 (2.4GHz)" },
+        { "id": 2, "description": "2 (2.4GHz)" },
+        { "id": 3, "description": "3 (2.4GHz)" },
+        { "id": 4, "description": "4 (2.4GHz)" },
+        { "id": 5, "description": "5 (2.4GHz)" },
+        { "id": 6, "description": "6 (2.4GHz)" },
+        { "id": 7, "description": "7 (2.4GHz)" },
+        { "id": 8, "description": "8 (2.4GHz)" },
+        { "id": 9, "description": "9 (2.4GHz)" },
+        { "id": 10, "description": "10 (2.4GHz)" },
+        { "id": 11, "description": "11 (2.4GHz)" },
+        { "id": 12, "description": "12 (2.4GHz)" },
+        { "id": 13, "description": "13 (2.4GHz)" },
+        { "id": 36, "description": "36 (5GHz)" },
+        { "id": 40, "description": "40 (5GHz)" },
+        { "id": 44, "description": "44 (5GHz)" },
+        { "id": 48, "description": "48 (5GHz)" },
+        { "id": 149, "description": "149 (5GHz)" },
+        { "id": 153, "description": "153 (5GHz)" },
+        { "id": 157, "description": "157 (5GHz)" },
+        { "id": 161, "description": "161 (5GHz)" },
+        { "id": 165, "description": "165 (5GHz)" }
+      ]
+    }
+  ]
+}
