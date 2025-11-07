@@ -21,12 +21,7 @@ PATH="`pwd`/bin:$PATH"
 export PATH
 umask 077
 
-# Get UID and GID for rpiap user
-RPAP_UID=$(id -u rpiap)
-RPAP_GID=$(id -g rpiap)
-
-# Change to www1 directory and run uvicorn as rpiap user
+# Change to www1 directory and run uvicorn as root
+# XXX TODO: run under rpiap user/group
 cd /usr/share/rpiap/www1
-export UID=${RPAP_UID}
-export GID=${RPAP_GID}
-exec /usr/share/rpiap/scripts/setuidgid.py ./bin/python3 -m uvicorn app:app --host 192.168.137.1 --port 80
+exec python3 -m uvicorn app:app --host 192.168.137.1 --port 80
