@@ -14,11 +14,19 @@ chown -R rpiap:rpiap /var/lib/rpiap/env
 # binary
 rm -rf ./bin
 mkdir -p ./bin
-cp /bin/busybox ./bin/httpd
-cp /usr/bin/python3.13 ./bin/python3
+cp /usr/bin/python3 ./bin/python3
 setcap cap_net_admin,cap_sys_chroot+ep ./bin/python3
 
 PATH="`pwd`/bin:$PATH"
 export PATH
 umask 077
-exec ./bin/httpd -f -p 192.168.137.1:80 -u rpiap:rpiap -h /usr/share/rpiap/www
+
+# Get UID and GID for rpiap user
+RPAP_UID=$(id -u rpiap)
+RPAP_GID=$(id -g rpiap)
+
+# Change to www1 directory and run uvicorn as rpiap user
+cd /usr/share/rpiap/www1
+export UID=${RPAP_UID}
+export GID=${RPAP_GID}
+exec /usr/share/rpiap/scripts/setuidgid.py ./bin/python3 -m uvicorn app:app --host 192.168.137.1 --port 80
