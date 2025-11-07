@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test - Raspberry PI - Access Point</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <!-- Admin Bar -->
+    <div class="admin-bar">
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </div>
+        <div class="user-icon" onclick="showUserMenu()">
+            <div class="user-avatar">R</div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar Menu -->
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="/"><span class="menu-icon">🏠</span>Home</a></li>
+                <li><a href="/settings"><span class="menu-icon">⚙️</span>Settings</a></li>
+                <li><a href="/system"><span class="menu-icon">🖥️</span>System</a></li>
+                <li><a href="/speedtest"><span class="menu-icon">🚀</span>Speed Test</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <span id="statusMessage"></span>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Speed Test Content -->
+                <div id="speed-test-content" class="content-section">
+                    <h1>Speed Test</h1>
+                    <p>Test your internet connection speed</p>
+                    
+                    <div class="speed-test-container">
+                        <div class="speed-test-controls">
+                            <button id="start-speed-test" class="btn btn-primary" onclick="startSpeedTest()">
+                                <span class="test-icon">🚀</span>
+                                Start Speed Test
+                            </button>
+                            <button id="stop-speed-test" class="btn btn-secondary" onclick="stopSpeedTest()" style="display: none;">
+                                <span class="test-icon">⏹️</span>
+                                Stop Test
+                            </button>
+                        </div>
+                        
+                        <div class="speed-test-results" id="speed-test-results" style="display: none;">
+                            <div class="speed-metrics">
+                                <div class="metric-card">
+                                    <h3>Download Speed</h3>
+                                    <div class="metric-value" id="download-speed">--</div>
+                                    <div class="metric-unit">Mbps</div>
+                                </div>
+                                <div class="metric-card">
+                                    <h3>Ping</h3>
+                                    <div class="metric-value" id="ping-value">--</div>
+                                    <div class="metric-unit">ms</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-label">Test Progress</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="progress-text" id="progress-text">Ready to start</div>
+                            </div>
+                            
+                            <div class="test-details" id="test-details">
+                                <h4>Test Details</h4>
+                                <div class="detail-item">
+                                    <span class="detail-label">Test Duration:</span>
+                                    <span class="detail-value" id="test-duration">--</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Data Transferred:</span>
+                                    <span class="detail-value" id="data-transferred">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/index.js"></script>
+    <script src="/static/js/speedtest.js"></script>
+</body>
+</html>
+

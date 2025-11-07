@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from api.interfaces import get_interfaces_data
+from api.speedtest import router as speedtest_router
 
 app = FastAPI(title="Raspberry PI - Access Point")
 
@@ -18,6 +19,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Setup templates
 templates = Jinja2Templates(directory="templates")
+
+# Include API routers
+app.include_router(speedtest_router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -53,7 +57,7 @@ async def system(request: Request):
 
 
 @app.get("/speedtest", response_class=HTMLResponse)
-async def speedtest(request: Request):
-    """Speed test page - placeholder"""
-    return templates.TemplateResponse("index.html", {"request": request})
+async def speedtest_page(request: Request):
+    """Speed test page"""
+    return templates.TemplateResponse("speedtest.html", {"request": request})
 
