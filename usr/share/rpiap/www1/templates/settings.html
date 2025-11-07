@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Raspberry PI - Access Point</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+</head>
+<body>
+    <!-- Admin Bar -->
+    <div class="admin-bar">
+        <div class="hamburger" onclick="toggleMenu()">
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+            <div class="hamburger-line"></div>
+        </div>
+        <div class="user-icon" onclick="showUserMenu()">
+            <div class="user-avatar">R</div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar Menu -->
+        <nav class="sidebar" id="sidebar">
+            <ul>
+                <li><a href="/"><span class="menu-icon">🏠</span>Home</a></li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('settings')"><span class="menu-icon">⚙️</span>Settings <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="settings-submenu">
+                        <li><a href="/settings"><span class="submenu-icon">📶</span>WLAN</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('system')"><span class="menu-icon">🖥️</span>System <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="system-submenu">
+                        <li><a href="/speedtest"><span class="submenu-icon">🚀</span>Speed Test</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <span id="statusMessage"></span>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- WLAN Settings Content -->
+                <div id="settings-wlan-content" class="content-section">
+                    <h1>WLAN Settings</h1>
+                    <p>Configure wireless network parameters</p>
+                    
+                    <form id="wlan-form" class="form-container">
+                        <div class="form-group">
+                            <label for="hostapd_ssid">Network Name (SSID):</label>
+                            <input type="text" id="hostapd_ssid" name="hostapd_ssid" placeholder="Enter network name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hostapd_password">Password:</label>
+                            <div class="password-input-container">
+                                <input type="password" id="hostapd_password" name="hostapd_password" minlength="8" placeholder="Enter password (min 8 characters)">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('hostapd_password')">
+                                    <span class="password-icon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hostapd_channel">Channel:</label>
+                            <select id="hostapd_channel" name="hostapd_channel">
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hostapd_country">Country:</label>
+                            <select id="hostapd_country" name="hostapd_country">
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-success">Save Settings</button>
+                            <button type="button" class="btn btn-secondary" onclick="loadCurrentSettings()">Load Current</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/index.js"></script>
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>
+

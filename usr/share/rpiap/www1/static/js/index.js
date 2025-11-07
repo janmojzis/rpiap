@@ -537,6 +537,29 @@
         }
     }
 
+    function toggleSubmenu(submenuId) {
+        const submenu = document.getElementById(submenuId + '-submenu');
+        const menuItem = submenu ? submenu.closest('.menu-item') : null;
+        
+        // Close other submenus
+        const allSubmenus = document.querySelectorAll('.submenu');
+        allSubmenus.forEach(sm => {
+            if (sm !== submenu) {
+                sm.classList.remove('visible');
+                const otherMenuItem = sm.closest('.menu-item');
+                if (otherMenuItem) {
+                    otherMenuItem.classList.remove('expanded');
+                }
+            }
+        });
+        
+        // Toggle current submenu
+        if (submenu && menuItem) {
+            submenu.classList.toggle('visible');
+            menuItem.classList.toggle('expanded');
+        }
+    }
+
     // Resize handler for responsive behavior
     window.addEventListener('resize', function() {
         const sidebar = document.getElementById('sidebar');
@@ -562,6 +585,7 @@
     // Global Functions
     // ------------------------------
     window.toggleMenu = toggleMenu;
+    window.toggleSubmenu = toggleSubmenu;
     window.showUserMenu = function() {
         showStatusMessage('User menu - feature will be implemented later', 'error', 3000);
     };

@@ -47,7 +47,7 @@ def handle_download(size: int = 1048576, chunk_id: int = 1):
     }
 
 
-@router.get("/api/speedtest")
+@router.get("/speedtest")
 async def speedtest(
     test: str = Query(..., description="Test type: 'ping' or 'download'"),
     size: int = Query(None, description="Size in bytes for download test (default: 1048576)"),
@@ -67,16 +67,18 @@ async def speedtest(
             chunk_id = id if id is not None else 1
             result = handle_download(download_size, chunk_id)
         else:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid test type. Use 'ping' or 'download'"
-            )
+            return {
+                "success": False,
+                "message": "Invalid test type. Use 'ping' or 'download'",
+                "data": ""
+            }
         
         return result
         
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error: {str(e)}"
-        )
+        return {
+            "success": False,
+            "message": f"Error: {str(e)}",
+            "data": ""
+        }
 

@@ -25,9 +25,18 @@
         <nav class="sidebar" id="sidebar">
             <ul>
                 <li><a href="/"><span class="menu-icon">🏠</span>Home</a></li>
-                <li><a href="/settings"><span class="menu-icon">⚙️</span>Settings</a></li>
-                <li><a href="/system"><span class="menu-icon">🖥️</span>System</a></li>
-                <li><a href="/speedtest"><span class="menu-icon">🚀</span>Speed Test</a></li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('settings')"><span class="menu-icon">⚙️</span>Settings <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="settings-submenu">
+                        <li><a href="/settings"><span class="submenu-icon">📶</span>WLAN</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a href="#" onclick="toggleSubmenu('system')"><span class="menu-icon">🖥️</span>System <span class="arrow">▶</span></a>
+                    <ul class="submenu" id="system-submenu">
+                        <li><a href="/speedtest"><span class="submenu-icon">🚀</span>Speed Test</a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
