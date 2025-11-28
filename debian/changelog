@@ -1,3 +1,10 @@
+rpiap (20251127) unstable; urgency=medium
+
+  * web interface - switch to uvicorn + fastapi/htmx
+  * hostapd - switch to jinja2 template
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 28 Nov 2025 18:28:09 +0100
+
 rpiap (20251102) unstable; urgency=medium
 
   * wpasupplicant: generate client config from debconf credentials
