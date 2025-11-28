@@ -9,16 +9,29 @@ if ! getent passwd rpiap > /dev/null; then
   adduser --quiet --system --no-create-home --disabled-password --home /var/lib/rpiap/env --ingroup rpiap --gecos "rpiap user" rpiap
 fi
 
+# create /var/run/rpiap/env
+if [ ! -d /var/run/rpiap/env ]; then
+  mkdir -p /var/run/rpiap/env
+  cp /var/lib/rpiap/env/* /var/run/rpiap/env/
+  chown -R rpiap:rpiap /var/run/rpiap/env
+fi
+
 chown -R rpiap:rpiap /var/lib/rpiap/env
 
 # binary
 rm -rf ./bin
 mkdir -p ./bin
-cp /bin/busybox ./bin/httpd
-cp /usr/bin/python3.13 ./bin/python3
-setcap cap_net_admin,cap_sys_chroot+ep ./bin/python3
+cp /usr/bin/python3 ./bin/python3
+setcap cap_net_admin,cap_net_bind_service+ep ./bin/python3
 
 PATH="`pwd`/bin:$PATH"
 export PATH
 umask 077
-exec ./bin/httpd -f -p 192.168.137.1:80 -u rpiap:rpiap -h /usr/share/rpiap/www
+
+echo $PATH
+
+# Change to www directory and run uvicorn under rpiap UID/GID
+envuidgid rpiap sh -c '
+ cd /usr/share/rpiap/www
+ exec /usr/share/rpiap/scripts/setuidgid.py python3 -m uvicorn app:app --host 192.168.137.1 --port 80
+'
