@@ -1,0 +1,8 @@
+<!-- LAN IPv4 info -->
+<span id="lan-ipv4">{{ lan_ipv4 or 'N/A' }}{% if lan_ipv4active is defined %} <span class="{% if lan_ipv4active %}ipv4-active{% else %}ipv4-inactive{% endif %}">({% if lan_ipv4active %}✓ Active{% else %}✗ Inactive{% endif %})</span>{% endif %}</span>
+<!-- LAN IPv6 info -->
+<span id="lan-ipv6">{{ lan_ipv6 or 'N/A' }}{% if lan_ipv6active is defined %} <span class="{% if lan_ipv6active %}ipv6-active{% else %}ipv6-inactive{% endif %}">({% if lan_ipv6active %}✓ Active{% else %}✗ Inactive{% endif %})</span>{% endif %}</span>
+<!-- LAN card CSS class data attribute -->
+<span id="lan-card-class" data-lan-status="{% if lan_active %}active{% else %}inactive{% endif %}" class="hidden"></span>
+
+

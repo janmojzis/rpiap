@@ -1,0 +1,22 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/settings/wlan"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden">
+    </div>
+    <h2>Wireless Access Point Settings</h2>
+    <!--
+    <p>Configure wireless access point (hostapd) parameters.</p>
+    -->
+
+    <!-- WLAN Form Container -->
+    <div id="wlan-form-container"
+         hx-get="/api/settings/wlan"
+         hx-trigger="load"
+         hx-target="#wlan-form-container"
+         hx-swap="innerHTML">
+         <div class="loading-placeholder">Loading settings...</div>
+    </div>
+</div>
+

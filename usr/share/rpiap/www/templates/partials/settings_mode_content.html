@@ -1,0 +1,25 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/settings/mode"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h1>Mode Settings</h1>
+    <p>Configure the operating mode of the access point.</p>
+
+    <div class="test-section">
+        <h2>Operating Mode Configuration</h2>
+        <p>Select the operating mode for your device.</p>
+
+        <!-- Mode Form Container -->
+        <div id="mode-form-container"
+             hx-get="/api/settings/mode"
+             hx-trigger="load"
+             hx-target="#mode-form-container"
+             hx-swap="innerHTML">
+             <div class="loading-placeholder">Loading settings...</div>
+        </div>
+    </div>
+</div>
+
+

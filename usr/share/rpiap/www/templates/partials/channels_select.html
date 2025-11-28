@@ -1,0 +1,8 @@
+<select id="hostapd_channel" name="hostapd_channel" class="form-group__select">
+{% for channel in channels %}
+    <option value="{{ channel.id }}" {% if channel.id|string == current_channel|string %}selected{% endif %} {% if channel.disabled %}disabled{% endif %}>
+        {{ channel.description }}
+    </option>
+{% endfor %}
+</select>
+

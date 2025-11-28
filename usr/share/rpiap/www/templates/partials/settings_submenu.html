@@ -1,0 +1,49 @@
+<ul class="sidebar__submenu">
+    <!-- Theme settings link removed as requested only DNS migration, but can be added back if needed -->
+    <!-- Keeping consistent with www6 structure -->
+    <li class="sidebar__subitem">
+        {% set is_settings_wlan = current_path == "/settings/wlan" %}
+        <a href="/settings/wlan" class="sidebar__sublink{% if is_settings_wlan %} sidebar__sublink--active{% endif %}"
+           hx-get="/settings/wlan?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/settings/wlan">
+            <span class="sidebar__icon">📶</span>
+            WLAN
+        </a>
+    </li>
+    <li class="sidebar__subitem">
+        {% set is_settings_wcli = current_path == "/settings/wcli" %}
+        <a href="/settings/wcli" class="sidebar__sublink{% if is_settings_wcli %} sidebar__sublink--active{% endif %}"
+           hx-get="/settings/wcli?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/settings/wcli">
+            <span class="sidebar__icon">📡</span>
+            Client
+        </a>
+    </li>
+    <li class="sidebar__subitem">
+        {% set is_settings_dns = current_path == "/settings/dns" %}
+        <a href="/settings/dns" class="sidebar__sublink{% if is_settings_dns %} sidebar__sublink--active{% endif %}"
+           hx-get="/settings/dns?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/settings/dns">
+            <span class="sidebar__icon">🌐</span>
+            DNS
+        </a>
+    </li>
+    <li class="sidebar__subitem">
+        {% set is_settings_mode = current_path == "/settings/mode" %}
+        <a href="/settings/mode" class="sidebar__sublink{% if is_settings_mode %} sidebar__sublink--active{% endif %}"
+           hx-get="/settings/mode?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/settings/mode">
+            <span class="sidebar__icon">⚙️</span>
+            Mode
+        </a>
+    </li>
+</ul>
+

@@ -1,0 +1,41 @@
+<form id="dns-form"
+      hx-post="/api/settings/dns"
+      hx-target="#dns-form-container"
+      hx-swap="innerHTML"
+      hx-indicator="#dns-loading">
+    <div id="dns-loading" class="htmx-indicator hidden">Loading...</div>
+    <div class="form-group">
+        <!--
+        <label class="form-group__label">Use standalone DNS server</label>
+        -->
+        <div class="form-container-flex">
+            <label class="toggle">
+                <input type="checkbox" 
+                       class="toggle-input" 
+                       name="dns_standalone" 
+                       value="true"
+                       id="dns_standalone"
+                       {% set dns_value = settings.get('dns_standalone', 'false') %}
+                       {% if dns_value == 'true' %}checked{% endif %}
+                       hx-get="/api/settings/dns"
+                       hx-trigger="change"
+                       hx-target="#dns-form-container"
+                       hx-swap="innerHTML"
+                       hx-vals='js:{dns_standalone: this.checked ? "true" : "false"}'>
+                <span class="toggle__slider"></span>
+            </label>
+            <span class="ml-sm text-secondary">Enable standalone DNS server</span>
+        </div>
+        <div class="form-group__helper">
+            {% if dns_value == 'true' %}
+            To use the internal standalone DNS server and benefit from support for encrypted DNS (DNSCurve), enable this setting.
+            {% else %}
+            If you need to use local DNS resolvers, for example to resolve internal DNS zones, leave this setting disabled.
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" class="btn btn--primary">Save Settings</button>
+    </div>
+</form>

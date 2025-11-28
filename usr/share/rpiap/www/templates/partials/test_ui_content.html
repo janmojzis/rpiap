@@ -1,0 +1,362 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/test/ui"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h1>UI Components Gallery</h1>
+
+    <p>This page provides a comprehensive visual reference for all UI components used throughout the application. All components are static and non-functional for design visualization purposes.</p>
+
+    <!-- Form Components -->
+    <section class="ui-showcase-section">
+        <h2>Form Components</h2>
+
+        <div class="ui-showcase-grid">
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Text Input</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="form-group">
+                        <label for="text-input" class="form-group__label">Full Name</label>
+                        <input type="text" id="text-input" class="form-group__input" placeholder="Enter your full name" value="">
+                        <span class="form-group__helper">This is helper text to guide the user.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Text Input (Error)</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="form-group form-group--error">
+                        <label for="text-input-error" class="form-group__label">Email Address</label>
+                        <input type="email" id="text-input-error" class="form-group__input" placeholder="Enter your email" value="invalid-email">
+                        <span class="form-group__error">Please enter a valid email address.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Password Input</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="form-group">
+                        <label for="password-input" class="form-group__label">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password-input" class="form-group__input" placeholder="Enter your password" value="password123">
+                            <button type="button" class="password-toggle-btn" aria-label="Toggle password visibility">👁️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Select Box</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="form-group">
+                        <label for="select-input" class="form-group__label">Country</label>
+                        <select id="select-input" class="form-group__select">
+                            <option value="">Select a country</option>
+                            <option value="us" selected>United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="uk">United Kingdom</option>
+                            <option value="de">Germany</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Textarea</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="form-group">
+                        <label for="textarea-input" class="form-group__label">Comments</label>
+                        <textarea id="textarea-input" class="form-group__textarea" rows="4" placeholder="Enter your comments here...">This is a sample comment to demonstrate the textarea component.</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Boolean & Choice Components -->
+    <section class="ui-showcase-section">
+        <h2>Boolean & Choice Components</h2>
+
+        <div class="ui-showcase-grid">
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Checkbox</h3>
+                </div>
+                <div class="ui-card__body">
+                    <label class="form-checkbox-label">
+                        <input type="checkbox" checked>
+                        Accept terms and conditions
+                    </label>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Checkbox Group</h3>
+                </div>
+                <div class="ui-card__body">
+                    <fieldset class="form-fieldset">
+                        <legend class="form-fieldset__legend">Preferred contact methods</legend>
+                        <label class="form-checkbox-label mb-sm">
+                            <input type="checkbox" checked>
+                            Email
+                        </label>
+                        <label class="form-checkbox-label mb-sm">
+                            <input type="checkbox">
+                            Phone
+                        </label>
+                        <label class="form-checkbox-label">
+                            <input type="checkbox" checked>
+                            SMS
+                        </label>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Radio Buttons</h3>
+                </div>
+                <div class="ui-card__body">
+                    <fieldset class="form-fieldset">
+                        <legend class="form-fieldset__legend">Account type</legend>
+                        <label class="form-radio-label mb-sm">
+                            <input type="radio" name="account-type" value="personal" checked>
+                            Personal
+                        </label>
+                        <label class="form-radio-label mb-sm">
+                            <input type="radio" name="account-type" value="business">
+                            Business
+                        </label>
+                        <label class="form-radio-label">
+                            <input type="radio" name="account-type" value="enterprise">
+                            Enterprise
+                        </label>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Toggle Switch</h3>
+                </div>
+                <div class="ui-card__body">
+                    <label class="toggle">
+                        <input type="checkbox" checked>
+                        <span class="toggle__slider"></span>
+                        Enable notifications
+                    </label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Button Components -->
+    <section class="ui-showcase-section">
+        <h2>Button Components</h2>
+
+        <div class="ui-showcase-grid">
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Button Variants</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="button-group">
+                        <button class="btn btn--primary">Primary</button>
+                        <button class="btn btn--secondary">Secondary</button>
+                        <button class="btn btn--success">Success</button>
+                        <button class="btn btn--warning">Warning</button>
+                        <button class="btn btn--danger">Danger</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Button States</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="button-group">
+                        <button class="btn btn--primary" disabled>Disabled</button>
+                        <button class="btn btn--primary loading" disabled>
+                            <span class="btn__spinner"></span>
+                            Loading...
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Button Sizes</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="button-group">
+                        <button class="btn btn--primary btn--sm">Small</button>
+                        <button class="btn btn--primary">Default</button>
+                        <button class="btn btn--primary btn--lg">Large</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feedback Components -->
+    <section class="ui-showcase-section">
+        <h2>Feedback Components</h2>
+
+        <div class="ui-showcase-grid">
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Alert Messages</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="alert alert--success">
+                        <span class="alert__icon">✓</span>
+                        <span class="alert__message">Operation completed successfully!</span>
+                        <button class="alert__close" aria-label="Close">×</button>
+                    </div>
+
+                    <div class="alert alert--error">
+                        <span class="alert__icon">⚠</span>
+                        <span class="alert__message">An error occurred while processing your request.</span>
+                        <button class="alert__close" aria-label="Close">×</button>
+                    </div>
+
+                    <div class="alert alert--warning">
+                        <span class="alert__icon">!</span>
+                        <span class="alert__message">Please review your input before continuing.</span>
+                        <button class="alert__close" aria-label="Close">×</button>
+                    </div>
+
+                    <div class="alert alert--info">
+                        <span class="alert__icon">ℹ</span>
+                        <span class="alert__message">Here is some additional information you might find useful.</span>
+                        <button class="alert__close" aria-label="Close">×</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Badges</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="badge-group">
+                        <span class="badge badge--primary">Primary</span>
+                        <span class="badge badge--secondary">Secondary</span>
+                        <span class="badge badge--success">Success</span>
+                        <span class="badge badge--warning">Warning</span>
+                        <span class="badge badge--danger">Danger</span>
+                        <span class="badge badge--info">Info</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Layout Components -->
+    <section class="ui-showcase-section">
+        <h2>Layout Components</h2>
+
+        <div class="ui-showcase-grid">
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Cards</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="ui-card ui-card--nested">
+                        <div class="ui-card__header">
+                            <h4>Nested Card Header</h4>
+                        </div>
+                        <div class="ui-card__body">
+                            <p>This is content within a nested card component.</p>
+                            <button class="btn btn--primary btn--sm">Action</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Tabs</h3>
+                </div>
+                <div class="ui-card__body">
+                    <div class="tabs">
+                        <div class="tabs__nav">
+                            <button class="tabs__tab tabs__tab--active">Tab 1</button>
+                            <button class="tabs__tab">Tab 2</button>
+                            <button class="tabs__tab">Tab 3</button>
+                        </div>
+                        <div class="tabs__content">
+                            <div class="tabs__pane tabs__pane--active">
+                                <p>Content for Tab 1. This tab is currently active.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Breadcrumbs</h3>
+                </div>
+                <div class="ui-card__body">
+                    <nav class="breadcrumbs" aria-label="Breadcrumb">
+                        <ol class="breadcrumbs__list">
+                            <li class="breadcrumbs__item">
+                                <a href="#" class="breadcrumbs__link">Home</a>
+                            </li>
+                            <li class="breadcrumbs__item">
+                                <a href="#" class="breadcrumbs__link">Settings</a>
+                            </li>
+                            <li class="breadcrumbs__item breadcrumbs__item--current">
+                                <span class="breadcrumbs__current">User Interface</span>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="ui-card">
+                <div class="ui-card__header">
+                    <h3>Pagination</h3>
+                </div>
+                <div class="ui-card__body">
+                    <nav class="pagination" aria-label="Pagination">
+                        <button class="pagination__btn pagination__btn--prev" disabled>
+                            <span class="pagination__icon">‹</span>
+                            Previous
+                        </button>
+
+                        <div class="pagination__pages">
+                            <button class="pagination__page pagination__page--current">1</button>
+                            <button class="pagination__page">2</button>
+                            <button class="pagination__page">3</button>
+                            <span class="pagination__ellipsis">…</span>
+                            <button class="pagination__page">10</button>
+                        </div>
+
+                        <button class="pagination__btn pagination__btn--next">
+                            Next
+                            <span class="pagination__icon">›</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

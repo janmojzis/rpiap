@@ -1,0 +1,46 @@
+{% if other and other.interfaces and other.interfaces|length > 0 %}
+{% for interface in other.interfaces %}
+{% set is_online = interface.state == 'up' %}
+{% set is_active = interface.active %}
+<div class="other-interface-card{% if is_active %} active{% elif not is_online %} offline{% endif %}" data-interface="{{ interface.interface }}">
+    <div class="interface-header">
+        <h4>{{ interface.interface }}</h4>
+        <span class="status-indicator {% if is_online %}online{% else %}offline{% endif %}"></span>
+    </div>
+    <div class="interface-details">
+        <p>MAC: {{ interface.mac or 'N/A' }}</p>
+        <p>Status: {% if is_online %}Online{% else %}Offline{% endif %}</p>
+        <p>IPv4: {% if interface.ipv4 and interface.ipv4|length > 0 %}{{ interface.ipv4|join(', ') }}{% else %}None{% endif %}{% if interface.ipv4active is defined %} <span class="{% if interface.ipv4active %}ipv4-active{% else %}ipv4-inactive{% endif %}">({% if interface.ipv4active %}✓ Active{% else %}✗ Inactive{% endif %})</span>{% endif %}</p>
+        <p>IPv6: {% if interface.ipv6 and interface.ipv6|length > 0 %}{{ interface.ipv6|join(', ') }}{% else %}None{% endif %}{% if interface.ipv6active is defined %} <span class="{% if interface.ipv6active %}ipv6-active{% else %}ipv6-inactive{% endif %}">({% if interface.ipv6active %}✓ Active{% else %}✗ Inactive{% endif %})</span>{% endif %}</p>
+        <form hx-post="/api/interfaces/move"
+              hx-swap="none"
+              hx-target-status-success="#statusBar"
+              hx-target-status-error="#statusBar"
+              hx-on::afterRequest="htmx.trigger('body','refreshStatus')"
+              class="mt-sm">
+            <input type="hidden" name="interface" value="{{ interface.interface }}">
+            <input type="hidden" name="target" value="lan">
+            <button type="submit" class="btn">Add to LAN</button>
+        </form>
+        {% if is_online %}
+        <form hx-post="/api/interfaces/activate"
+              hx-swap="none"
+              hx-target-status-success="#statusBar"
+              hx-target-status-error="#statusBar"
+              hx-on::afterRequest="htmx.trigger('body','refreshStatus')"
+              hx-confirm="Are you sure you want to activate {{ interface.interface }} as your internet connection? This will immediately change your network configuration."
+              class="mt-sm">
+            <input type="hidden" name="interface" value="{{ interface.interface }}">
+            <button type="submit" class="btn btn-primary">
+                Activate as WAN
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="no-interfaces">No other interfaces found</div>
+{% endif %}
+
+

@@ -1,0 +1,20 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/settings/dns"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h2>DNS Server Settings</h2>
+    <!--
+    <p>Control whether to use the internal standalone DNS server.</p>
+    -->
+
+    <!-- DNS Form Container -->
+    <div id="dns-form-container"
+         hx-get="/api/settings/dns"
+         hx-trigger="load"
+         hx-target="#dns-form-container"
+         hx-swap="innerHTML">
+         <div class="loading-placeholder">Loading settings...</div>
+    </div>
+</div>

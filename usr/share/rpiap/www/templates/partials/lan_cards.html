@@ -1,0 +1,32 @@
+{% if lan and lan.interfaces and lan.interfaces|length > 0 %}
+{% for interface in lan.interfaces %}
+{% set is_online = interface.state == 'up' %}
+{% set is_active = interface.active %}
+<div class="lan-interface-card{% if is_active %} active{% elif not is_online %} offline{% endif %}" data-interface="{{ interface.interface }}">
+    <div class="interface-header">
+        <h4>{{ interface.interface }}</h4>
+        <span class="status-indicator {% if is_online %}online{% else %}offline{% endif %}"></span>
+    </div>
+    <div class="interface-details">
+        <p>MAC: {{ interface.mac or 'N/A' }}</p>
+        <p>Status: {% if is_online %}Online{% else %}Offline{% endif %}</p>
+        {% if lan.interfaces|length > 1 %}
+        <form hx-post="/api/interfaces/move"
+              hx-swap="none"
+              hx-target-status-success="#statusBar"
+              hx-target-status-error="#statusBar"
+              hx-on::afterRequest="htmx.trigger('body','refreshStatus')"
+              class="mt-sm">
+            <input type="hidden" name="interface" value="{{ interface.interface }}">
+            <input type="hidden" name="target" value="other">
+            <button type="submit" class="btn">Remove from LAN</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="no-interfaces">No LAN interfaces found</div>
+{% endif %}
+
+

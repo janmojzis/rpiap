@@ -32,6 +32,6 @@ echo $PATH
 
 # Change to www directory and run uvicorn under rpiap UID/GID
 envuidgid rpiap sh -c '
- cd /usr/share/rpiap/www
+ cd /usr/share/rpiap/www7
  exec /usr/share/rpiap/scripts/setuidgid.py python3 -m uvicorn app:app --host 192.168.137.1 --port 80
 '

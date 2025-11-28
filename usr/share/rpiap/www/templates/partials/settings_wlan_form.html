@@ -1,0 +1,81 @@
+<form id="wlan-form"
+      hx-post="/api/settings/wlan"
+      hx-target="#wlan-form-container"
+      hx-swap="innerHTML"
+      hx-indicator="#wlan-loading">
+    <div id="wlan-loading" class="htmx-indicator hidden">Loading...</div>
+    
+    <div class="form-group">
+        <label for="hostapd_ssid" class="form-group__label">Network Name (SSID):</label>
+        <input type="text" id="hostapd_ssid" name="hostapd_ssid" class="form-group__input" 
+               placeholder="Enter network name" value="{{ settings.get('hostapd_ssid', '') }}" required>
+        <div class="form-group__helper">
+            The name of your wireless network that will be visible to clients.
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="hostapd_password" class="form-group__label">Password:</label>
+        <div class="password-input-container">
+            {% set show_password = password_visible if password_visible is defined else False %}
+            {% set pwd_value = password_value if password_value is defined else "" %}
+            <input type="{{ 'text' if show_password else 'password' }}" id="hostapd_password" name="hostapd_password" 
+                   class="form-group__input" minlength="8" 
+                   placeholder="Enter password (min 8 characters)"
+                   value="{{ pwd_value }}">
+            <button type="button" class="password-toggle-btn" 
+                    hx-post="/api/settings/wlan/toggle"
+                    hx-vals='js:{password_visible: "{{ "false" if show_password else "true" }}", hostapd_password: document.getElementById("hostapd_password").value}'
+                    hx-target="#wlan-form-container"
+                    hx-swap="innerHTML"
+                    aria-label="Toggle password visibility">
+                <span class="password-icon">{{ '🙈' if show_password else '👁️' }}</span>
+            </button>
+        </div>
+        <div class="form-group__helper">
+            Password must be at least 8 characters long. Leave empty to keep current password.
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="hostapd_country" class="form-group__label">Country:</label>
+        <div id="country-select-wrapper">
+            <select id="hostapd_country" name="hostapd_country" class="form-group__select"
+                    hx-get="/api/settings/channels"
+                    hx-trigger="change"
+                    hx-target="#channel-select-wrapper"
+                    hx-swap="innerHTML"
+                    hx-include="#hostapd_country">
+                {% for country in countries %}
+                <option value="{{ country.code }}" {% if country.code == current_country %}selected{% endif %}>
+                    {% if country.code %}{{ country.code }} ({{ country.name }}){% else %}{{ country.name }}{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group__helper">
+            Select your country to ensure compliance with local regulations for wireless channels.
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="hostapd_channel" class="form-group__label">Channel:</label>
+        <div id="channel-select-wrapper">
+            <select id="hostapd_channel" name="hostapd_channel" class="form-group__select">
+                {% for channel in channels %}
+                <option value="{{ channel.id }}" {% if channel.id|string == current_channel|string %}selected{% endif %} {% if channel.disabled %}disabled{% endif %}>
+                    {{ channel.description }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group__helper">
+            Select a specific channel or use Auto (0) to let the system choose automatically based on country regulations.
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" class="btn btn--primary">Save Settings</button>
+    </div>
+</form>
+

@@ -1,0 +1,176 @@
+<div>
+    <h1>Test Select</h1>
+    <p>Select an option and submit to test different configurations of status target attributes.</p>
+    
+    <!-- Success Tests -->
+    <div class="test-section">
+        <h2>Success Tests (HTTP 200)</h2>
+        <div class="form-container">
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-success="#statusBar"
+                  hx-target-status-error="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-both">Status:</label>
+                    <select id="status-select-both" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="success">Success</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Success - both statusBars</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-success="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-success">Status:</label>
+                    <select id="status-select-success" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="success">Success</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Success - success statusBar only</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-error="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-error">Status:</label>
+                    <select id="status-select-error" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="success">Success</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Success - error statusBar only</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-none">Status:</label>
+                    <select id="status-select-none" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="success">Success</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Success</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Failure Tests -->
+    <div class="test-section">
+        <h2>Failure Tests (HTTP 400)</h2>
+        <div class="form-container">
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-error="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-failure-with">Status:</label>
+                    <select id="status-select-failure-with" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="failure">Failure</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Failure - with statusBar</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-failure">Status:</label>
+                    <select id="status-select-failure" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="failure">Failure</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Failure</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Exception Tests -->
+    <div class="test-section">
+        <h2>Exception Tests (HTTP 500)</h2>
+        <div class="form-container">
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-error="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-exception-with">Status:</label>
+                    <select id="status-select-exception-with" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="exception">Exception</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Exception - with statusBar</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-exception">Status:</label>
+                    <select id="status-select-exception" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="exception">Exception</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Exception</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Timeout Tests -->
+    <div class="test-section">
+        <h2>Timeout Tests</h2>
+        <div class="form-container">
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-target-status-error="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-timeout-with">Status:</label>
+                    <select id="status-select-timeout-with" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="timeout">Timeout</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Timeout - with statusBar</button>
+            </form>
+            
+            <form hx-post="/api/test/select"
+                  hx-target="#statusBar"
+                  hx-timeout="5000"
+                  hx-swap="outerHTML">
+                <div class="form-group">
+                    <label for="status-select-timeout">Status:</label>
+                    <select id="status-select-timeout" name="status" required>
+                        <option value="">-- Select --</option>
+                        <option value="timeout">Timeout</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">Timeout</button>
+            </form>
+        </div>
+    </div>
+</div>
+

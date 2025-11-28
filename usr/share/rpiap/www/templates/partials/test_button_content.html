@@ -1,0 +1,81 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/test/button"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h1>Test Buttons</h1>
+
+    <p>This page demonstrates the status bar and info bar functionality using HTMX.</p>
+
+    <div class="test-section">
+        <h2>Status Bar Tests</h2>
+        <p>These buttons will show messages in the status bar at the top of the page.</p>
+
+        <div class="test-buttons">
+            <button class="btn btn--success"
+                    hx-get="/api/successbar/show"
+                    hx-swap="none">
+                Success
+            </button>
+
+            <button class="btn btn--danger"
+                    hx-get="/api/errorbar/show"
+                    hx-swap="none">
+                Error
+            </button>
+        </div>
+    </div>
+
+
+    <div class="test-section">
+        <h2>Status Bar Tests – JavaScript + htmx.ajax</h2>
+        <p>These buttons call small JavaScript helpers which internally use <code>htmx.ajax()</code> to fetch the status bar HTML and swap it into the correct global targets.</p>
+
+        <div class="test-buttons">
+            <button class="btn btn--success"
+                    type="button"
+                    onclick="htmx.trigger(document.body, 'showSuccessBar')">
+                Success (JS + htmx.ajax)
+            </button>
+
+            <button class="btn btn--danger"
+                    type="button"
+                    onclick="htmx.trigger(document.body, 'showErrorBar')">
+                Error (JS + htmx.ajax)
+            </button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Info Bar Control</h2>
+        <p>These buttons will activate/deactivate the info bar.</p>
+
+        <div class="test-buttons">
+            <button class="btn btn--primary"
+                    hx-post="/test/button/infobar/activate"
+                    hx-target="#infoBar"
+                    hx-swap="innerHTML">
+                Info activate
+            </button>
+
+            <button class="btn btn--secondary"
+                    hx-post="/test/button/infobar/deactivate"
+                    hx-target="#infoBar"
+                    hx-swap="innerHTML">
+                Info remove
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button class="btn btn--primary"
+                hx-get="/?partial=true"
+                hx-target=".content-area"
+                hx-swap="innerHTML"
+                hx-push-url="/">
+            Back to Dashboard (HTMX Partial)
+        </button>
+        <a href="/" class="btn btn--secondary">Back to Dashboard (Full Reload)</a>
+    </div>
+</div>

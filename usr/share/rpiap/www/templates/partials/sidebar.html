@@ -1,0 +1,64 @@
+<nav class="sidebar" id="sidebar">
+    <ul class="sidebar__menu">
+        <li class="sidebar__item">
+            {% set current_path = current_path|default(request.url.path) %}
+            {% set is_home = current_path == "/" %}
+            <a href="/" class="sidebar__link sidebar__link--main{% if is_home %} sidebar__link--active{% endif %}"
+               hx-get="/?partial=true"
+               hx-target=".content-area"
+               hx-swap="innerHTML"
+               hx-push-url="/">
+                <span class="sidebar__icon">🏠</span>
+                Dashboard
+            </a>
+        </li>
+        <li class="sidebar__item">
+            {% set is_speedtest = current_path == "/speedtest" %}
+            <a href="/speedtest" class="sidebar__link sidebar__link--main{% if is_speedtest %} sidebar__link--active{% endif %}"
+               hx-get="/speedtest?partial=true"
+               hx-target=".content-area"
+               hx-swap="innerHTML"
+               hx-push-url="/speedtest">
+                <span class="sidebar__icon">⚡</span>
+                Speed Test
+            </a>
+        </li>
+        <li class="sidebar__item sidebar__item--collapsible">
+            {% set is_test_page = current_path.startswith('/test') %}
+            <input type="checkbox" id="test-menu-toggle" class="sidebar__toggle-checkbox"{% if is_test_page %} checked{% endif %}>
+            <label for="test-menu-toggle" class="sidebar__link sidebar__link--toggle{% if is_test_page %} sidebar__link--active{% endif %}"
+                   hx-get="/test/submenu?current_path={{ current_path }}"
+                   hx-target="#test-submenu-container"
+                   hx-swap="innerHTML"
+                   hx-trigger="click"
+                   hx-push-url="/test/button">
+                <span class="sidebar__icon">🧪</span>
+                Test
+                <span class="sidebar__toggle-icon">▼</span>
+            </label>
+            <div id="test-submenu-container" class="sidebar__submenu-container"{% if is_test_page %}
+                 hx-get="/test/submenu?current_path={{ current_path }}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML"{% endif %}>
+            </div>
+        </li>
+        <li class="sidebar__item sidebar__item--collapsible">
+            {% set is_settings_page = current_path.startswith('/settings') %}
+            <input type="checkbox" id="settings-menu-toggle" class="sidebar__toggle-checkbox"{% if is_settings_page %} checked{% endif %}>
+            <label for="settings-menu-toggle" class="sidebar__link sidebar__link--toggle{% if is_settings_page %} sidebar__link--active{% endif %}"
+                   hx-get="/settings/submenu?current_path={{ current_path }}"
+                   hx-target="#settings-submenu-container"
+                   hx-swap="innerHTML"
+                   hx-trigger="click">
+                <span class="sidebar__icon">⚙️</span>
+                Settings
+                <span class="sidebar__toggle-icon">▼</span>
+            </label>
+            <div id="settings-submenu-container" class="sidebar__submenu-container"{% if is_settings_page %}
+                 hx-get="/settings/submenu?current_path={{ current_path }}"
+                 hx-trigger="load"
+                 hx-swap="innerHTML"{% endif %}>
+            </div>
+        </li>
+    </ul>
+</nav>

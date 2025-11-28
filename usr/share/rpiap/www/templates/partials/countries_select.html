@@ -1,0 +1,13 @@
+<select id="hostapd_country" name="hostapd_country" class="form-group__select"
+        hx-get="/api/settings/channels"
+        hx-trigger="change"
+        hx-target="#channel-select-wrapper"
+        hx-swap="innerHTML"
+        hx-include="#hostapd_country">
+{% for country in countries %}
+    <option value="{{ country.code }}" {% if country.code == current_country %}selected{% endif %}>
+        {% if country.code %}{{ country.code }} ({{ country.name }}){% else %}{{ country.name }}{% endif %}
+    </option>
+{% endfor %}
+</select>
+

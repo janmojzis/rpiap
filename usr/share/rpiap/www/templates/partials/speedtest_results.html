@@ -1,0 +1,47 @@
+<div class="speed-test-results" id="speed-test-results">
+    <div class="speed-metrics">
+        <div class="ui-card">
+            <div class="ui-card__header">
+                <h3>Download Speed</h3>
+            </div>
+            <div class="ui-card__body">
+                <div class="metric-value" id="download-speed">{{ download_speed or '--' }}</div>
+                <div class="metric-unit">Mbps</div>
+            </div>
+        </div>
+        <div class="ui-card">
+            <div class="ui-card__header">
+                <h3>Ping</h3>
+            </div>
+            <div class="ui-card__body">
+                <div class="metric-value" id="ping-value">{{ ping_value or '--' }}</div>
+                <div class="metric-unit">ms</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-label">Test Progress</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: {{ progress or 0 }}%"></div>
+        </div>
+        <div class="progress-text" id="progress-text">{{ progress_text or 'Ready to start' }}</div>
+    </div>
+    
+    <div class="test-details ui-card">
+        <div class="ui-card__header">
+            <h4>Test Details</h4>
+        </div>
+        <div class="ui-card__body">
+            <div class="detail-item">
+                <span class="detail-label">Test Duration:</span>
+                <span class="detail-value" id="test-duration">{{ test_duration or '--' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Data Transferred:</span>
+                <span class="detail-value" id="data-transferred">{{ data_transferred or '--' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+

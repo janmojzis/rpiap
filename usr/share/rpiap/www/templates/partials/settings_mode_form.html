@@ -1,0 +1,67 @@
+<form id="mode-form"
+      hx-post="/api/settings/mode"
+      hx-target="#mode-form-container"
+      hx-swap="innerHTML"
+      hx-indicator="#mode-loading">
+    <div id="mode-loading" class="htmx-indicator hidden">Loading...</div>
+    
+    {% if error %}
+    <div class="form-error-message">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+        <label class="form-group__label" for="mode-select">Operating Mode</label>
+        <select id="mode-select" 
+                name="mode" 
+                class="form-group__select"
+                hx-get="/api/settings/mode"
+                hx-target="#mode-form-container"
+                hx-swap="innerHTML"
+                hx-trigger="change"
+                hx-vals='js:{mode: this.value}'>
+            <option value="ap" {% if mode == 'ap' %}selected{% endif %}>AP</option>
+            <option value="client" {% if mode == 'client' %}selected{% endif %}>Client</option>
+            <option value="bridge" {% if mode == 'bridge' %}selected{% endif %}>Bridge</option>
+            <option value="custom" {% if mode == 'custom' %}selected{% endif %}>Custom</option>
+        </select>
+        <div class="form-group__helper">
+            Select the operating mode for your device. AP mode creates a wireless access point, 
+            Client mode connects to a wireless network, Bridge mode bridges wired and wireless networks, 
+            and Custom mode allows you to select specific interfaces.
+        </div>
+    </div>
+
+    {% if mode == 'custom' %}
+    <div class="form-group mt-lg" id="custom-interfaces-group">
+        <label class="form-group__label">Enabled Interfaces</label>
+        <div class="form-container-flex-column">
+            {% for interface in allowed_interfaces %}
+            <label class="form-checkbox-label">
+                <input type="checkbox" 
+                       name="custom_interfaces" 
+                       value="{{ interface }}"
+                       {% if interface in enabled_interfaces %}checked{% endif %}>
+                <span class="text-primary">{{ interface }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="form-group__helper">
+            Select which interfaces should be enabled in custom mode. At least one interface must be selected.
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="button-group">
+        <button type="submit" class="btn btn--primary">Save Settings</button>
+        <button type="button" class="btn btn--secondary"
+                hx-get="/api/settings/mode"
+                hx-target="#mode-form-container"
+                hx-swap="innerHTML"
+                hx-trigger="click">
+            Reload
+        </button>
+    </div>
+</form>
+

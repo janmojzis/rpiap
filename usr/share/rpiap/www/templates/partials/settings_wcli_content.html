@@ -1,0 +1,20 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/settings/wcli"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h2>Wireless Client Settings</h2>
+    <!--
+    <p>Configure wireless client (wpasupplicant) parameters.</p>
+    -->
+
+    <!-- Client Form Container -->
+    <div id="wcli-form-container"
+         hx-get="/api/settings/wcli"
+         hx-trigger="load"
+         hx-target="#wcli-form-container"
+         hx-swap="innerHTML">
+         <div class="loading-placeholder">Loading settings...</div>
+    </div>
+</div>

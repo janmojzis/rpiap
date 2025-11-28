@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" id="html" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPIAP</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body hx-ext="response-targets">
+    <!-- Header -->
+    <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+	<div class="header-bar">
+    	<label for="hamburger-toggle" class="hamburger">
+        	<div class="hamburger-line"></div>
+        	<div class="hamburger-line"></div>
+        	<div class="hamburger-line"></div>
+    	</label>
+
+    	<div class="header-title">
+        	<h1>rpiap</h1>
+    	</div>
+
+    	<!-- Theme Toggle Button -->
+    	<button id="theme-toggle" class="theme-toggle-btn" title="Toggle theme">
+        	<span class="theme-icon">🌙</span>
+    	</button>
+	</div>
+
+    <!-- Page Layout -->
+    <div class="page-layout">
+        <!-- Sidebar -->
+        <div class="sidebar-container" id="sidebar-container">
+            {% include 'partials/sidebar.html' %}
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            <!-- Notification Bar (sticky under header; shifts with sidebar) -->
+            <div class="notification-bar">
+				<div class="infobar"
+     				id="infoBar"
+     				hx-get="/api/infobar"
+     				hx-trigger="load, refreshInfoBar from:body"
+     				hx-target="this"
+     				hx-swap="textContent">
+				</div>
+                <div class="successbar"
+                    id="successBar"
+                    hx-get="/api/successbar"
+                    hx-trigger="showSuccessBar from:body"
+                    hx-target="this"
+                    hx-swap="textContent"></div>
+                <div class="errorbar"
+                    id="errorBar"
+                    hx-get="/api/errorbar"
+                    hx-trigger="showErrorBar from:body"
+                    hx-vals='js:{message: event.detail?.message || event.detail?.value?.message || "An error occurred during the operation"}'
+                    hx-swap="textContent"></div>
+                <!-- Hidden helper elements for auto-hiding bars after 5 seconds -->
+                <div class="hidden"
+                    id="successBarAutoHide"
+                    hx-get="/api/successbar/hide"
+                    hx-trigger="showSuccessBar from:body delay:5s"
+                    hx-target="#successBar"
+                    hx-swap="textContent"></div>
+                <div class="hidden"
+                    id="errorBarAutoHide"
+                    hx-get="/api/errorbar/hide"
+                    hx-trigger="showErrorBar from:body delay:5s"
+                    hx-target="#errorBar"
+                    hx-swap="textContent"></div>
+            </div>
+
+            <!-- Page Content -->
+            <div class="content-area">
+                {% include content_template %}
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/htmx.min.js"></script>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.querySelector('.theme-icon');
+            const htmlElement = document.documentElement;
+
+            // Function to get current theme
+            function getCurrentTheme() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const themeParam = urlParams.get('theme');
+                const storedTheme = localStorage.getItem('theme');
+
+                // Priority: URL param > localStorage > default
+                return themeParam || storedTheme || 'default';
+            }
+
+            // Function to set theme
+            function setTheme(theme) {
+                if (theme === 'default') {
+                    htmlElement.removeAttribute('data-theme');
+                } else {
+                    htmlElement.setAttribute('data-theme', theme);
+                }
+
+                // Update icon
+                if (themeIcon) {
+                    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                }
+
+                // Update URL
+                const url = new URL(window.location);
+                url.searchParams.set('theme', theme);
+                window.history.replaceState(null, null, url);
+
+                // Store in localStorage
+                localStorage.setItem('theme', theme);
+
+                console.log('Theme set to:', theme);
+            }
+
+            // Initialize theme on page load
+            const currentTheme = getCurrentTheme();
+            setTheme(currentTheme);
+
+            // Toggle theme on button click
+            if (themeToggleBtn) {
+                console.log('Theme toggle button found, adding event listener');
+                themeToggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Theme toggle button clicked');
+
+                    const currentTheme = getCurrentTheme();
+                    console.log('Current theme:', currentTheme);
+                    const newTheme = currentTheme === 'default' ? 'dark' : 'default';
+                    console.log('New theme:', newTheme);
+
+                    // Set new theme locally
+                    setTheme(newTheme);
+                });
+            } else {
+                console.error('Theme toggle button not found!');
+            }
+        });
+    </script>
+</body>
+</html>

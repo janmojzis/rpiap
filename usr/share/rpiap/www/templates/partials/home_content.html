@@ -1,0 +1,58 @@
+<div class="container">
+    <div hx-trigger="load"
+         hx-get="/api/sidebar/update?current_path=/"
+         hx-target="#sidebar-container"
+         hx-swap="innerHTML"
+         class="hidden"></div>
+    <h2>Dashboard</h2>
+    <!--
+    <p>LAN/WAN statistics</p>
+    -->
+    
+    <div class="content-grid">
+        <div class="card" id="lan-card">
+            <h3>LAN Interfaces</h3>
+            <p>IPv4: <span id="lan-ipv4">Loading...</span></p>
+            <p>IPv6: <span id="lan-ipv6">Loading...</span></p>
+            <div id="lan-info-container" 
+                 hx-get="/api/interfaces/lan-info" 
+                 hx-trigger="load"
+                 hx-swap="innerHTML"
+                 class="hidden"></div>
+            <div class="lan-interfaces-grid" 
+                 id="lan-interfaces-container" 
+                 hx-get="/api/interfaces/lan" 
+                 hx-trigger="intersect once, every 30s"
+                 hx-swap="innerHTML"
+                 hx-indicator="#lan-loading">
+                <div id="lan-loading" class="htmx-indicator">Loading...</div>
+            </div>
+        </div>
+        <div class="card" id="wan-card">
+            <h3>WAN Interfaces</h3>
+            <div id="wan-info-container" 
+                 hx-get="/api/interfaces/wan-info" 
+                 hx-trigger="load"
+                 hx-swap="innerHTML"
+                 class="hidden"></div>
+            <div class="wan-interfaces-grid" 
+                 id="wan-interfaces-container" 
+                 hx-get="/api/interfaces/wan" 
+                 hx-trigger="intersect once, every 30s"
+                 hx-swap="innerHTML"
+                 hx-indicator="#wan-loading">
+                <div id="wan-loading" class="htmx-indicator">Loading...</div>
+            </div>
+        </div>
+        <div class="card" id="other-card">
+            <h3>Other Interfaces</h3>
+            <div class="other-interfaces-grid" 
+                 id="other-interfaces-container" 
+                 hx-get="/api/interfaces/other" 
+                 hx-trigger="intersect once, every 30s"
+                 hx-swap="innerHTML">
+                <div id="other-loading" class="htmx-indicator">Loading...</div>
+            </div>
+        </div>
+    </div>
+</div>

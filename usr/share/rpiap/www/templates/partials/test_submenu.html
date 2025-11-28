@@ -1,0 +1,25 @@
+<ul class="sidebar__submenu">
+    <li class="sidebar__subitem">
+        {% set current_path = current_path|default(request.url.path) %}
+        {% set is_test_button = current_path == "/test/button" %}
+        <a href="/test/button" class="sidebar__sublink{% if is_test_button %} sidebar__sublink--active{% endif %}"
+           hx-get="/test/button?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/test/button">
+            <span class="sidebar__icon">🧪</span>
+            Test Button
+        </a>
+    </li>
+    <li class="sidebar__subitem">
+        {% set is_test_ui = current_path == "/test/ui" %}
+        <a href="/test/ui" class="sidebar__sublink{% if is_test_ui %} sidebar__sublink--active{% endif %}"
+           hx-get="/test/ui?partial=true"
+           hx-target=".content-area"
+           hx-swap="innerHTML"
+           hx-push-url="/test/ui">
+            <span class="sidebar__icon">🎨</span>
+            User Interface
+        </a>
+    </li>
+</ul>

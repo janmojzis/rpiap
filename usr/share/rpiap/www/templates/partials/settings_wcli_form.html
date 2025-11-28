@@ -1,0 +1,51 @@
+<form id="wcli-form"
+      hx-post="/api/settings/wcli"
+      hx-target="#wcli-form-container"
+      hx-swap="innerHTML"
+      hx-indicator="#wcli-loading">
+    <div id="wcli-loading" class="htmx-indicator hidden">Loading...</div>
+    
+    <div class="form-group">
+        <label for="wpasupplicant_ssid" class="form-group__label">Network Name (SSID):</label>
+        <input type="text" id="wpasupplicant_ssid" name="wpasupplicant_ssid" class="form-group__input" 
+               placeholder="Enter network name to connect to" value="{{ settings.get('wpasupplicant_ssid', '') }}" required>
+        <div class="form-group__helper">
+            The name of the wireless network to connect to in client mode.
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="wpasupplicant_password" class="form-group__label">Password:</label>
+        <div class="password-input-container">
+            <input type="password" id="wpasupplicant_password" name="wpasupplicant_password" 
+                   class="form-group__input" minlength="8" 
+                   placeholder="Enter password (min 8 characters, optional)">
+            <button type="button" class="password-toggle-btn" 
+                    onclick="togglePassword('wpasupplicant_password', this)"
+                    aria-label="Toggle password visibility">
+                <span class="password-icon">👁️</span>
+            </button>
+        </div>
+        <div class="form-group__helper">
+            Password must be at least 8 characters long. Leave empty to keep current password.
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" class="btn btn--primary">Save Settings</button>
+    </div>
+</form>
+
+<script>
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.querySelector('.password-icon').textContent = '🙈';
+    } else {
+        input.type = 'password';
+        button.querySelector('.password-icon').textContent = '👁️';
+    }
+}
+</script>
+
